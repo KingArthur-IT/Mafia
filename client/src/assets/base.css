@@ -1,12 +1,13 @@
 /* semantic color variables for this project */
 :root {
   --color-background: #151515;
-  --color-background-soft: #151515;
-  --color-background-mute: #151515;
+  --color-background-soft: #191919;
 
-  --color-text: var(--vt-c-text-light-1);
+  --color-primary: #d7273d;
 
-  --section-gap: 160px;
+  --color-text: #fff;
+
+  --section-gap: 80px;
 }
 
 *,
@@ -16,7 +17,10 @@
   margin: 0;
   padding: 0;
   position: relative;
-  font-weight: normal;
+}
+
+ul{
+  list-style: none;
 }
 
 body {
@@ -24,9 +28,8 @@ body {
   color: var(--color-text);
   background: var(--color-background);
   line-height: 1.35;
-  font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
-    Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-  font-size: 16px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 18px;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

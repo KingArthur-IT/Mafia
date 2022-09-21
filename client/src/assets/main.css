@@ -1,3 +1,40 @@
+@import url('https://fonts.googleapis.com/css2?family=Kaushan+Script&family=Montserrat:wght@300;400;500;600&display=swap');
 @import "./base.css";
 
-
+.container{
+    padding-left: 30px;
+    padding-right: 30px;
+}
+.section{
+    width: 100%;
+    position: relative;
+}
+.section-screen{
+    margin-bottom: 100px;
+}
+.section-hero{
+    width: 100%;
+    background-color: var(--color-background-soft);
+    padding: 40px 60px;
+    border-radius: 15px;
+}
+.btn{
+    appearance: none;
+    display: block;
+    border: none;
+    outline: none;
+    color: var(--color-text);
+    cursor: pointer;
+}
+.primary-btn{
+    background-color: var(--color-primary);
+    border: 1px solid var(--color-primary);
+    transition: color .2s ease, background-color .2s ease;
+    font-weight: 600;
+    border-radius: 5px;
+}
+.primary-btn:hover{
+    background-color: transparent;
+    color: var(--color-primary);
+    border: 1px solid var(--color-primary);
+}

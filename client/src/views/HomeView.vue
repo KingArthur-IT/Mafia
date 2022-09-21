@@ -1,9 +1,17 @@
 <script setup lang="ts">
-// import TheWelcome from '../components/TheWelcome.vue'
+import HeadSection from '@/components/HomePage/HeadSection.vue'
+import AboutSection from '@/components/HomePage/AboutSection.vue'
+import InterfaceSection from '@/components/HomePage/InterfaceSection.vue'
 </script>
 
 <template>
-  <main>
-    111
+  <main class="container">
+    <HeadSection />
+    <AboutSection />
+    <InterfaceSection />
   </main>
 </template>
+
+<style scoped>
+
+</style>
