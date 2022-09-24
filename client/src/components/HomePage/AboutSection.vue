@@ -35,6 +35,16 @@ export default {
 
 <style scoped lang="sass">
 .about-section
+    overflow: hidden
+    &::after
+        content: ""
+        position: absolute
+        top: -200px
+        right: -90%
+        bottom: -200px
+        left: 0
+        background: var(--color-primary)
+        transform: rotate(-45deg)
     &__head
         display: flex
         justify-content: center
@@ -51,4 +61,9 @@ export default {
             margin-right: 4px
     &__img
         width: 40%
+        z-index: 2
+    &__icon
+        position: absolute
+        top: 0
+        right: 0
 </style>

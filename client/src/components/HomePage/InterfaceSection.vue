@@ -43,12 +43,17 @@
                 </li>
             </ul>
         </div>
+        <GunIcon class="interface__icon"/>
     </section>
 </template>
 
 <script>
-export default {
+import GunIcon from "@/components/icons/GunIcon.vue"
 
+export default {
+    components:{
+        GunIcon
+    }
 }
 </script>
 
@@ -56,7 +61,7 @@ export default {
 .interface
     background-color: var(--color-background)
     &__title
-        margin-bottom: 15px
+        margin-bottom: 30px
         text-align: center
     &__list
         width: calc( 100% + 30px)
@@ -70,5 +75,10 @@ export default {
         margin: 0 15px 30px
         border-radius: 15px
         & h3
-            margin-bottom: 15px
+            margin-bottom: 25px
+    &__icon
+        position: absolute
+        bottom: -120px
+        right: 0
+        width: 200px
 </style>
