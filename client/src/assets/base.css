@@ -19,6 +19,11 @@
   position: relative;
 }
 
+a{
+  color: #fff;
+  text-decoration: none;
+}
+
 ul{
   list-style: none;
 }

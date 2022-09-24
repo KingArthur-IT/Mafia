@@ -3,7 +3,7 @@ import HeadSection from '@/components/HomePage/HeadSection.vue'
 import AboutSection from '@/components/HomePage/AboutSection.vue'
 import InterfaceSection from '@/components/HomePage/InterfaceSection.vue'
 import GameRolesSection from '@/components/HomePage/GameRolesSection.vue'
-
+import CallToAction from '@/components/HomePage/CallToAction.vue'
 </script>
 
 <template>
@@ -12,6 +12,7 @@ import GameRolesSection from '@/components/HomePage/GameRolesSection.vue'
     <AboutSection />
     <InterfaceSection />
     <GameRolesSection />
+    <CallToAction />
   </main>
 </template>
 

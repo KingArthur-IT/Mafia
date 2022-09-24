@@ -36,6 +36,7 @@ export default {
 <style scoped lang="sass">
 .about-section
     overflow: hidden
+    border-radius: 15px
     &::after
         content: ""
         position: absolute

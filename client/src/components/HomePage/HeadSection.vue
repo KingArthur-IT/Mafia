@@ -39,6 +39,7 @@ export default {
   &__img
     max-width: 40%
     max-height: calc(100vh - 200px)
+    border-radius: 15px
   &__btn
     padding: 15px 30px
     font-size: 18px

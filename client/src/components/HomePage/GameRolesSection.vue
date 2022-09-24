@@ -1,5 +1,6 @@
 <template>
     <section class="section section-screen roles">
+        <SheriffIcon class="roles__icon" />
         <h2 class="roles__title">Разнообразие игровых ролей</h2>
         <Carousel 
             ref="cardsCarousel" 
@@ -16,6 +17,7 @@
 </template>
 
 <script lang="ts">
+import SheriffIcon from "@/components/icons/SheriffIcon.vue"
 import { Carousel, Slide } from 'vue3-carousel';
 import 'vue3-carousel/dist/carousel.css';
 
@@ -23,6 +25,7 @@ export default {
     components: {
         Carousel,
         Slide,
+        SheriffIcon
     },
     setup(){
         const cardsList : string[] = [
@@ -81,6 +84,12 @@ export default {
         &__img
             width: 100%
             border-radius: 10px
+        &__icon
+            position: absolute
+            top: -50px
+            left: 0
+            width: 200px
+            transform: rotate(5deg)
 
     .carousel__slide > .carousel__item
         transform: scale(1)
