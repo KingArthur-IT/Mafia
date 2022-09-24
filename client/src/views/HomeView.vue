@@ -2,6 +2,8 @@
 import HeadSection from '@/components/HomePage/HeadSection.vue'
 import AboutSection from '@/components/HomePage/AboutSection.vue'
 import InterfaceSection from '@/components/HomePage/InterfaceSection.vue'
+import GameRolesSection from '@/components/HomePage/GameRolesSection.vue'
+
 </script>
 
 <template>
@@ -9,6 +11,7 @@ import InterfaceSection from '@/components/HomePage/InterfaceSection.vue'
     <HeadSection />
     <AboutSection />
     <InterfaceSection />
+    <GameRolesSection />
   </main>
 </template>
 
