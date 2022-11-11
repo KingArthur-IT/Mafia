@@ -1,7 +1,7 @@
 <template>
   <header class="container header">
     <div class="header__logo" @click="goToMainPage">MafiaWorld</div>
-    <button class="btn header__btn">Войти</button>
+    <button class="btn header__btn" @click="goToAuthPage">Войти</button>
   </header>
 </template>
 
@@ -10,6 +10,9 @@ export default {
   methods:{
     goToMainPage(){
       this.$router.push({name: 'home'})
+    },
+    goToAuthPage(){
+      this.$router.push({name: 'auth'})
     }
   }
 }

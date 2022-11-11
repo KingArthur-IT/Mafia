@@ -8,6 +8,8 @@
             :breakpoints="breakpoints" 
             class="roles__slider"
             :autoplay="2000"
+            :transition="2000"
+            :pauseAutoplayOnHover="true"
         >
             <Slide v-for="(slide, i) in cardsList" :key="i" class="roles__slide">
                 <img :src="getImageUrl(slide)" alt="img" class="roles__img carousel__item">
@@ -84,6 +86,7 @@ export default {
         &__img
             width: 100%
             border-radius: 10px
+            pointer-events: none
         &__icon
             position: absolute
             top: -50px
