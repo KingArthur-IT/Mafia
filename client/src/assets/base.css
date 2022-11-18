@@ -40,3 +40,20 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+small{
+  line-height: 1;
+}
+
+.xl-font{
+  font-size: 48px;
+}
+.lg-font{
+  font-size: 32px;
+}
+.md-font{
+  font-size: 24px;
+}
+.sm-font{
+  font-size: 14px;
+}
