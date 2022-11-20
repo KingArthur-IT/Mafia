@@ -51,6 +51,7 @@ export default {
         justify-content: center
     &__hero
         margin-right: 15px
+        z-index: 1
     &__title
         margin-bottom: 15px
     &__description

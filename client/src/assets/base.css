@@ -8,6 +8,8 @@
   --color-text: #fff;
 
   --section-gap: 80px;
+
+  --text-size: 18px
 }
 
 *,
@@ -56,4 +58,14 @@ small{
 }
 .sm-font{
   font-size: 14px;
+}
+
+@media screen and (max-width: 425px){
+  :root {  
+    --text-size: 14px
+  }
+
+  body{
+    font-size: 14px;
+  }
 }
