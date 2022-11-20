@@ -16,9 +16,10 @@ export default {
     cursor: pointer;
 }
 .svg-icon path{
-    stroke: var(--primary-svg-color);
+    stroke: #fff;
+    transition: all .2s ease-in-out;
 }
 .svg-icon:hover path{
-    stroke: var(--primary-button-color);
+    stroke: var(--color-primary);
 }
 </style>

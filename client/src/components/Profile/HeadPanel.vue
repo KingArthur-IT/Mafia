@@ -1,19 +1,78 @@
 <template>
   <div class="panel">
-
+    <div class="panel__item">
+      <p class="panel__title">{{$route.meta.pageName}}</p>
+    </div>
+    <div class="panel__icons">
+      <div class="panel__item">
+        <LetterIcon class="panel__icon"/>
+        <div class="panel__badge">{{messagesCount}}</div>
+      </div>
+      <div class="panel__item">
+        <BellIcon class="panel__icon panel__bell"/>
+        <div class="panel__badge">{{notificationsCount}}</div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-export default {
+import BellIcon from '@/components/icons/BellIcon.vue'
+import LetterIcon from '@/components/icons/LetterIcon.vue'
 
+export default {
+  components:{
+    BellIcon,
+    LetterIcon
+  },
+  data(){
+    return{
+      notificationsCount: 1,
+      messagesCount: 5,
+    }
+  }
 }
 </script>
 
 <style scoped lang="sass">
-    .panel
-        background: var(--color-background-soft)
-        min-height: 200px
-        width: 100%
-        border-radius: 30px
+  .panel
+    background: var(--color-background-soft)
+    width: 100%
+    border-radius: 30px
+    padding: 30px
+    display: flex
+    justify-content: space-between
+    align-items: center
+    &__icons
+      display: flex
+      align-items: center
+      justify-content: flex-end
+    &__icon
+      width: 30px
+      height: 30px
+      margin-left: 30px
+    &__bell
+      width: 26px
+      height: 26px
+    &__item
+      position: relative
+    &__badge
+      position: absolute
+      background-color: var(--color-primary)
+      color: #fff
+      display: flex
+      justify-content: center
+      align-items: center
+      text-align: center
+      font-size: 14px
+      width: 20px
+      height: 20px
+      border-radius: 50%
+      bottom: 0
+      right: 0
+      transform: translate(50%, 0)
+    &__title
+      color: #fff
+      text-transform: uppercase
+      font-weight: 500
 </style>
