@@ -2,9 +2,15 @@
   <div class="sidebar">
     <div>
       <div class="sidebar__logo lg-font">MafiaWorld</div>
-      <div class="profile-section" @click="$router.push({name: 'profile'})">
+      <div class="profile-section">
         <div class="profile-section__icon md-font">AA</div>
         <div class="profile-section__nick">KingArthur-99</div>
+      </div>
+    </div>
+    <div>
+      <div class="sidebar__item"  @click="$router.push({name: 'profile'})">
+        <SettingsIcon class="sidebar__icon" />
+        <div class="sidebar__item-name">Настройки</div>
       </div>
     </div>
     <div class="sidebar__information">
@@ -22,10 +28,12 @@
 
 <script>
 import LogoutIcon from '@/components/icons/LogoutIcon.vue'
+import SettingsIcon from '@/components/icons/SettingsIcon.vue'
 
 export default {
   components:{
-    LogoutIcon
+    LogoutIcon,
+    SettingsIcon
   }
 }
 </script>

@@ -8,7 +8,7 @@
                     v-model="modelValue"
                     @input="(event) => $emit('update:modelValue', item.value)"
             >
-            <label :for="item.id" class="label">{{item.value == '1' ? $t('Male') : $t('Female')}}</label>
+            <label :for="item.id" class="label">{{item.value == '1' ? 'Мужской' : 'Женский'}}</label>
         </div>
     </div>
 </template>
@@ -39,7 +39,6 @@ export default {
 <style scoped>
 .radio-group{
     display: flex;
-    margin-bottom: 50px;
 }
 .radio-item{
     margin-right: 34px;
@@ -58,16 +57,16 @@ export default {
     font-weight: 500;
     font-size: 14px;
     line-height: 120%;
-    color: var(--primary-text-color);
+    color: #fff;
 }
 [type="radio"]:not(:checked) + label:before {
     content: '';
     position: absolute;
     left: 0;
-    top: 0;
-    width: 13px;
-    height: 13px;
-    border: 1px solid var(--primary-text-color);
+    top: 1px;
+    width: 15px;
+    height: 15px;
+    border: 1px solid #fff;
     border-radius: 50%;
     background: transparent;
 }
@@ -75,10 +74,10 @@ export default {
     content: '';
     position: absolute;
     left: 0;
-    top: 0;
-    width: 13px;
-    height: 13px;
-    border: 1px solid var(--primary-button-color);
+    top: 1px;
+    width: 15px;
+    height: 15px;
+    border: 1px solid var(--color-primary);
     border-radius: 50%;
     background: transparent;
 }
@@ -87,9 +86,9 @@ export default {
     content: '';
     width: 7px;
     height: 7px;
-    background: var(--primary-button-color);
+    background: var(--color-primary);
     position: absolute;
-    top: 4px;
+    top: 5px;
     left: 4px;
     border-radius: 100%;
     -webkit-transition: all 0.2s ease;
@@ -106,6 +105,6 @@ export default {
     transform: scale(1);
 }
 .label{
-    color: var(--primary-text-color)
+    color: #fff
 }
 </style>

@@ -1,14 +1,19 @@
 <template>
-    <div>
+    <div class="input-wrap">
         <label v-if="label" class="label">{{label}}</label>
-        <input 
-            class="input" 
-            :type="inputType" 
-            :value="modelValue"
-            @input="(event) => $emit('update:modelValue', event.target.value)"
-        >
-        <OpenedEyeIcon v-if="isOpenEyeVisible" class="eye" @click="isPasswordVisible = !isPasswordVisible"/>
-        <ClosedEyeIcon v-if="isClosedEyeVisible" class="eye" @click="isPasswordVisible = !isPasswordVisible"/>
+        <div class="input-wrap d-flex">
+            <input 
+                class="input" 
+                :class="{'disable': !isEditing}"
+                :type="inputType" 
+                :value="modelValue"
+                @input="(event) => $emit('update:modelValue', event.target.value)"
+                :readonly="!isEditing"
+            >
+            <SaveEditButton v-if="isWithEdit" v-model="isEditing" />
+            <OpenedEyeIcon v-if="isOpenEyeVisible" class="eye" @click="isPasswordVisible = !isPasswordVisible"/>
+            <ClosedEyeIcon v-if="isClosedEyeVisible" class="eye" @click="isPasswordVisible = !isPasswordVisible"/>
+        </div>
     </div>
     <small v-if="!isValid" class="error sm-font">
         <slot></slot>
@@ -18,10 +23,11 @@
 <script>
 import OpenedEyeIcon from '@/components/icons/OpenedEyeIcon.vue'
 import ClosedEyeIcon from '@/components/icons/ClosedEyeIcon.vue'
+import SaveEditButton from '@/components/UIKit/SaveEditButton.vue'
 
 export default {
     components:{
-        OpenedEyeIcon, ClosedEyeIcon
+        OpenedEyeIcon, ClosedEyeIcon, SaveEditButton
     },
     props:{
         modelValue: {
@@ -39,11 +45,16 @@ export default {
         isValid:{
             type: Boolean,
             default: true
+        },
+        isWithEdit:{
+            type: Boolean,
+            default: false
         }
     },
     data(){
         return{
-            isPasswordVisible: false
+            isPasswordVisible: false,
+            isEditing: false
         }
     },
     computed:{
@@ -72,6 +83,8 @@ export default {
         display: block
         color: #fff
         margin-bottom: 5px
+    .input-wrap
+        width: 100%
     .input
         width: 100%
         background: var(--color-background-soft)
@@ -82,7 +95,13 @@ export default {
         color: #fff
         &:focus
             border: 1px solid #fff
+        &:hover
+            border: 1px solid #fff
     .error
         color: var(--color-primary)
         margin-top: 5px
+    .disable
+        user-select: none
+        pointer-events: none
+        color: #595c67
 </style>

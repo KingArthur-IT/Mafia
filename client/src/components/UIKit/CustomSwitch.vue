@@ -25,8 +25,8 @@ export default {
 .switch {
   position: relative;
   display: inline-block;
-  width: 60px;
-  height: 34px;
+  width: 50px;
+  height: 26px;
 }
 .switch input {
   opacity: 0;
@@ -40,7 +40,7 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: var(--selected-background);
+  background-color: var(--color-background);
   -webkit-transition: .4s;
   transition: .4s;
 }
@@ -50,25 +50,25 @@ export default {
   content: "";
   height: 26px;
   width: 26px;
-  left: 4px;
-  bottom: 4px;
+  left: 0px;
+  bottom: 0px;
   background-color: white;
   -webkit-transition: .4s;
   transition: .4s;
 }
 
 input:checked + .slider {
-  background-color: var(--primary-button-color);
+  background-color: var(--color-primary);
 }
 
 input:focus + .slider {
-  box-shadow: 0 0 1px var(--primary-button-color);
+  box-shadow: 0 0 1px #fff;
 }
 
 input:checked + .slider:before {
-  -webkit-transform: translateX(26px);
-  -ms-transform: translateX(26px);
-  transform: translateX(26px);
+  -webkit-transform: translateX(24px);
+  -ms-transform: translateX(24px);
+  transform: translateX(24px);
 }
 
 .slider.round {
