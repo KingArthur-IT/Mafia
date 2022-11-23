@@ -84,6 +84,7 @@
 </template>
 
 <script>
+import { validatePassword, validateEmail } from '@/use/validation.js'
 import CustomInput from '@/components/UIKit/CustomInput.vue'
 
 export default {
@@ -121,33 +122,14 @@ export default {
         regEvent(){
             if (!this.isRegAvailable) return;
             this.regData.isNicknameValid = this.regData.nickname.length > 5;
-            this.regData.isEmailValid = this.validateEmail(this.regData.email);
+            this.regData.isEmailValid = validateEmail(this.regData.email);
             this.regData.isConfirmPasswordValid = this.regData.password === this.regData.confirmPassword && !!this.regData.password.length
-            this.regData.isPasswordValid = this.validatePassword(this.regData.password);
+            this.regData.isPasswordValid = validatePassword(this.regData.password);
         },
         loginEvent(){
             if (!this.isLoginAvailable) return;
-            this.loginData.isEmailValid = this.validateEmail(this.loginData.email);
-            this.loginData.isPasswordValid = this.validatePassword(this.loginData.password);
-        },
-        validateEmail(email) {
-            var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-            return re.test(email);
-        },
-        validatePassword(password){
-            const withoutSpaces = /\s/;
-            const uppers = /[A-Z]/; // Есть хотя бы одна буква в верхнем регистре
-            const lowers = /[a-z]/; // Есть хотя бы одна буква в нижнем регистре
-            const numbers = /\d/; // Есть хотя бы одна цифра
-            const special = /[ !"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]/; 
-            const minMaxLength = /^[\s\S]{8,32}$/;
-
-            return  !withoutSpaces.test(password) && 
-                    uppers.test(password) && 
-                    lowers.test(password) && 
-                    numbers.test(password) && 
-                    // special.test(password) && 
-                    minMaxLength.test(password);
+            this.loginData.isEmailValid = validateEmail(this.loginData.email);
+            this.loginData.isPasswordValid = validatePassword(this.loginData.password);
         },
     },
     computed:{
@@ -205,9 +187,6 @@ export default {
             padding: 15px 40px
             margin: auto
             margin-top: 24px
-    .error-list
-        list-style: square
-        padding-left: 15px
 
 @media screen and (max-width: 768px)
     .auth

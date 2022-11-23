@@ -1,42 +1,62 @@
 <template>
-    <div class="radio-group">
-        <div v-for="item in radioList" :key="item.id"  class="radio-item">
-            <input  type="radio" 
-                    :id="item.id" 
-                    :value="item.value" 
-                    name="radio-male-group"
-                    v-model="modelValue"
-                    @input="(event) => $emit('update:modelValue', item.value)"
-            >
-            <label :for="item.id" class="label">{{item.value == '1' ? 'Мужской' : 'Женский'}}</label>
+    <div class="wrapper">
+        <div class="radio-group">
+            <div v-for="item in radioList" :key="item.id"  class="radio-item">
+                <input  type="radio" 
+                        :class="{'disable': !isEditing && isWithEdit}"
+                        :id="item.id" 
+                        :value="item.value" 
+                        name="radio-male-group"
+                        v-model="modelValue"
+                        :disabled="!isEditing && isWithEdit"
+                        @input="(event) => $emit('update:modelValue', item.value)"
+                >
+                <label :for="item.id" class="label">{{item.value == 'male' ? 'Мужской' : 'Женский'}}</label>
+            </div>
         </div>
+        <SaveEditButton v-if="isWithEdit" v-model="isEditing" />
     </div>
 </template>
 
 <script>
+import SaveEditButton from '@/components/UIKit/SaveEditButton.vue'
+import { ref } from '@vue/reactivity'
+
 export default {
     emits: ['update:modelValue'],
     props: {
         modelValue: {
             type: String,
-            default: '1'
+            default: 'male'
         },
+        isWithEdit:{
+            type: Boolean,
+            default: false
+        }
+    },
+    components:{
+        SaveEditButton
     },
     setup(){
         const radioList = [
-            { id: 'male', value: 1 },
-            { id: 'femail', value: 2 },
+            { id: 'male', value: 'male' },
+            { id: 'femail', value: 'female' },
         ]
 
+        const isEditing = ref(false)
 
         return {
-            radioList
+            radioList, isEditing
         }
     }
 }
 </script>
 
 <style scoped>
+.wrapper{
+    display: flex;
+    align-items: center;
+}
 .radio-group{
     display: flex;
 }
@@ -59,6 +79,10 @@ export default {
     line-height: 120%;
     color: #fff;
 }
+[type="radio"]:checked.disable + label,
+[type="radio"]:not(:checked).disable + label{
+    cursor: default;
+}
 [type="radio"]:not(:checked) + label:before {
     content: '';
     position: absolute;
@@ -69,6 +93,9 @@ export default {
     border: 1px solid #fff;
     border-radius: 50%;
     background: transparent;
+}
+[type="radio"]:not(:checked).disable + label:before {
+    border: 1px solid #4c4c4c;
 }
 [type="radio"]:checked + label:before {
     content: '';

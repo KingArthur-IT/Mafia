@@ -1,6 +1,7 @@
 <template>
     <label class="switch">
         <input  type="checkbox"
+                :class="`${colorScheme}`"
                 :checked="modelValue"
                 :value="modelValue"
                 @input="(event) => $emit('update:modelValue', !modelValue)"
@@ -11,13 +12,17 @@
 
 <script>
 export default {
-    emits: ['update:modelValue'],
-    props: {
-        modelValue: {
-            type: Boolean,
-            default: false
-        },
+  emits: ['update:modelValue'],
+  props: {
+    modelValue: {
+        type: Boolean,
+        default: false
     },
+    colorScheme:{
+      type: String,
+      default: 'primary'
+    }
+  },
 }
 </script>
 
@@ -57,8 +62,14 @@ export default {
   transition: .4s;
 }
 
-input:checked + .slider {
+input:checked.primary + .slider {
   background-color: var(--color-primary);
+}
+input:checked.edit + .slider {
+  background-color: var(--color-edit);
+}
+input:checked.save + .slider {
+  background-color: var(--color-save);
 }
 
 input:focus + .slider {

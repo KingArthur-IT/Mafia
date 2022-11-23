@@ -32,14 +32,15 @@ export default {
         width: 35px
         height: 39px
         padding: 5px
-        background-color: #f3b703
+        background-color: var(--color-edit)
         display: flex
         justify-content: center
         align-items: center
         border: 1px solid rgba(255, 255, 255, 0.5333333333)
-        margin-left: -1px
+        margin-left: 6px
+        border-radius: 5px
         & svg
             fill: #fff
     .save
-        background-color: #00ac0d
+        background-color: var(--color-save)
 </style>

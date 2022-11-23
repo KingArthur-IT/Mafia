@@ -4,11 +4,11 @@
         <div class="input-wrap d-flex">
             <input 
                 class="input" 
-                :class="{'disable': !isEditing}"
+                :class="{'disable': !isEditing && isWithEdit}"
                 :type="inputType" 
                 :value="modelValue"
                 @input="(event) => $emit('update:modelValue', event.target.value)"
-                :readonly="!isEditing"
+                :readonly="!isEditing && isWithEdit"
             >
             <SaveEditButton v-if="isWithEdit" v-model="isEditing" />
             <OpenedEyeIcon v-if="isOpenEyeVisible" class="eye" @click="isPasswordVisible = !isPasswordVisible"/>
@@ -93,6 +93,7 @@ export default {
         outline: none
         caret-color: var(--color-primary)
         color: #fff
+        border-radius: 5px
         &:focus
             border: 1px solid #fff
         &:hover

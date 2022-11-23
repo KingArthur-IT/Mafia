@@ -4,6 +4,8 @@
   --color-background-soft: #191919;
 
   --color-primary: #d7273d;
+  --color-edit: #f3b703;
+  --color-save: #00ac0d;
 
   --color-text: #fff;
 
@@ -62,6 +64,11 @@ small{
 
 .d-flex{
   display: flex;
+}
+
+.error-list{
+  list-style: square;
+  padding-left: 15px;
 }
 
 @media screen and (max-width: 425px){
