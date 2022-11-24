@@ -8,7 +8,11 @@
       </div>
     </div>
     <div>
-      <div class="sidebar__item"  @click="$router.push({name: 'profile'})">
+      <div class="sidebar__item" @click="goToPage('profile.main')">
+        <HomeIcon class="sidebar__icon" />
+        <div class="sidebar__item-name">Домой</div>
+      </div>
+      <div class="sidebar__item" @click="goToPage('profile.settings')">
         <SettingsIcon class="sidebar__icon" />
         <div class="sidebar__item-name">Настройки</div>
       </div>
@@ -21,7 +25,7 @@
     </div>
     <div class="sidebar__item">
       <LogoutIcon class="sidebar__icon" />
-      <div class="sidebar__item-name">Logout</div>
+      <div class="sidebar__item-name">Выйти</div>
     </div>
   </div>
 </template>
@@ -29,11 +33,18 @@
 <script>
 import LogoutIcon from '@/components/icons/LogoutIcon.vue'
 import SettingsIcon from '@/components/icons/SettingsIcon.vue'
+import HomeIcon from '@/components/icons/HomeIcon.vue'
 
 export default {
   components:{
     LogoutIcon,
-    SettingsIcon
+    SettingsIcon,
+    HomeIcon
+  },
+  methods:{
+    goToPage(pageName){
+      this.$router.push({name: pageName})
+    }
   }
 }
 </script>
@@ -59,6 +70,7 @@ export default {
       align-items: center
       cursor: pointer
       font-weight: 500
+      padding: 6px 0
     &__icon
       width: 30px
       height: 30px

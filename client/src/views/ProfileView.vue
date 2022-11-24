@@ -7,7 +7,9 @@
           <div class="profile__head">
               <HeadPanel />
           </div>
-          <ProfileHero />
+          <div class="profile__hero">
+              <router-view></router-view>
+          </div>
       </div>
   </div>
 </template>
@@ -15,13 +17,11 @@
 <script>
 import ProfileSidebar from '@/components/Profile/ProfileSidebar.vue'
 import HeadPanel from '@/components/Profile/HeadPanel.vue'
-import ProfileHero from '@/components/Profile/ProfileHero.vue'
 
 export default {
     components:{
         ProfileSidebar,
         HeadPanel,
-        ProfileHero
     }
 }
 </script>
@@ -41,6 +41,12 @@ export default {
         &__head
             width: 100%
             padding-bottom: 20px
+        &__hero
+            background: var(--color-background-soft)
+            height: 100%
+            width: 100%
+            border-radius: 30px
+            padding: 30px
     .sidebar-wrap
         min-width: 280px
         padding: 20px

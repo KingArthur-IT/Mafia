@@ -134,11 +134,6 @@ export default {
 
 <style scoped lang="sass">
   .hero
-    background: var(--color-background-soft)
-    height: 100%
-    width: 100%
-    border-radius: 30px
-    padding: 30px
     &__line
       width: 100%
       height: 1px
