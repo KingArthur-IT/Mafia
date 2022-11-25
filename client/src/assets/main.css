@@ -18,6 +18,7 @@
     padding: 40px 60px;
     border-radius: 15px;
 }
+
 .btn{
     appearance: none;
     display: block;
@@ -75,3 +76,17 @@
     color: #fff;
     border: 1px solid var(--color-save);
 }
+.secondary-btn{
+    display: block;
+    background: transparent;
+    border: 1px solid var(--color-primary);
+    font-weight: 600;
+    border-radius: 5px;
+    transition: color .2s ease, background-color .2s ease;
+}
+.secondary-btn:hover{
+    background-color: var(--color-primary);
+}
+.secondary-btn:active{
+    background-color: transparent;
+}  

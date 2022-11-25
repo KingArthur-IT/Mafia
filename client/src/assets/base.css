@@ -6,6 +6,7 @@
   --color-primary: #d7273d;
   --color-edit: #f3b703;
   --color-save: #00ac0d;
+  --color-gray: #757B8C;
 
   --color-text: #fff;
 
@@ -69,6 +70,34 @@ small{
 .error-list{
   list-style: square;
   padding-left: 15px;
+}
+
+.table{
+  width: 100%;
+}
+.table tr{
+  transition: background .15s ease-in-out;
+  cursor: pointer;
+}
+.table tr:hover{
+  background: var(--color-gray);
+}
+.table tr:first-child:hover{
+  background: transparent;
+  cursor: default;
+}
+.table th{
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--color-gray);
+}
+.table td{
+  padding: 12px;
+  border-bottom: 1px solid var(--color-gray);
+}      
+.table-no-spacing{
+  border-spacing:0;
+  border-collapse: collapse;
 }
 
 @media screen and (max-width: 425px){
