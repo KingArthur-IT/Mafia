@@ -2,7 +2,7 @@
   <div class="hero">
       <Achivements />
       <button class="btn hero__btn">Играть</button>
-      <button class="btn hero__btn">Правила</button>
+      <button class="btn hero__btn" @click="$router.push({name: 'profile.rules'})">Правила</button>
       <button class="btn hero__btn">Статистика</button>
   </div>
   

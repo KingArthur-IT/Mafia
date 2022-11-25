@@ -4,6 +4,7 @@ import AuthView from '../views/AuthView.vue'
 import ProfileView from '../views/ProfileView.vue'
 import MainHero from '../components/Profile/MainHero.vue'
 import ProfileSettings from '../components/Profile/ProfileSettings.vue'
+import RulesView from '../views/RulesView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -15,6 +16,7 @@ const router = createRouter({
         children: [
           { path: '', name: 'profile.main', component: MainHero, meta: { pageName: 'Главная' } },
           { path: 'settings', name: 'profile.settings', component: ProfileSettings, meta: { pageName: 'Настройки профиля' } },
+          { path: 'rules', name: 'profile.rules', component: RulesView, meta: { pageName: 'Правила игры' } },
         ]
     },
   ]

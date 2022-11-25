@@ -38,14 +38,14 @@ export default {
             'sheriff-m',
             'citizen-w',
             'bodyguard-m',
-            'barmen',
+            'barmen-m',
             'bodyguard-w',
             'lover-m',
             'doctor-w',
-            'mafia',
+            'mafia-m',
             'lover-w',
             'reporter-m',
-            'terrorist'
+            'terrorist-m'
         ]
 
         const breakpoints: object = {
