@@ -1,20 +1,19 @@
 <template>
   <div class="hero">
-      <p class="hero__text">Достижения</p>
-      <div class="hero__achivments">
-          <img src="../../assets/achievements/sheriff.png" alt="achivements" class="hero__achivments-item">
-          <img src="../../assets/achievements/sheriff.png" alt="achivements" class="hero__achivments-item">
-          <img src="../../assets/achievements/sheriff.png" alt="achivements" class="hero__achivments-item">
-      </div>
+      <Achivements />
       <button class="btn hero__btn">Играть</button>
       <button class="btn hero__btn">Правила</button>
       <button class="btn hero__btn">Статистика</button>
   </div>
+  
 </template>
 
 <script>
+import Achivements from '@/components/Profile/Achivements.vue'
 export default {
-
+    components:{
+        Achivements
+    }
 }
 </script>
 
@@ -38,12 +37,4 @@ export default {
                 background-color: var(--color-primary)
             &::active  
                 background-color: transparent
-        &__achivments
-            display: flex
-            align-items: center
-            margin-bottom: 24px
-        &__achivments-item
-            width: 100px
-            height: 100px
-            margin-right: 12px
 </style>
