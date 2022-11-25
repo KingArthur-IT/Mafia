@@ -1,9 +1,11 @@
 <template>
   <div class="hero">
+      Рейтинг
+      Уровень авторитета
       <Achivements />
-      <button class="btn hero__btn">Играть</button>
-      <button class="btn hero__btn" @click="$router.push({name: 'profile.rules'})">Правила</button>
-      <button class="btn hero__btn">Статистика</button>
+      <button class="btn hero__btn" @click="goToPage('profile.holl')">Играть</button>
+      <button class="btn hero__btn" @click="goToPage('profile.rules')">Правила</button>
+      <button class="btn hero__btn" @click="goToPage('profile.statistics')">Статистика</button>
   </div>
   
 </template>
@@ -13,6 +15,11 @@ import Achivements from '@/components/Profile/Achivements.vue'
 export default {
     components:{
         Achivements
+    },
+    methods:{
+        goToPage(name){
+            this.$router.push({name: name})
+        }
     }
 }
 </script>

@@ -16,6 +16,14 @@
         <SettingsIcon class="sidebar__icon" />
         <div class="sidebar__item-name">Настройки</div>
       </div>
+      <div class="sidebar__item" @click="goToPage('profile.support')">
+        <SupportIcon class="sidebar__icon" />
+        <div class="sidebar__item-name">Поддержка</div>
+      </div>
+      <div class="sidebar__item" @click="goToPage('profile.market')">
+        <MarketIcon class="sidebar__icon" />
+        <div class="sidebar__item-name">Магазин</div>
+      </div>
     </div>
     <div class="sidebar__information">
       <p>Information</p>
@@ -34,12 +42,16 @@
 import LogoutIcon from '@/components/icons/LogoutIcon.vue'
 import SettingsIcon from '@/components/icons/SettingsIcon.vue'
 import HomeIcon from '@/components/icons/HomeIcon.vue'
+import SupportIcon from '@/components/icons/SupportIcon.vue'
+import MarketIcon from '@/components/icons/MarketIcon.vue'
 
 export default {
   components:{
     LogoutIcon,
     SettingsIcon,
-    HomeIcon
+    HomeIcon,
+    SupportIcon,
+    MarketIcon
   },
   methods:{
     goToPage(pageName){

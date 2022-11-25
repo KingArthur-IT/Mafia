@@ -4,11 +4,11 @@
       <p class="panel__title">{{$route.meta.pageName}}</p>
     </div>
     <div class="panel__icons">
-      <div class="panel__item">
+      <div class="panel__item" @click="$router.push({name: 'profile.message'})">
         <LetterIcon class="panel__icon"/>
         <div class="panel__badge">{{messagesCount}}</div>
       </div>
-      <div class="panel__item">
+      <div class="panel__item" @click="$router.push({name: 'profile.notifications'})">
         <BellIcon class="panel__icon panel__bell"/>
         <div class="panel__badge">{{notificationsCount}}</div>
       </div>
