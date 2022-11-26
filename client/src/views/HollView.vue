@@ -24,7 +24,7 @@
                 </td>
             </tr>
         </table>
-        <Pagination v-if="roomsList?.length"
+        <Pagination v-if="roomsList?.length > perPage"
             v-model="currentPage"
             :arrayLength="roomsList.length"
             :perPage="perPage"
@@ -45,7 +45,7 @@ export default {
     data(){
         return{
             currentPage: 1,
-            perPage: 3,
+            perPage: 5,
             roomsList: [
                 {
                     id: 0,
