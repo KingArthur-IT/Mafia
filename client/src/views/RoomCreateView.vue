@@ -174,7 +174,7 @@ export default {
             this.isRoomNameValid = !!this.roomName.length;
             if (!this.isRoomNameValid) return;
 
-            this.$router.push({name: 'room'});
+            this.$router.push({name: 'profile.holl'});
         }
     }
 }

@@ -13,7 +13,7 @@
                 <th width="20%">Мин/Макс игроков</th>
                 <th width="35%">Дополнительные роли</th>
             </tr>
-            <tr v-for="room in currentPageArray" :key="room.id">
+            <tr v-for="room in currentPageArray" :key="room.id" @click="$router.push({name: 'room'})">
                 <td>{{room.name}}</td>
                 <td>{{room.currentPersons}}</td>
                 <td>{{room.minPersons}} / {{room.maxPersons}}</td>
