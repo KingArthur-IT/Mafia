@@ -105,18 +105,18 @@ export default {
     display: flex;
 }
 .page-item{
-    color: var(--gray-text-color);
+    color: var(--color-gray);
     cursor: pointer;
-     margin-right: 25px;
+    margin-right: 16px;
 }
 .page-item:first-child{
-    margin-left: 20px;
+    margin-left: 16px;
 }
 .page-item:last-child{
-    margin-right: 20px;
+    margin-right: 16px;
 }
 .active-page{
-    color: var(--primary-text-color)
+    color: #fff
 }
 
 

@@ -12,6 +12,7 @@
   "dependencies": {
     "vue": "^3.2.38",
     "vue-router": "^4.1.5",
+    "vue-simple-range-slider": "^1.0.0",
     "vue3-carousel": "^0.1.46"
   },
   "devDependencies": {

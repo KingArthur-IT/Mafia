@@ -1,7 +1,7 @@
 <template>
     <div class="holl">
         <div class="holl__header">
-            <button class="btn secondary-btn holl__add-btn">
+            <button class="btn secondary-btn holl__add-btn" @click="$router.push({name: 'profile.create'})">
                 Добавить комнату
                 <PlusIcon class="holl__add-icon" />
             </button>
@@ -19,7 +19,7 @@
                 <td>{{room.minPersons}} / {{room.maxPersons}}</td>
                 <td class="holl__rolles-list">
                     <div class="holl__role" v-for="(role, i) in room.roles" :key="i">
-                        <img :src="getImageUrl('short-cards', role ,'png')" :alt="role">
+                        <img :src="getImageUrl('short-cards', role.role ,'png')" :alt="role.role"><span>x{{role.count}}</span>
                     </div>
                 </td>
             </tr>
@@ -53,7 +53,14 @@ export default {
                     maxPersons: 10,
                     minPersons: 8,
                     currentPersons: 10,
-                    roles: ['lover', 'reporter', 'barmen', 'doctor', 'bodyguard', 'terrorist']
+                    roles: [
+                        {role: 'lover', count: 1},
+                        {role: 'reporter', count: 1},
+                        {role: 'barmen', count: 1},
+                        {role: 'doctor', count: 1},
+                        {role: 'bodyguard', count: 1},
+                        {role: 'terrorist', count: 1}
+                    ]
                 },
                 {
                     id: 1,
@@ -69,7 +76,9 @@ export default {
                     maxPersons: 12,
                     minPersons: 6,
                     currentPersons: 6,
-                    roles: ['lover']
+                    roles: [
+                        {role: 'lover', count: 1}
+                    ]
                 },
                 {
                     id: 3,
@@ -77,7 +86,14 @@ export default {
                     maxPersons: 10,
                     minPersons: 8,
                     currentPersons: 10,
-                    roles: ['lover', 'reporter', 'barmen', 'doctor', 'bodyguard', 'terrorist']
+                    roles: [
+                        {role: 'lover', count: 1},
+                        {role: 'reporter', count: 1},
+                        {role: 'barmen', count: 1},
+                        {role: 'doctor', count: 1},
+                        {role: 'bodyguard', count: 1},
+                        {role: 'terrorist', count: 1}
+                    ]
                 },
                 {
                     id: 4,
@@ -85,7 +101,14 @@ export default {
                     maxPersons: 10,
                     minPersons: 8,
                     currentPersons: 10,
-                    roles: ['lover', 'reporter', 'barmen', 'doctor', 'bodyguard', 'terrorist']
+                    roles: [
+                        {role: 'lover', count: 1},
+                        {role: 'reporter', count: 1},
+                        {role: 'barmen', count: 1},
+                        {role: 'doctor', count: 1},
+                        {role: 'bodyguard', count: 1},
+                        {role: 'terrorist', count: 1}
+                    ]
                 },
                 {
                     id: 5,
@@ -93,7 +116,14 @@ export default {
                     maxPersons: 10,
                     minPersons: 8,
                     currentPersons: 10,
-                    roles: ['lover', 'reporter', 'barmen', 'doctor', 'bodyguard', 'terrorist']
+                    roles: [
+                        {role: 'lover', count: 1},
+                        {role: 'reporter', count: 1},
+                        {role: 'barmen', count: 1},
+                        {role: 'doctor', count: 1},
+                        {role: 'bodyguard', count: 1},
+                        {role: 'terrorist', count: 1}
+                    ]
                 }
             ]
         }
@@ -125,16 +155,18 @@ export default {
             margin-left: 12px
             width: 14px
             height: 14px
+            fill: #fff
         &__rolles-list
             display: flex
             flex-wrap: wrap
             align-items: center
             margin-bottom: -0.5px
         &__role
-            width: 30px
-            height: 30px
+            display: flex
+            align-items: center
             margin-right: 12px
             & img
-                width: 100%
-                height: 100%
+                width: 30px
+                height: 30px
+                margin-right: 5
 </style>

@@ -12,31 +12,31 @@ const rolesList = [
 
 const rolesInfo = {
     citizen: {
-        description: 'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Rem eaque corrupti, sint nisi fugit fuga dignissimos cupiditate numquam quam reprehenderit porro iste totam tempora sit dicta, repudiandae quia minus autem.'
+        description: 'Задача мирных жителей обнаружить игроков команды мафии. Не имеют особых способностей, могут голосовать за устранениемафии днем.'
     },
     doctor: {
-        description: 'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Rem eaque corrupti, sint nisi fugit fuga dignissimos cupiditate numquam quam reprehenderit porro iste totam tempora sit dicta, repudiandae quia minus autem.'
+        description: 'Доктор - игрок команды мирных жителей. Доктор может спасти от смерти одного из игроков, если его будут убивать этой ночью.'
     },
     sheriff: {
-        description: 'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Rem eaque corrupti, sint nisi fugit fuga dignissimos cupiditate numquam quam reprehenderit porro iste totam tempora sit dicta, repudiandae quia minus autem.'
+        description: 'Шериф - обязательный игрок команды мирных жителей. Каждую ночь он может исследовать другого игрока и узнать его роль.'
     },
     bodyguard: {
-        description: 'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Rem eaque corrupti, sint nisi fugit fuga dignissimos cupiditate numquam quam reprehenderit porro iste totam tempora sit dicta, repudiandae quia minus autem.'
+        description: 'Телохранитель - играет на стороне мирных жителей. Днем он решает, кого из игроков защитить от взрыва террориста или убийства мафией следующей ночью. Его защита срабатывает только один раз - либо днем либо ночью и отменяется, если телохранитель был убит.'
     },
     lover: {
-        description: 'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Rem eaque corrupti, sint nisi fugit fuga dignissimos cupiditate numquam quam reprehenderit porro iste totam tempora sit dicta, repudiandae quia minus autem.'
+        description: 'Любовница - игрок команды мирных жителей. Ночью она приходит к игроку и отвлекает его от действия. Игрок, под влиянием любовницы, не может использовать свои способности ни днем ни ночью, а также голосовать. Любовные чары проходят на следующую ночь.'
     },
     reporter: {
-        description: 'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Rem eaque corrupti, sint nisi fugit fuga dignissimos cupiditate numquam quam reprehenderit porro iste totam tempora sit dicta, repudiandae quia minus autem.'
+        description: 'Журналист - игрок команды мирных жителей. Ночью может провести расследование и узнать играют ли любые два игрока за одну команду или нет. Результаты расследования видят все игроки.'
     },
     mafia: {
-        description: 'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Rem eaque corrupti, sint nisi fugit fuga dignissimos cupiditate numquam quam reprehenderit porro iste totam tempora sit dicta, repudiandae quia minus autem.'
+        description: 'Мафия - неотъемлемый персонаж в игре. Каждый игрок с ролью мафии знает членов своей команды (кроме бармена). Просыпаются ночью для того, чтобы одного из мирных жителей.'
     },
     barmen: {
-        description: 'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Rem eaque corrupti, sint nisi fugit fuga dignissimos cupiditate numquam quam reprehenderit porro iste totam tempora sit dicta, repudiandae quia minus autem.'
+        description: 'Бармен - играет на стороне команды мафии. Ночью может опьянить любого игрока. Пьяный игрок будет писать неразборчивый текст и не сможет голосовать днем. Опьянение проходит на следующую ночь.'
     },
     terrorist: {
-        description: 'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Rem eaque corrupti, sint nisi fugit fuga dignissimos cupiditate numquam quam reprehenderit porro iste totam tempora sit dicta, repudiandae quia minus autem.'
+        description: 'Террорист - игрок команды мафии. Мафия знает его личность, но он не знает личностей мафии. В любое время во время дневного голосования он может взорвать любого игрока, убив при этом и себя.'
     },
 }
 

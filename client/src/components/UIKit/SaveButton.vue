@@ -1,21 +1,27 @@
 <template>
-  <button class="btn save-btn button">
-      <SaveIcon class="button__icon" />
+  <button class="btn save-btn button" :class="{'pad': isAdd}">
+      <SaveIcon v-if="!isAdd" class="button__icon" />
+      <PlusIcon v-else class="button__icon add" />
       <span>{{text}}</span>
   </button>
 </template>
 
 <script>
 import SaveIcon from '@/components/icons/SaveIcon.vue'
+import PlusIcon from '@/components/icons/PlusIcon.vue'
 
 export default {
     components:{
-        SaveIcon
+        SaveIcon, PlusIcon
     },
     props:{
         text:{
             type: String,
             default: 'Сохранить'
+        },
+        isAdd:{
+            type: Boolean,
+            default: false
         }
     }
 }
@@ -34,7 +40,12 @@ export default {
             margin-right: 12px
             fill: #fff
         &:hover svg
-            fill: var(--color-save)
+            fill: var(--color-save) !important
         &:active svg
-            fill: #fff
+            fill: #fff !important
+    .add
+        width: 15px
+        height: 15px
+    .pad
+        padding: 10px 0
 </style>
