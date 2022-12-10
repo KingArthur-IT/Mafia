@@ -15,6 +15,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import Achivements from '@/components/Profile/Achivements.vue'
 import StarIcon from '@/components/icons/StarIcon.vue'
 import CrownIcon from '@/components/icons/CrownIcon.vue'
@@ -39,6 +40,7 @@ export default {
         }
     },
     computed:{
+        ...mapGetters(['userData']),
         profileType: function(){
             return this.profileData.type === 'standart' ? 'Базовый' : 'VIP';
         }
