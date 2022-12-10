@@ -2,9 +2,9 @@
   <div class="hero">
       <div class="hero__row">
           <p class="hero__text">
-              Тип профиля: <span @click="$router.push({name: 'profile.market'})">{{profileType}}</span> <CrownIcon v-if="profileData.type === 'vip'" />
+              Тип профиля: <span @click="$router.push({name: 'profile.market'})">{{profileType}}</span> <CrownIcon v-if="isCrownShown" />
           </p>
-          <p class="hero__text">Рейтинг: {{profileData.level}} <StarIcon /> </p>
+          <p class="hero__text">Рейтинг: {{userData.rating}} <StarIcon /> </p>
       </div>
       <Achivements />
       <button class="btn secondary-btn hero__btn" @click="goToPage('profile.holl')">Играть</button>
@@ -28,10 +28,7 @@ export default {
     },
     data(){
         return{
-            profileData:{
-                type: 'standart',
-                level: 100
-            }
+            
         }
     },
     methods:{
@@ -42,7 +39,10 @@ export default {
     computed:{
         ...mapGetters(['userData']),
         profileType: function(){
-            return this.profileData.type === 'standart' ? 'Базовый' : 'VIP';
+            return this.userData?.accountType === 'standart' ? 'Базовый' : 'VIP';
+        },
+        isCrownShown: function(){
+            return this.userData?.accountType === 'vip'
         }
     }
 }

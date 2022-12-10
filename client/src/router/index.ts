@@ -2,8 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import AuthView from '../views/AuthView.vue'
 import ProfileView from '../views/ProfileView.vue'
-import MainHero from '../components/Profile/MainHero.vue'
-import ProfileSettings from '../components/Profile/ProfileSettings.vue'
+import ProfileStartView from '../views/ProfileStartView.vue'
+import ProfileSettingsView from '../views/ProfileSettingsView.vue'
 import RulesView from '../views/RulesView.vue'
 import MarketView from '../views/MarketView.vue'
 import SupportView from '../views/SupportView.vue'
@@ -21,8 +21,8 @@ const router = createRouter({
     { path: '/authorize', name: 'auth', component: AuthView },
     { path: '/profile', name: 'profile', component: ProfileView, meta: { auth: true },
         children: [
-          { path: '', name: 'profile.main', component: MainHero, meta: { pageName: 'Главная' } },
-          { path: 'settings', name: 'profile.settings', component: ProfileSettings, meta: { pageName: 'Настройки профиля' } },
+          { path: '', name: 'profile.main', component: ProfileStartView, meta: { pageName: 'Главная' } },
+          { path: 'settings', name: 'profile.settings', component: ProfileSettingsView, meta: { pageName: 'Настройки профиля' } },
           { path: 'rules', name: 'profile.rules', component: RulesView, meta: { pageName: 'Правила игры' } },
           { path: 'market', name: 'profile.market', component: MarketView, meta: { pageName: 'Магазин' } },
           { path: 'support', name: 'profile.support', component: SupportView, meta: { pageName: 'Поддержка' } },

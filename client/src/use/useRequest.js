@@ -20,7 +20,7 @@ async function sendRequest(url, method = 'GET', data = null){
         })
         .catch((error) => {
             console.log('from use, err =' + error);
-            return error
+            return null
         })
 }
 
