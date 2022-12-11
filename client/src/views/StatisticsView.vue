@@ -5,57 +5,41 @@
               <th width="60%"></th>
               <th></th>
           </tr>
-          <tr v-for="(item, i) in Object.keys(data)" :key="i" class="row">
-              <td>{{data[item].description}}</td>
-              <td>{{data[item].value}}</td>
+          <tr v-for="(item, i) in Object.keys(statsData)" :key="i" class="row">
+              <td>{{descriptions[item]}}</td>
+              <td>{{statsData[item]}}</td>
           </tr>
       </table>
   </div>
 </template>
 
 <script>
+import { mapActions, mapGetters } from 'vuex'
+
 export default {
     data(){
         return{
-            data: {
-                allGames: {
-                    description: 'Сыгнано игр',
-                    value: 50
-                },
-                winsGames: {
-                    description: 'Побед',
-                    value: 50
-                },
-                wasMafia:{
-                    description: 'Был мафией',
-                    value: 50
-                },
-                wasSheriff:{
-                    description: 'Был шерифом',
-                    value: 50
-                },
-                wasDoctor:{
-                    description: 'Был доктором',
-                    value: 50
-                },
-                wasLover:{
-                    description: 'Был любовницей',
-                    value: 50
-                },
-                wasTerrorist:{
-                    description: 'Был террористом',
-                    value: 50
-                },
-                wasBarmen:{
-                    description: 'Был барменом',
-                    value: 50
-                },
-                wasBodyguard:{
-                    description: 'Был телохранителем',
-                    value: 50
-                },
+            descriptions: {
+                allGames: 'Сыгнано игр',
+                wins: 'Побед',
+                wasMafia: 'Был мафией',
+                wasSheriff: 'Был шерифом',
+                wasDoctor: 'Был доктором',
+                wasLover: 'Был любовницей',
+                wasTerrorist: 'Был террористом',
+                wasBarmen: 'Был барменом',
+                wasBodyguard: 'Был телохранителем'
             }
         }
+    },
+    mounted(){
+        this.getStatsData();
+    },
+    methods:{
+        ...mapActions(['getStatsData'])
+    },
+    computed:{
+        ...mapGetters(['statsData'])
     }
 }
 </script>

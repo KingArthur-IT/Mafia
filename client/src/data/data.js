@@ -40,6 +40,10 @@ const rolesInfo = {
     },
 }
 
+const achievementsInfo = {
+    sheriff: 'Вы успешно сыграли в роли шерифа'
+}
+
 export {
-    rolesList, rolesInfo
+    rolesList, rolesInfo, achievementsInfo
 }

@@ -5,6 +5,7 @@
           :label="'Никнейм'"  
           v-model="nickname.value"
           :isWithEdit="true"
+          @saveEvent="updateUserData"
         >Никнейм должен быть не короче 6 символов</CustomInput>
     </div>
 
@@ -86,6 +87,7 @@
 </template>
 
 <script>
+import { mapGetters, mapActions } from 'vuex' 
 import { validatePassword } from '@/use/validation.js'
 import CustomInput from '@/components/UIKit/CustomInput.vue'
 import CustomRadio from '@/components/UIKit/CustomRadio.vue'
@@ -99,14 +101,22 @@ export default {
     CustomSwitch,
     SaveButton
   },
+  mounted(){
+    if (this.userData){
+      this.nickname.value = this.userData.nickname;
+      this.email.value = this.userData.email;
+      this.email.isNotification = this.userData.emailNotification;
+      this.gender = this.userData.gender;
+    }
+  },
   data(){
     return{
       nickname:{
-        value: 'KingArthur-99',
+        value: '',
       },
       email:{
-        value: 'king@gmail.com',
-        isNotification: true
+        value: '',
+        isNotification: false
       },
       gender:{
         value: 'male',
@@ -123,11 +133,25 @@ export default {
     }
   },
   methods:{
+    ...mapActions(['updateUserInfo']),
     savePasswordEvent(){
       this.password.isOldValid = this.password.old !== '';
       this.password.isNewValid = validatePassword(this.password.new);
       this.password.isRepeatValid = this.password.new === this.password.repeatNew && this.password.new !== '';
+
+      // const data = await sendRequest('/auth/password', 'PUT', newPassword);
+    },
+    updateUserData(){
+      this.updateUserInfo({
+        nickname: this.nickname.value,
+        gender: this.gender.value,
+        email: this.email.value,
+        emailNotification: this.email.isNotification
+      })
     }
+  },
+  computed:{
+    ...mapGetters(['userData'])
   }
 }
 </script>

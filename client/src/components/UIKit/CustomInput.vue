@@ -10,7 +10,7 @@
                 @input="(event) => $emit('update:modelValue', event.target.value)"
                 :readonly="!isEditing && isWithEdit"
             >
-            <SaveEditButton v-if="isWithEdit" v-model="isEditing" />
+            <SaveEditButton v-if="isWithEdit" v-model="isEditing" @click="save" />
             <OpenedEyeIcon v-if="isOpenEyeVisible" class="eye" @click="isPasswordVisible = !isPasswordVisible"/>
             <ClosedEyeIcon v-if="isClosedEyeVisible" class="eye" @click="isPasswordVisible = !isPasswordVisible"/>
         </div>
@@ -51,6 +51,7 @@ export default {
             default: false
         }
     },
+    emits: ['saveEvent'],
     data(){
         return{
             isPasswordVisible: false,
@@ -67,6 +68,12 @@ export default {
         isClosedEyeVisible: function(){
             return this.type === 'password' && this.isPasswordVisible
         },
+    },
+    methods:{
+        save(){
+            if (!this.isEditing)
+                this.$emit('saveEvent')
+        }
     }
 }
 </script>

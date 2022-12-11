@@ -3,12 +3,12 @@
         <p class="achievements__text">Достижения</p>
           <div class="achievements__list">
               <div 
-                v-for="item in achievements" 
-                :key="item.id"
+                v-for="(item, i) in achievementsData" 
+                :key="i"
                 class="achievements__item" 
-                @click="openAchievement(item.description)"
+                @click="openAchievement(achievementsInfo[item])"
               >
-                  <img :src="getImageUrl('achievements', item.imgName)" :alt="item.imgName">
+                  <img :src="getImageUrl('achievements', achievementsData)" :alt="achievementsData">
                   <QuestionIcon class="achievements__question" />
               </div>
           </div>
@@ -24,9 +24,11 @@
 </template>
 
 <script>
+import { mapGetters, mapActions } from 'vuex';
 import { getImageUrl } from '@/use/imgLinks.js'
 import ModelWrapper from '@/components/Modals/ModalWrapper.vue'
 import QuestionIcon from '@/components/icons/QuestionIcon.vue'
+import { achievementsInfo } from '@/data/data'
 
 export default {
     components:{
@@ -37,34 +39,24 @@ export default {
         return{
             isModalVisible: false,
             description: '',
-            achievements: [
-                {
-                    id: 0,
-                    imgName: 'sheriff',
-                    alt: 'sheriff',
-                    description: 'Вы успешно сыграли в роли шерифа'
-                },
-                {
-                    id: 1,
-                    imgName: 'sheriff',
-                    alt: 'sheriff',
-                    description: 'Вы успешно сыграли в роли шерифа'
-                },
-                {
-                    id: 2,
-                    imgName: 'sheriff',
-                    alt: 'sheriff',
-                    description: 'Вы успешно сыграли в роли шерифа'
-                }
-            ]
+            achievementsDescriptions: '',
+            achievementsInfo
         }
     },
+    mounted(){
+        this.getAchievementsData();
+        this.achievementsDescriptions = {...achievementsInfo};
+    },
     methods:{
+        ...mapActions(['getAchievementsData']),
         getImageUrl,
         openAchievement(descr){
             this.isModalVisible = true;
             this.description = descr;
         }
+    },
+    computed:{
+        ...mapGetters(['achievementsData']),
     }
 }
 </script>
