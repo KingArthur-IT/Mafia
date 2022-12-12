@@ -10,7 +10,7 @@
                 @input="(event) => $emit('update:modelValue', event.target.value)"
                 :readonly="!isEditing && isWithEdit"
             >
-            <SaveEditButton v-if="isWithEdit" v-model="isEditing" @click="save" />
+            <SaveEditButton v-if="isWithEdit" v-model="isEditing" @click="save" class="edit-btn" />
             <OpenedEyeIcon v-if="isOpenEyeVisible" class="eye" @click="isPasswordVisible = !isPasswordVisible"/>
             <ClosedEyeIcon v-if="isClosedEyeVisible" class="eye" @click="isPasswordVisible = !isPasswordVisible"/>
         </div>
@@ -112,4 +112,7 @@ export default {
         user-select: none
         pointer-events: none
         color: #595c67
+    .edit-btn
+        position: absolute
+        right: 0
 </style>

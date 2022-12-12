@@ -7,12 +7,16 @@
   --color-edit: #f3b703;
   --color-save: #00ac0d;
   --color-gray: #757B8C;
+  --color-info: #2196f3;
+  --color-error: #d7273d;
+  --color-warning: #fb8c00;
 
   --color-text: #fff;
 
   --section-gap: 80px;
 
-  --text-size: 18px
+  --text-size: 18px;
+
 }
 
 *,

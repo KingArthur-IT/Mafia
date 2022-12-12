@@ -10,7 +10,7 @@ export default{
       email: 'NotFound',
       emailNotification: true,
       accountType: 'standart',
-      rating: 0,
+      rating: 10,
     }, 
     userStats:{
       allGames: 0,
@@ -43,16 +43,25 @@ export default{
       const data = await sendRequest('/user');
       if (data)
         commit('setUserData', data);
+      else {
+        this.dispatch('toast/show', {text: 'Request failed', type: 'error'}, { root: true })
+      }
     },
     async getStatsData ({ commit }) {
       const data = await sendRequest('/user/stats');
       if (data)
         commit('setUserStats', data);
+      else {
+        this.dispatch('toast/show', {text: 'Request failed', type: 'error'}, { root: true })
+      }
     },
     async getAchievementsData ({ commit }) {
       const data = await sendRequest('/user/achievs');
       if (data)
         commit('setUserAchievements', data);
+      else {
+        this.dispatch('toast/show', {text: 'Request failed', type: 'error'}, { root: true })
+      }
     },
     async updateUserInfo ({ commit }, newUserData) {
       const data = await sendRequest('/user', 'PUT', newUserData);
@@ -61,7 +70,7 @@ export default{
         commit('setUserData', data);
       }
       else 
-        this.dispatch('toast/show', {text: 'Request failed'}, { root: true })
+        this.dispatch('toast/show', {text: 'Request failed', type: 'error'}, { root: true })
     },
   },
 
