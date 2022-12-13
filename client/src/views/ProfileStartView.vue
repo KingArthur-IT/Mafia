@@ -37,7 +37,7 @@ export default {
         }
     },
     computed:{
-        ...mapGetters(['userData']),
+        ...mapGetters('user', ['userData']),
         profileType: function(){
             return this.userData?.accountType === 'standart' ? 'Базовый' : 'VIP';
         },

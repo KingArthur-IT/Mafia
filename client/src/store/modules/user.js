@@ -2,6 +2,9 @@ import createPersistedState from "vuex-persistedstate";
 import { sendRequest } from '@/use/useRequest' 
 
 export default{
+  name: 'user', 
+  namespaced: true,
+
   state: {
     user: {
       id: 0,
@@ -40,37 +43,38 @@ export default{
 
   actions: {
     async getUserData ({ commit }) {
-      const data = await sendRequest('/user');
-      if (data)
-        commit('setUserData', data);
+      const res = await sendRequest('/user');
+      if (res?.data?.data)
+        commit('setUserData', res.data.data);
       else {
-        this.dispatch('toast/show', {text: 'Request failed', type: 'error'}, { root: true })
+        this.dispatch('toast/showToast', {text: 'Failed to get user info', type: 'error'}, { root: true })
       }
     },
     async getStatsData ({ commit }) {
-      const data = await sendRequest('/user/stats');
-      if (data)
-        commit('setUserStats', data);
+      const res = await sendRequest('/user/stats');
+      if (res?.data?.data)
+        commit('setUserStats', res.data.data);
       else {
-        this.dispatch('toast/show', {text: 'Request failed', type: 'error'}, { root: true })
+        this.dispatch('toast/showToast', {text: 'Failed to get statistics', type: 'error'}, { root: true })
       }
     },
     async getAchievementsData ({ commit }) {
-      const data = await sendRequest('/user/achievs');
-      if (data)
-        commit('setUserAchievements', data);
+      const res = await sendRequest('/user/achievs');
+      if (res?.data?.data)
+        commit('setUserAchievements', res.data.data);
       else {
-        this.dispatch('toast/show', {text: 'Request failed', type: 'error'}, { root: true })
+        this.dispatch('toast/showToast', {text: 'Failed to get achievements', type: 'error'}, { root: true })
       }
     },
     async updateUserInfo ({ commit }, newUserData) {
-      const data = await sendRequest('/user', 'PUT', newUserData);
+      const res = await sendRequest('/user', 'PUT', newUserData);
       //null if server in not available
-      if (data){
-        commit('setUserData', data);
+      if (res?.data?.data){
+        commit('setUserData', res.data.data);
+        this.dispatch('toast/showToast', {text: res.data.text, type: res.data.type}, { root: true })
       }
       else 
-        this.dispatch('toast/show', {text: 'Request failed', type: 'error'}, { root: true })
+        this.dispatch('toast/showToast', {text: 'Request failed or new data is epmty', type: 'error'}, { root: true })
     },
   },
 

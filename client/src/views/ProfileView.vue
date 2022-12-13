@@ -29,7 +29,7 @@ export default {
         this.getUserData( );
     },
     methods:{
-        ...mapActions(['getUserData']),
+        ...mapActions('user', ['getUserData']),
     }
 }
 </script>

@@ -36,10 +36,10 @@ export default {
         this.getStatsData();
     },
     methods:{
-        ...mapActions({getStatsData: 'user/getStatsData'})
+        ...mapActions('user', ['getStatsData'])
     },
     computed:{
-        ...mapGetters({statsData: 'user/statsData'})
+        ...mapGetters('user', ['statsData'])
     }
 }
 </script>

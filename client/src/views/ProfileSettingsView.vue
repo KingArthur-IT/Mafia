@@ -24,6 +24,7 @@
         :label="'Email'" 
         v-model="email.value" 
         :isWithEdit="true"
+        @saveEvent="updateUserData"
       >Не валидный email</CustomInput>
     </div>
 
@@ -88,7 +89,7 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex' 
-import { validatePassword } from '@/use/validation.js'
+import { validatePassword, validateEmail } from '@/use/validation.js'
 import CustomInput from '@/components/UIKit/CustomInput.vue'
 import CustomRadio from '@/components/UIKit/CustomRadio.vue'
 import CustomSwitch from '@/components/UIKit/CustomSwitch.vue'
@@ -133,7 +134,8 @@ export default {
     }
   },
   methods:{
-    ...mapActions(['updateUserInfo']),
+    ...mapActions('user', ['updateUserInfo']),
+    ...mapActions('toast', ['showToast']),
     savePasswordEvent(){
       this.password.isOldValid = this.password.old !== '';
       this.password.isNewValid = validatePassword(this.password.new);
@@ -142,16 +144,32 @@ export default {
       // const data = await sendRequest('/auth/password', 'PUT', newPassword);
     },
     updateUserData(){
-      this.updateUserInfo({
-        nickname: this.nickname.value,
-        gender: this.gender.value,
-        email: this.email.value,
-        emailNotification: this.email.isNotification
-      })
+      if (this.nickname.value.length < 6){
+        this.showToast({text: 'Никнейм должен быть не короче 6 символов', type: 'error'});
+        return
+      }
+      if (!validateEmail(this.email.value)){
+        this.showToast({text: 'Не валидный email', type: 'error'});
+        return
+      }
+
+      if (this.smthWasChanged)
+        this.updateUserInfo({
+          nickname: this.nickname.value,
+          gender: this.gender.value,
+          email: this.email.value,
+          emailNotification: this.email.isNotification
+        })
     }
   },
   computed:{
-    ...mapGetters(['userData'])
+    ...mapGetters('user', ['userData']),
+    smthWasChanged(){
+      return this.userData.nickname !== this.nickname.value ||
+            this.userData.email !== this.email.value ||
+            this.userData.emailNotification !== this.email.isNotification ||
+            this.userData.gender !== this.gender.value
+    }
   }
 }
 </script>

@@ -51,7 +51,7 @@ export default {
             default: false
         }
     },
-    emits: ['saveEvent'],
+    emits: ['update:modelValue' , 'saveEvent'],
     data(){
         return{
             isPasswordVisible: false,

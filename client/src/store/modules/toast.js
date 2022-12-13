@@ -23,7 +23,7 @@ export default{
   },
 
   actions: {
-    show({ commit }, {text, type = 'info'}){
+    showToast({ commit }, {text, type = 'info'}){
         commit('setText', text);
         commit('setType', type);
         commit('setShown', true);
