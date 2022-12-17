@@ -44,8 +44,9 @@ export default{
   actions: {
     async getRoomsList ({ commit }) {
       const res = await sendRequest('/rooms');
-      if (res?.data?.data)
-        commit('setRoomsList', res.data.data);
+      console.log(res);
+      if (res?.data)
+        commit('setRoomsList', res.data);
       else {
         this.dispatch('toast/showToast', {text: 'Failed to get rooms list', type: 'error'}, { root: true })
       }

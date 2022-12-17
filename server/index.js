@@ -1,19 +1,30 @@
 const express = require('express')
-var cors = require('cors')
+const cors = require('cors')
+const app = express();
+app.use(cors())
+const server = require('http').createServer(app);
+const { Server } = require("socket.io");
+const io = new Server(server, {
+  cors: {
+    origin: '*',
+  }
+});
 const PORT = process.env.PORT || 3000
 
 const userRouter = require('./routes/user.routes')
 
-const app = express();
 app.use(express.json());
-app.use(cors())
 // app.get('*', (req, res) => {
 
 // })
 
+io.on('connection', (socket) => {
+    console.log('Connected');
+  });
+
 app.use('/api', userRouter)
 
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`Server has been started on PORT ${PORT} ...`);
 })

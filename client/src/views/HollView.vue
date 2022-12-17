@@ -6,7 +6,7 @@
                 <PlusIcon class="holl__add-icon" />
             </button>
         </div>
-        <table v-if="currentPageArray.length" class="table table-no-spacing">
+        <table v-if="currentPageArray?.length" class="table table-no-spacing">
             <tr class="table__row">
                 <th width="30%">Название комнаты</th>
                 <th width="15%">Количество игроков</th>

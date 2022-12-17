@@ -44,24 +44,25 @@ export default{
   actions: {
     async getUserData ({ commit }) {
       const res = await sendRequest('/user');
-      if (res?.data?.data)
-        commit('setUserData', res.data.data);
+      console.log(res);
+      if (res?.data)
+        commit('setUserData', res.data);
       else {
         this.dispatch('toast/showToast', {text: 'Failed to get user info', type: 'error'}, { root: true })
       }
     },
     async getStatsData ({ commit }) {
       const res = await sendRequest('/user/stats');
-      if (res?.data?.data)
-        commit('setUserStats', res.data.data);
+      if (res?.data)
+        commit('setUserStats', res.data);
       else {
         this.dispatch('toast/showToast', {text: 'Failed to get statistics', type: 'error'}, { root: true })
       }
     },
     async getAchievementsData ({ commit }) {
       const res = await sendRequest('/user/achievs');
-      if (res?.data?.data)
-        commit('setUserAchievements', res.data.data);
+      if (res?.data)
+        commit('setUserAchievements', res.data);
       else {
         this.dispatch('toast/showToast', {text: 'Failed to get achievements', type: 'error'}, { root: true })
       }
@@ -69,8 +70,8 @@ export default{
     async updateUserInfo ({ commit }, newUserData) {
       const res = await sendRequest('/user', 'PUT', newUserData);
       //null if server in not available
-      if (res?.data?.data){
-        commit('setUserData', res.data.data);
+      if (res?.data){
+        commit('setUserData', res.data);
         this.dispatch('toast/showToast', {text: res.data.text, type: res.data.type}, { root: true })
       }
       else 
