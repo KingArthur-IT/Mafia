@@ -82,12 +82,13 @@
         </div>
 
         <div class="create__btn">
-            <SaveButton :text="'Создать'" :isAdd="true" @click="createRoom" />
+            <SaveButton :text="'Создать'" :isAdd="true" @click="createRoomEvent" />
         </div>
   </div>
 </template>
 
 <script>
+import {mapActions} from 'vuex'
 import RangeSlider from 'vue-simple-range-slider';
 import 'vue-simple-range-slider/css';
 import CustomInput from '@/components/UIKit/CustomInput.vue'
@@ -170,11 +171,26 @@ export default {
         },
     },
     methods:{
-        createRoom(){
+        ...mapActions('rooms', ['createRoom']),
+        async createRoomEvent(){
             this.isRoomNameValid = !!this.roomName.length;
             if (!this.isRoomNameValid) return;
 
-            this.$router.push({name: 'profile.holl'});
+            const roomId = await this.createRoom({
+                name: this.roomName,
+                maxPersons: this.roomPlayers[0],
+                minPersons: this.roomPlayers[1],
+                roles: [
+                    {role: 'lover', count: this.lover.value},
+                    {role: 'reporter', count: this.reporter.value},
+                    {role: 'barmen', count: this.barmen.value},
+                    {role: 'doctor', count: this.doctor.value},
+                    {role: 'bodyguard', count: this.bodyguard.value},
+                    {role: 'terrorist', count: this.terrorist.value}
+                ]
+            });
+            if (roomId !== -1)
+                this.$router.push({name: 'room', params:{id: roomId}});
         }
     }
 }

@@ -48,7 +48,7 @@ export default {
         this.achievementsDescriptions = {...achievementsInfo};
     },
     methods:{
-        ...mapActions(['getAchievementsData']),
+        ...mapActions('user', ['getAchievementsData']),
         getImageUrl,
         openAchievement(descr){
             this.isModalVisible = true;
@@ -56,7 +56,7 @@ export default {
         }
     },
     computed:{
-        ...mapGetters(['achievementsData']),
+        ...mapGetters('user', ['achievementsData']),
     }
 }
 </script>

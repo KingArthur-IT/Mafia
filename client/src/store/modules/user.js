@@ -78,5 +78,5 @@ export default{
     },
   },
 
-  plugins: [createPersistedState()],
+  // plugins: [createPersistedState()],
 };

@@ -6,14 +6,14 @@
                 <PlusIcon class="holl__add-icon" />
             </button>
         </div>
-        <table class="table table-no-spacing">
+        <table v-if="currentPageArray.length" class="table table-no-spacing">
             <tr class="table__row">
                 <th width="30%">Название комнаты</th>
                 <th width="15%">Количество игроков</th>
                 <th width="20%">Мин/Макс игроков</th>
                 <th width="35%">Дополнительные роли</th>
             </tr>
-            <tr v-for="room in currentPageArray" :key="room.id" @click="$router.push({name: 'room'})">
+            <tr v-for="room in currentPageArray" :key="room.id" @click="goToRoom(room.id)">
                 <td>{{room.name}}</td>
                 <td>{{room.currentPersons}}</td>
                 <td>{{room.minPersons}} / {{room.maxPersons}}</td>
@@ -24,6 +24,7 @@
                 </td>
             </tr>
         </table>
+        <p v-else>Созданных комнат нет</p>
         <Pagination v-if="roomsList?.length > perPage"
             v-model="currentPage"
             :arrayLength="roomsList.length"
@@ -33,6 +34,7 @@
 </template>
 
 <script>
+import {mapActions, mapGetters} from 'vuex'
 import PlusIcon from '@/components/icons/PlusIcon.vue'
 import { getImageUrl } from '@/use/imgLinks.js'
 import Pagination from '@/components/UIKit/Pagination.vue'
@@ -45,95 +47,25 @@ export default {
     data(){
         return{
             currentPage: 1,
-            perPage: 5,
-            roomsList: [
-                {
-                    id: 0,
-                    name: 'Крутая комната',
-                    maxPersons: 10,
-                    minPersons: 8,
-                    currentPersons: 10,
-                    roles: [
-                        {role: 'lover', count: 1},
-                        {role: 'reporter', count: 1},
-                        {role: 'barmen', count: 1},
-                        {role: 'doctor', count: 1},
-                        {role: 'bodyguard', count: 1},
-                        {role: 'terrorist', count: 1}
-                    ]
-                },
-                {
-                    id: 1,
-                    name: 'Крутая комната 2',
-                    maxPersons: 16,
-                    minPersons: 8,
-                    currentPersons: 10,
-                    roles: []
-                },
-                {
-                    id: 2,
-                    name: 'Крутая комната 3',
-                    maxPersons: 12,
-                    minPersons: 6,
-                    currentPersons: 6,
-                    roles: [
-                        {role: 'lover', count: 1}
-                    ]
-                },
-                {
-                    id: 3,
-                    name: 'Крутая комната 4',
-                    maxPersons: 10,
-                    minPersons: 8,
-                    currentPersons: 10,
-                    roles: [
-                        {role: 'lover', count: 1},
-                        {role: 'reporter', count: 1},
-                        {role: 'barmen', count: 1},
-                        {role: 'doctor', count: 1},
-                        {role: 'bodyguard', count: 1},
-                        {role: 'terrorist', count: 1}
-                    ]
-                },
-                {
-                    id: 4,
-                    name: 'Крутая комната 4',
-                    maxPersons: 10,
-                    minPersons: 8,
-                    currentPersons: 10,
-                    roles: [
-                        {role: 'lover', count: 1},
-                        {role: 'reporter', count: 1},
-                        {role: 'barmen', count: 1},
-                        {role: 'doctor', count: 1},
-                        {role: 'bodyguard', count: 1},
-                        {role: 'terrorist', count: 1}
-                    ]
-                },
-                {
-                    id: 5,
-                    name: 'Крутая комната 4',
-                    maxPersons: 10,
-                    minPersons: 8,
-                    currentPersons: 10,
-                    roles: [
-                        {role: 'lover', count: 1},
-                        {role: 'reporter', count: 1},
-                        {role: 'barmen', count: 1},
-                        {role: 'doctor', count: 1},
-                        {role: 'bodyguard', count: 1},
-                        {role: 'terrorist', count: 1}
-                    ]
-                }
-            ]
+            perPage: 10,
+            roomsListData: [],
         }
     },
+    mounted(){
+        this.getRoomsList();
+        this.roomsListData = [...this.roomsList];
+    },
     methods:{
-        getImageUrl
+        ...mapActions('rooms', ['getRoomsList']),
+        getImageUrl,
+        goToRoom(id){
+            this.$router.push({name: 'room', params:{id: id}})
+        }
     },
     computed:{
+        ...mapGetters('rooms', ['roomsList']),
         currentPageArray(){
-            return this.roomsList.slice((this.currentPage - 1) * this.perPage, this.currentPage * this.perPage)
+            return this.roomsList?.slice((this.currentPage - 1) * this.perPage, this.currentPage * this.perPage)
         }
     },
 }

@@ -33,7 +33,7 @@ const router = createRouter({
           { path: 'create', name: 'profile.create', component: RoomCreateView, meta: { pageName: 'Создать комнату' } },
         ]
     },
-    { path: '/room', name: 'room', component: RoomView, meta: { auth: true }}
+    { path: '/room/:id', name: 'room', component: RoomView, meta: { auth: true }}
   ]
 })
 
