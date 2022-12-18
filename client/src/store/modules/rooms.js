@@ -7,29 +7,29 @@ export default{
 
   state: {
     roomsList: [
-      {
-          id: 0,
-          name: 'Крутая комната',
-          maxPersons: 10,
-          minPersons: 8,
-          currentPersons: 10,
-          roles: [
-              {role: 'lover', count: 1},
-              {role: 'reporter', count: 1},
-              {role: 'barmen', count: 1},
-              {role: 'doctor', count: 1},
-              {role: 'bodyguard', count: 1},
-              {role: 'terrorist', count: 1}
-          ]
-      },
-      {
-          id: 1,
-          name: 'Крутая комната 2',
-          maxPersons: 16,
-          minPersons: 8,
-          currentPersons: 10,
-          roles: []
-      },
+      // {
+      //     id: 0,
+      //     name: 'Крутая комната',
+      //     maxPersons: 10,
+      //     minPersons: 8,
+      //     currentPersons: 10,
+      //     roles: [
+      //         {role: 'lover', count: 1},
+      //         {role: 'reporter', count: 1},
+      //         {role: 'barmen', count: 1},
+      //         {role: 'doctor', count: 1},
+      //         {role: 'bodyguard', count: 1},
+      //         {role: 'terrorist', count: 1}
+      //     ]
+      // },
+      // {
+      //     id: 1,
+      //     name: 'Крутая комната 2',
+      //     maxPersons: 16,
+      //     minPersons: 8,
+      //     currentPersons: 10,
+      //     roles: []
+      // },
     ]
   },
 
@@ -38,15 +38,16 @@ export default{
   },
 
   mutations: {
-    setRoomsList: (state, data) => state.user = [...data],
+    setRoomsList: (state, data) => state.roomsList = [...data],
   },
 
   actions: {
     async getRoomsList ({ commit }) {
       const res = await sendRequest('/rooms');
       console.log(res);
-      if (res?.data)
+      if (res?.data){
         commit('setRoomsList', res.data);
+      }
       else {
         this.dispatch('toast/showToast', {text: 'Failed to get rooms list', type: 'error'}, { root: true })
       }

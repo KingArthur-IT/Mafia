@@ -24,7 +24,7 @@
           </div>
           <div class="hero">
               <div class="dialog">
-
+                  <p v-for="(msg, i) in gameChat" :key="i" class="chat-msg" :class="{'server-msg': msg.author === 'server'}">{{msg.text}}</p>
               </div>
               <div class="dialog-inputs">
                   <input type="text">
@@ -37,24 +37,11 @@
 
 <script>
 import CardRole from '@/components/UIKit/CardRole.vue'
+import { mapGetters } from 'vuex'
 
 export default {
     components:{
         CardRole
-    },
-    sockets: {
-        connect: function () {
-            console.log('socket connected')
-        },
-        customEmit: function (data) {
-            console.log('this method was fired by the socket server. eg: io.emit("customEmit", data)')
-        }
-    },
-    methods: {
-        clickButton: function (data) {
-            // $socket is socket.io-client instance
-            this.$socket.emit('emit_method', data)
-        }
     },
     data(){
         return{
@@ -63,60 +50,63 @@ export default {
                 role: 'sheriff',
                 gender: 'male'
             },
-            players: [
-                {
-                    nickname: 'nick',
-                    gender: 'male',
-                    role: 'unknown' 
-                },
-                {
-                    nickname: 'nick',
-                    gender: 'female',
-                    role: 'citizen' 
-                },
-                {
-                    nickname: 'nick',
-                    gender: 'male',
-                    role: 'mafia' 
-                },
-                {
-                    nickname: 'nick',
-                    gender: 'male',
-                    role: 'reporter' 
-                },
-                {
-                    nickname: 'nick',
-                    gender: 'male',
-                    role: 'barmen' 
-                },
-                {
-                    nickname: 'nick',
-                    gender: 'male',
-                    role: 'doctor' 
-                },
-                {
-                    nickname: 'nick',
-                    gender: 'male',
-                    role: 'bodyguard' 
-                },
-                {
-                    nickname: 'nick',
-                    gender: 'male',
-                    role: 'terrorist' 
-                },
-                {
-                    nickname: 'nick',
-                    gender: 'male',
-                    role: 'sheriff' 
-                },
-                {
-                    nickname: 'nick',
-                    gender: 'male',
-                    role: 'lover' 
-                },
-            ]
+            // players: [
+            //     {
+            //         nickname: 'nick',
+            //         gender: 'male',
+            //         role: 'unknown' 
+            //     },
+            //     {
+            //         nickname: 'nick',
+            //         gender: 'female',
+            //         role: 'citizen' 
+            //     },
+            //     {
+            //         nickname: 'nick',
+            //         gender: 'male',
+            //         role: 'mafia' 
+            //     },
+            //     {
+            //         nickname: 'nick',
+            //         gender: 'male',
+            //         role: 'reporter' 
+            //     },
+            //     {
+            //         nickname: 'nick',
+            //         gender: 'male',
+            //         role: 'barmen' 
+            //     },
+            //     {
+            //         nickname: 'nick',
+            //         gender: 'male',
+            //         role: 'doctor' 
+            //     },
+            //     {
+            //         nickname: 'nick',
+            //         gender: 'male',
+            //         role: 'bodyguard' 
+            //     },
+            //     {
+            //         nickname: 'nick',
+            //         gender: 'male',
+            //         role: 'terrorist' 
+            //     },
+            //     {
+            //         nickname: 'nick',
+            //         gender: 'male',
+            //         role: 'sheriff' 
+            //     },
+            //     {
+            //         nickname: 'nick',
+            //         gender: 'male',
+            //         role: 'lover' 
+            //     },
+            // ]
         }
     },
+    computed:{
+        ...mapGetters('game', ['gameChat'])
+    }
 }
 </script>
 
@@ -173,4 +163,10 @@ export default {
             color: #fff
         & button
             width: 60px
+
+    .chat-msg
+        text-align: right
+    .server-msg
+        text-align: center
+        color: #d8ff00
 </style>

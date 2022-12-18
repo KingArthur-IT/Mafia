@@ -15,7 +15,7 @@
             </tr>
             <tr v-for="room in currentPageArray" :key="room.id" @click="goToRoom(room.id)">
                 <td>{{room.name}}</td>
-                <td>{{room.currentPersons}}</td>
+                <td>{{room.users.length}}</td>
                 <td>{{room.minPersons}} / {{room.maxPersons}}</td>
                 <td class="holl__rolles-list">
                     <div class="holl__role" v-for="(role, i) in room.roles" :key="i">
@@ -51,19 +51,32 @@ export default {
             roomsListData: [],
         }
     },
+    sockets: {
+        connect: function () {
+            console.log('socket connected')
+        },
+    },
     mounted(){
         this.getRoomsList();
         this.roomsListData = [...this.roomsList];
     },
     methods:{
         ...mapActions('rooms', ['getRoomsList']),
+        ...mapActions('toast', ['showToast']),
         getImageUrl,
         goToRoom(id){
-            this.$router.push({name: 'room', params:{id: id}})
+            if (this.userData?.id){
+                this.$socket.emit('enterRoom', {userId: this.userData.id, nickname: this.userData.nickname, roomId: id}, response => {
+                    if (response?.status === 'ok')
+                        this.$router.push({name: 'room', params:{id: id}})
+                    else this.showToast({text: 'Ошибка входа в комнату', type: 'error'})
+                })
+            }
         }
     },
     computed:{
         ...mapGetters('rooms', ['roomsList']),
+        ...mapGetters('user', ['userData']),
         currentPageArray(){
             return this.roomsList?.slice((this.currentPage - 1) * this.perPage, this.currentPage * this.perPage)
         }

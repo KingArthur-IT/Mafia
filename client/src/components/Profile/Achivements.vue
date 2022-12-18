@@ -8,7 +8,7 @@
                 class="achievements__item" 
                 @click="openAchievement(achievementsInfo[item])"
               >
-                  <img :src="getImageUrl('achievements', achievementsData)" :alt="achievementsData">
+                  <img :src="getImageUrl('achievements', item)" :alt="item">
                   <QuestionIcon class="achievements__question" />
               </div>
           </div>

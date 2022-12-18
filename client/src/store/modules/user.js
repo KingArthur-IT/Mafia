@@ -38,7 +38,7 @@ export default{
   mutations: {
     setUserData: (state, data) => state.user = {...data},
     setUserStats: (state, data) => state.userStats = {...data},
-    setUserAchievements: (state, data) => state.userAchievements = [...data],
+    setUserAchievements: (state, data) => state.userAchievements = data,
   },
 
   actions: {

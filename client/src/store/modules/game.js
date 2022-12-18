@@ -5,6 +5,7 @@ export default{
   namespaced: true,
 
   state: {
+    chat: [],
     players: [
         {
             nickname: 'nick',
@@ -60,11 +61,12 @@ export default{
   },
 
   getters: {
-    // roomsList: state => state.roomsList,
+    gameChat: state => state.chat,
   },
 
   mutations: {
     // setRoomsList: (state, data) => state.user = [...data],
+    SOCKET_newChatMsg: (state, data) => state.chat.push(data)
   },
 
   actions: {
