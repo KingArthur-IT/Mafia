@@ -14,10 +14,10 @@ const users = [
         id: 2,
         nickname: 'KingArthur123',
         gender: 'male',
-        email: 'king@king.com',
+        email: 'king2@king.com',
         emailNotification: true,
-        accountType: 'standart',
-        rating: 101,
+        accountType: 'vip',
+        rating: 102,
         achivements: ['sheriff'],
         statistics: {}
     }
@@ -75,5 +75,5 @@ const rooms = [
 // }
 
 module.exports = {
-    user, rolesList, rooms
+    users, rolesList, rooms
 }

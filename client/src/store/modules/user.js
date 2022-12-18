@@ -13,7 +13,7 @@ export default{
       email: 'NotFound',
       emailNotification: true,
       accountType: 'standart',
-      rating: 10,
+      rating: 0,
     }, 
     userStats:{
       allGames: 0,
@@ -26,7 +26,7 @@ export default{
       wasBarmen: 0,
       wasBodyguard: 0
     },
-    userAchievements: ['sheriff'],
+    userAchievements: [],
   },
 
   getters: {
@@ -42,13 +42,20 @@ export default{
   },
 
   actions: {
-    async getUserData ({ commit }) {
-      const res = await sendRequest('/user');
-      console.log(res);
-      if (res?.data)
-        commit('setUserData', res.data);
+    async getUserData ({ commit }, {email, password}) {
+      const res = await sendRequest('/user', 'POST', {email, password});
+      if (res?.status)
+        if (res?.status === 'ok'){
+          commit('setUserData', res.data);
+          return true
+        }
+        else {
+          this.dispatch('toast/showToast', {text: res.text, type: 'error'}, { root: true });
+          return false
+        }
       else {
-        this.dispatch('toast/showToast', {text: 'Failed to get user info', type: 'error'}, { root: true })
+        this.dispatch('toast/showToast', {text: 'Не удалось получить ответ от сервера', type: 'error'}, { root: true });
+        return false;
       }
     },
     async getStatsData ({ commit }) {
@@ -59,12 +66,14 @@ export default{
         this.dispatch('toast/showToast', {text: 'Failed to get statistics', type: 'error'}, { root: true })
       }
     },
-    async getAchievementsData ({ commit }) {
-      const res = await sendRequest('/user/achievs');
-      if (res?.data)
-        commit('setUserAchievements', res.data);
+    async getAchievementsData ({ commit }, userId) {
+      const res = await sendRequest('/user/achievs', 'POST', {userId});
+      if (res?.status)
+        if (res?.status === 'ok') 
+          commit('setUserAchievements', res.data);
+        else this.dispatch('toast/showToast', {text: res.text, type: 'error'}, { root: true });
       else {
-        this.dispatch('toast/showToast', {text: 'Failed to get achievements', type: 'error'}, { root: true })
+        this.dispatch('toast/showToast', {text: 'Не удалось получить ответ от сервера', type: 'error'}, { root: true })
       }
     },
     async updateUserInfo ({ commit }, newUserData) {

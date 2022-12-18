@@ -1,17 +1,18 @@
 <template>
     <div class="achievements">
-        <p class="achievements__text">Достижения</p>
-          <div class="achievements__list">
-              <div 
+        <p v-if="achievementsData?.length" class="achievements__text">Достижения</p>
+        <p v-else class="achievements__text">Достижений пока нет</p>
+        <div v-if="achievementsData?.length" class="achievements__list">
+            <div 
                 v-for="(item, i) in achievementsData" 
                 :key="i"
                 class="achievements__item" 
                 @click="openAchievement(achievementsInfo[item])"
-              >
-                  <img :src="getImageUrl('achievements', item)" :alt="item">
-                  <QuestionIcon class="achievements__question" />
-              </div>
-          </div>
+                >
+                    <img :src="getImageUrl('achievements', item)" :alt="item">
+                    <QuestionIcon class="achievements__question" />
+            </div>
+        </div>
     </div>
     <ModelWrapper
         v-model="isModalVisible"
@@ -44,7 +45,7 @@ export default {
         }
     },
     mounted(){
-        this.getAchievementsData();
+        this.getAchievementsData(this.userData.id);
         this.achievementsDescriptions = {...achievementsInfo};
     },
     methods:{
@@ -56,7 +57,7 @@ export default {
         }
     },
     computed:{
-        ...mapGetters('user', ['achievementsData']),
+        ...mapGetters('user', ['userData', 'achievementsData']),
     }
 }
 </script>

@@ -18,19 +18,11 @@
 import ProfileSidebar from '@/components/Profile/ProfileSidebar.vue'
 import HeadPanel from '@/components/Profile/HeadPanel.vue'
 
-import { mapActions } from 'vuex'
-
 export default {
     components:{
         ProfileSidebar,
         HeadPanel,
     },
-    async mounted(){
-        this.getUserData( );
-    },
-    methods:{
-        ...mapActions('user', ['getUserData']),
-    }
 }
 </script>
 

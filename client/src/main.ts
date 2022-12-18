@@ -13,7 +13,7 @@ const app = createApp(App)
 app.use(router)
 app.use(store)
 app.use(new VueSocketIO({
-    debug: true,
+    debug: false,
     connection: SocketIO('http://localhost:3000'),
     vuex:{
         store,

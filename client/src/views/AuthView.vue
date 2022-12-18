@@ -84,6 +84,7 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex'
 import { validatePassword, validateEmail } from '@/use/validation.js'
 import CustomInput from '@/components/UIKit/CustomInput.vue'
 
@@ -116,6 +117,7 @@ export default {
         }
     },
     methods:{
+        ...mapActions('user', ['getUserData']),
         goToMainPage(){
             this.$router.push({name: 'home'})
         },
@@ -126,10 +128,19 @@ export default {
             this.regData.isConfirmPasswordValid = this.regData.password === this.regData.confirmPassword && !!this.regData.password.length
             this.regData.isPasswordValid = validatePassword(this.regData.password);
         },
-        loginEvent(){
+        async loginEvent(){
             if (!this.isLoginAvailable) return;
             this.loginData.isEmailValid = validateEmail(this.loginData.email);
-            this.loginData.isPasswordValid = validatePassword(this.loginData.password);
+            // this.loginData.isPasswordValid = validatePassword(this.loginData.password);
+
+            if (!this.loginData.isEmailValid) return;
+
+            const rez = await this.getUserData({
+                email: this.loginData.email,
+                password: this.loginData.password
+            });
+
+            if (rez) this.$router.push({name: 'profile.main'})
         },
     },
     computed:{
@@ -139,7 +150,7 @@ export default {
         isRegAvailable: function(){
             return this.regData.nickname && this.regData.email && this.regData.password && this.regData.confirmPassword
         }
-    }
+    },
 }
 </script>
 

@@ -12,7 +12,7 @@ async function sendRequest(url, method = 'GET', data = null){
             'Accept': 'application/json',
             // 'Authorization': `Bearer ${localStorage.getItem('access_token')}`
         },
-        ...data
+        data: {...data}
     })
         .then((response) => {
             console.log('from use, res =' + response);
