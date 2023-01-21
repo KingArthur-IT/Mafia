@@ -2,7 +2,7 @@
   <div class="room">
       <div class="sidebar-wrap">
           <div class="hero sidebar">
-              <div v-for="(player, i) in players" :key="i">
+              <div v-for="(player, i) in gamePlayers" :key="i">
                   <CardRole 
                     :nickname="player.nickname"
                     :gender="player.gender"
@@ -13,13 +13,21 @@
       </div>
       <div class="room__main">
           <div class="room__head">
-              <div class="hero">
-                  <p>Вы: {{myInfo.role}}</p>
-                  <CardRole 
-                    :nickname="myInfo.nickname"
-                    :gender="myInfo.gender"
-                    :role="myInfo.role"
-                  />
+              <div class="hero head">
+                  <div class="head__card">
+                      <p>Вы<span v-if="gameRole != 'unknown'">: {{gameRole}}</span></p>
+                      <CardRole 
+                        :nickname="userData.nickname"
+                        :gender="userData.gender"
+                        :role="gameRole"
+                        :showNick="false"
+                      />
+                  </div>
+                  <div class="stage">
+                      <p>{{gameStatus}}</p>
+                      <div class="timer" v-if="gameTimer > 0"><strong>{{gameTimer}} c</strong></div>
+                  </div>
+                  <QuiteIcon class="leave" @click="$router.push({name: 'profile.holl'})" />
               </div>
           </div>
           <div class="hero">
@@ -37,75 +45,39 @@
 
 <script>
 import CardRole from '@/components/UIKit/CardRole.vue'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
+import QuiteIcon from '@/components/icons/LogoutIcon.vue'
 
 export default {
     components:{
-        CardRole
+        CardRole,
+        QuiteIcon
     },
-    data(){
-        return{
-            myInfo:{
-                nickname: 'KingArthur-99',
-                role: 'sheriff',
-                gender: 'male'
-            },
-            // players: [
-            //     {
-            //         nickname: 'nick',
-            //         gender: 'male',
-            //         role: 'unknown' 
-            //     },
-            //     {
-            //         nickname: 'nick',
-            //         gender: 'female',
-            //         role: 'citizen' 
-            //     },
-            //     {
-            //         nickname: 'nick',
-            //         gender: 'male',
-            //         role: 'mafia' 
-            //     },
-            //     {
-            //         nickname: 'nick',
-            //         gender: 'male',
-            //         role: 'reporter' 
-            //     },
-            //     {
-            //         nickname: 'nick',
-            //         gender: 'male',
-            //         role: 'barmen' 
-            //     },
-            //     {
-            //         nickname: 'nick',
-            //         gender: 'male',
-            //         role: 'doctor' 
-            //     },
-            //     {
-            //         nickname: 'nick',
-            //         gender: 'male',
-            //         role: 'bodyguard' 
-            //     },
-            //     {
-            //         nickname: 'nick',
-            //         gender: 'male',
-            //         role: 'terrorist' 
-            //     },
-            //     {
-            //         nickname: 'nick',
-            //         gender: 'male',
-            //         role: 'sheriff' 
-            //     },
-            //     {
-            //         nickname: 'nick',
-            //         gender: 'male',
-            //         role: 'lover' 
-            //     },
-            // ]
+    data() {
+        return {
+            roomId: -1
         }
     },
     computed:{
-        ...mapGetters('game', ['gameChat'])
+        ...mapGetters('game', ['gameChat', 'gamePlayers', 'gameRole', 'gameTimer', 'gameStatus']),
+        ...mapGetters('user', ['userData']),
+    },
+    mounted() {
+        this.roomId = Number(this.$route.params.id)
+    },
+    beforeUnmount(){
+        this.leaveTheRoom()
+    },
+    methods: {
+        ...mapActions('toast', ['showToast']),
+        leaveTheRoom() {
+            if (this.userData?.id){
+                this.$socket.emit('leaveRoom', {userId: this.userData.id, nickname: this.userData.nickname, roomId: this.roomId}, response => {
+                    if (response?.status !== 'ok')
+                        this.showToast({text: response.text || 'Ошибка при выходе из комнаты', type: 'error'})
+                })
+            }
+        }
     }
 }
 </script>
@@ -169,4 +141,15 @@ export default {
     .server-msg
         text-align: center
         color: #d8ff00
+    .head
+        display: flex
+        justify-content: space-between
+        align-items: center
+    .leave
+        cursor: pointer
+        width: 35px
+        height: 35px
+        fill: #fff
+    .stage
+        text-align: center
 </style>

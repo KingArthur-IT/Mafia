@@ -3,8 +3,8 @@
     <div>
       <div class="sidebar__logo lg-font">MafiaWorld</div>
       <div class="profile-section">
-        <div class="profile-section__icon md-font">AA</div>
-        <div class="profile-section__nick">KingArthur-99</div>
+        <div class="profile-section__icon md-font">{{userData?.nickname[0]}}</div>
+        <div class="profile-section__nick">{{userData?.nickname}}</div>
       </div>
     </div>
     <div>
@@ -39,6 +39,7 @@
 </template>
 
 <script>
+import {mapGetters} from 'vuex'
 import LogoutIcon from '@/components/icons/LogoutIcon.vue'
 import SettingsIcon from '@/components/icons/SettingsIcon.vue'
 import HomeIcon from '@/components/icons/HomeIcon.vue'
@@ -56,7 +57,10 @@ export default {
   methods:{
     goToPage(pageName){
       this.$router.push({name: pageName})
-    }
+    },
+  },
+  computed:{
+    ...mapGetters('user', ['userData'])
   }
 }
 </script>

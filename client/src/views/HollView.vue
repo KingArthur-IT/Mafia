@@ -66,10 +66,11 @@ export default {
         getImageUrl,
         goToRoom(id){
             if (this.userData?.id){
-                this.$socket.emit('enterRoom', {userId: this.userData.id, nickname: this.userData.nickname, roomId: id}, response => {
-                    if (response?.status === 'ok')
-                        this.$router.push({name: 'room', params:{id: id}})
-                    else this.showToast({text: 'Ошибка входа в комнату', type: 'error'})
+                this.$socket.emit('enterRoom', { userId: this.userData.id, roomId: id }, response => {
+                    if (response?.status === 'ok') {
+                        this.$router.push({ name: 'room', params: { id: id } })
+                    }
+                    else this.showToast({ text: response.text || 'Ошибка входа в комнату', type: 'error' })
                 })
             }
         }

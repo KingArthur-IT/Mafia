@@ -1,9 +1,9 @@
 <template>
-    <div class="card">
+    <div class="card" :class="{'no-nick': !showNick}">
         <div class="card__hero">
             <img :src="getImageUrl('room-cards', getCardName(role, gender) )" :alt="role">
         </div>
-        <p class="sm-font card__nick">{{nickname}}</p>
+        <p v-if="showNick" class="card__nick">{{nickname}}</p>
     </div>
 </template>
 
@@ -23,6 +23,10 @@ export default {
         gender:{
             type: String,
             required: true
+        },
+        showNick: {
+            type: Boolean,
+            default: true
         }
     },
     methods:{
@@ -42,6 +46,8 @@ export default {
         height: 80px
         padding: 5px
         margin-bottom: 20px
+        &.no-nick
+            margin-bottom: 0
         &__hero
             border: 1px solid #fff
             border-radius: 5px
@@ -51,4 +57,6 @@ export default {
                 height: 100%
         &__nick
             text-align: center
+            word-break: break-all
+            font-size: 12px
 </style>

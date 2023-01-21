@@ -6,67 +6,45 @@ export default{
 
   state: {
     chat: [],
-    players: [
-        {
-            nickname: 'nick',
-            gender: 'male',
-            role: 'unknown' 
-        },
-        {
-            nickname: 'nick',
-            gender: 'female',
-            role: 'citizen' 
-        },
-        {
-            nickname: 'nick',
-            gender: 'male',
-            role: 'mafia' 
-        },
-        {
-            nickname: 'nick',
-            gender: 'male',
-            role: 'reporter' 
-        },
-        {
-            nickname: 'nick',
-            gender: 'male',
-            role: 'barmen' 
-        },
-        {
-            nickname: 'nick',
-            gender: 'male',
-            role: 'doctor' 
-        },
-        {
-            nickname: 'nick',
-            gender: 'male',
-            role: 'bodyguard' 
-        },
-        {
-            nickname: 'nick',
-            gender: 'male',
-            role: 'terrorist' 
-        },
-        {
-            nickname: 'nick',
-            gender: 'male',
-            role: 'sheriff' 
-        },
-        {
-            nickname: 'nick',
-            gender: 'male',
-            role: 'lover' 
-        },
-    ] 
+    players: [],
+    timer: -1,
+    timerObj: null,
+    gameStatus: 'Набор игроков', 
+    role: 'unknown'
   },
 
   getters: {
     gameChat: state => state.chat,
+    gamePlayers: state => state.players,
+    gameTimer: state => state.timer,
+    gameRole: state => state.role,
+    gameStatus: state => state.gameStatus
   },
 
   mutations: {
     // setRoomsList: (state, data) => state.user = [...data],
-    SOCKET_newChatMsg: (state, data) => state.chat.push(data)
+    SOCKET_newChatMsg: (state, data) => state.chat.push(data),
+    SOCKET_copyChat: (state, data) => state.chat = data,
+    SOCKET_clearChat: (state) => state.chat = [],
+    SOCKET_updateUsers: (state, data) => state.players = data,
+    SOCKET_setCountdown: (state, data) => {
+      state.timer = data;
+      if (data <= 0) {
+        clearInterval(state.timerObj)
+        state.timerObj = null
+      }
+
+      if (!state.timerObj)
+        state.timerObj = setInterval(() => {
+          state.timer --
+          if (state.timer <= 0) {
+            clearInterval(state.timerObj)
+            state.timerObj = null
+            state.timer = 0
+          }
+        }, 1000);
+    },
+    SOCKET_updateGameStage: (state, data) => state.gameStatus = data
   },
 
   actions: {
