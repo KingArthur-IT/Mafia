@@ -44,7 +44,8 @@ export default{
           }
         }, 1000);
     },
-    SOCKET_updateGameStage: (state, data) => state.gameStatus = data
+    SOCKET_updateGameStage: (state, data) => state.gameStatus = data,
+    SOCKET_setPlayerRole: (state, data) => state.role = data
   },
 
   actions: {

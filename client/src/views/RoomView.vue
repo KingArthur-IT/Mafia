@@ -41,21 +41,31 @@
           </div>
       </div>
   </div>
+  <ModalWrapper v-model="isModalOpened" :title="'ВАША ИГРОВАЯ РОЛЬ'">
+    <img :src="getImageUrl('room-cards', `${gameRole}-${userData.gender[0]}`, 'png')" :alt="gameRole" class="modal-img">
+    <p class="modal-text">{{ rolesInfo[gameRole]?.description }}</p>
+  </ModalWrapper>
 </template>
 
 <script>
-import CardRole from '@/components/UIKit/CardRole.vue'
 import { mapGetters, mapActions } from 'vuex'
+import { getImageUrl } from '@/use/imgLinks.js'
+import { rolesInfo } from '@/data/data'
+import CardRole from '@/components/UIKit/CardRole.vue'
 import QuiteIcon from '@/components/icons/LogoutIcon.vue'
+import ModalWrapper from '@/components/Modals/ModalWrapper.vue'
 
 export default {
     components:{
         CardRole,
-        QuiteIcon
+        QuiteIcon,
+        ModalWrapper
     },
     data() {
         return {
-            roomId: -1
+            roomId: -1,
+            isModalOpened: false,
+            rolesInfo
         }
     },
     computed:{
@@ -68,8 +78,14 @@ export default {
     beforeUnmount(){
         this.leaveTheRoom()
     },
+    watch: {
+        gameRole() {
+            this.isModalOpened = true
+        }
+    },
     methods: {
         ...mapActions('toast', ['showToast']),
+        getImageUrl,
         leaveTheRoom() {
             if (this.userData?.id){
                 this.$socket.emit('leaveRoom', {userId: this.userData.id, nickname: this.userData.nickname, roomId: this.roomId}, response => {
@@ -151,5 +167,14 @@ export default {
         height: 35px
         fill: #fff
     .stage
+        text-align: center
+    .modal-img
+        width: 200px
+        display: block
+        margin: 0 auto
+        margin-bottom: 10px
+        mix-blend-mode: hard-light
+    .modal-text
+        max-width: 300px
         text-align: center
 </style>

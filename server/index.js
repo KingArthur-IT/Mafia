@@ -12,11 +12,15 @@ const io = new Server(server, {
     origin: '*',
   }
 });
+
 const PORT = process.env.PORT || 3000
 const PRE_START_TIMER = 20; //60 csec
 
+const getRolesCount = require('./game/getRolesCount')
+
 const userRouter = require('./routes/user.routes')
-const roomsRouter = require('./routes/rooms.routes')
+const roomsRouter = require('./routes/rooms.routes');
+const e = require('express');
 
 var gameTimer = null,
     timeCount = 0
@@ -63,7 +67,6 @@ io.on('connection', (socket) => {
       //ok
       cb({ status: 'ok' });
 
-      console.log(currRoom.id, currRoom.status);
       socket.join(data.roomId); //join user to room
 
       if (currRoom.status !== 'playing') {
@@ -74,6 +77,7 @@ io.on('connection', (socket) => {
   
         //add user
         currRoom.users.push({
+          socketId: socket.id,
           id: currUser.id,
           nickname: currUser.nickname,
           gender: currUser.gender,
@@ -102,12 +106,31 @@ io.on('connection', (socket) => {
         gameTimer = setInterval(() => {
           timeCount --
           if (timeCount <= 0) {
+            // game start
             io.in(data.roomId).emit('updateGameStage', 'Наступила ночь');
             currRoom.status = 'playing';
             io.in(data.roomId).emit('setCountdown', 0);
             clearInterval(gameTimer)
             gameTimer = null
             timeCount = 0
+
+            const roles = getRolesCount(currRoom.users.length, currRoom.roles)
+            const rolesEntries = Object.entries(roles)
+            
+            currRoom.users.forEach((user) => {
+
+              if (rolesEntries.length) {
+                const rand = Math.random() * (rolesEntries.length - 1)
+                user.role = rolesEntries[rand][0]
+
+                if (rolesEntries[rand][1] > 1)
+                  rolesEntries[rand][1] = rolesEntries[rand][0] - 1
+                else rolesEntries.splice(rand, 1)
+              }
+              else user.role = 'citizen'
+
+              io.to(user.socketId).emit("setPlayerRole", user.role)
+            })
           }
         }, 1000)
       }
@@ -115,7 +138,7 @@ io.on('connection', (socket) => {
   })
 
   //leave the room
-  socket.on('leaveRoom', (data, cb) => { //data: {userId, nickname, roomId}
+  socket.on('leaveRoom', (data, cb) => { //data: { userId, nickname, roomId }
     if (!data.userId || !data.roomId){
       return cb({ status: 'error', text: 'Данные пользователя не корректны' })
     } else {
@@ -154,6 +177,29 @@ io.on('connection', (socket) => {
       }
     }
   })
+
+  //send msg
+  socket.on('sendMsg', (data, cb) => { //data: { userId, nickname, roomId, msgText }
+    if (!data.userId || !data.roomId){
+      return cb({ status: 'error', text: 'Данные пользователя не корректны' })
+    } else {
+      const currRoom = rooms.find(room => room.id === data.roomId);
+      const currUser = users.find(user => user.id === data.userId);
+      
+      if (!currRoom || !currUser) {
+        cb({ status: 'error', text: 'Room or user not found' })
+        return
+      }
+      //ok
+      cb({ status: 'ok' });
+
+      //msg to chat
+      const chatMsg = { author: data.nickname, text: `Пользователь ${currUser.nickname} вышел` };
+      currRoom.chat.push(chatMsg);
+      io.in(data.roomId).emit('newChatMsg', chatMsg);  
+    }
+  })
+
 });
 
 app.use('/api', userRouter)
