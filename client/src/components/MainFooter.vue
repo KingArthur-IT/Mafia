@@ -1,7 +1,7 @@
 <template>
   <footer class="container footer">
       <div class="footer__logo" @click="goToMainPage">MafiaWorld</div>
-      <p class="footer__copyright">(c) copyright 2022</p>
+      <p class="footer__copyright">(c) copyright 2023</p>
       <a href="mailto:" class="footer__mail">mafiaworld@support.com</a>
   </footer>
 </template>

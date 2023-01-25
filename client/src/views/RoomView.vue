@@ -32,11 +32,21 @@
           </div>
           <div class="hero">
               <div class="dialog">
-                  <p v-for="(msg, i) in gameChat" :key="i" class="chat-msg" :class="{'server-msg': msg.author === 'server'}">{{msg.text}}</p>
+                  <div 
+                    v-for="(msg, i) in gameChat" 
+                    :key="i" class="chat-msg" 
+                    :class="{'server-msg': msg.author === 'server', 'own-msg': msg.author === userData.nickname}"
+                  >
+                    <div v-if="msg.author === 'server'">{{ msg.text }}</div>
+                    <div v-else>
+                        <span v-if="isOtherPlayerMsg(msg)" class="sm-font author-name">{{ msg.author }}:</span>
+                        <span>{{ msg.text }}</span>
+                    </div>
+                  </div>
               </div>
               <div class="dialog-inputs">
-                  <input type="text">
-                  <button class="btn secondary-btn"></button>
+                  <input v-model="inputMsgText" type="text">
+                  <button class="btn secondary-btn" @click="sendMsg"></button>
               </div>
           </div>
       </div>
@@ -65,7 +75,8 @@ export default {
         return {
             roomId: -1,
             isModalOpened: false,
-            rolesInfo
+            rolesInfo,
+            inputMsgText: ''
         }
     },
     computed:{
@@ -86,11 +97,22 @@ export default {
     methods: {
         ...mapActions('toast', ['showToast']),
         getImageUrl,
+        isOtherPlayerMsg(msg) { //msg.text, msg.author
+            return msg.author !== 'server' && msg.author !== this.userData.nickname
+        },
         leaveTheRoom() {
             if (this.userData?.id){
-                this.$socket.emit('leaveRoom', {userId: this.userData.id, nickname: this.userData.nickname, roomId: this.roomId}, response => {
+                this.$socket.emit('leaveRoom', { userId: this.userData.id, nickname: this.userData.nickname, roomId: this.roomId }, response => {
                     if (response?.status !== 'ok')
                         this.showToast({text: response.text || 'Ошибка при выходе из комнаты', type: 'error'})
+                })
+            }
+        },
+        sendMsg() {
+            if (this.userData?.id){
+                this.$socket.emit('sendMsg', { userId: this.userData.id, nickname: this.userData.nickname, roomId: this.roomId, msgText: this.inputMsgText }, response => {
+                    if (response?.status !== 'ok')
+                        this.showToast({text: response.text || 'Отправка сообщения не удалась', type: 'error'})
                 })
             }
         }
@@ -153,10 +175,17 @@ export default {
             width: 60px
 
     .chat-msg
-        text-align: right
+        text-align: left
+        padding: 5px 0
     .server-msg
         text-align: center
-        color: #d8ff00
+        color: #fff// #d8ff00
+        font-style: italic
+    .own-msg
+        text-align: right
+    .author-name
+        display: block
+        font-style: italic
     .head
         display: flex
         justify-content: space-between

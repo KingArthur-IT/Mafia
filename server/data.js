@@ -31,6 +31,17 @@ const users = [
         rating: 103,
         achivements: [],
         statistics: {}
+    },
+    {
+        id: 4,
+        nickname: 'King',
+        gender: 'male',
+        email: 'king4@king.com',
+        emailNotification: true,
+        accountType: 'vip',
+        rating: 103,
+        achivements: [],
+        statistics: {}
     }
 ];
 
@@ -60,12 +71,29 @@ const rooms = [
             {role: 'bodyguard', count: 1},
             {role: 'terrorist', count: 1}
         ],
-        users: [],
+        users: [], //socketId, id, nickname, gender, role
         chat: [],
         status: 'collecting' //collecting, countdown, playing
     },
     {
         id: 2,
+        name: 'Test room',
+        maxPersons: 10,
+        minPersons: 4,
+        roles: [
+            {role: 'lover', count: 0},
+            {role: 'reporter', count: 0},
+            {role: 'barmen', count: 0},
+            {role: 'doctor', count: 0},
+            {role: 'bodyguard', count: 0},
+            {role: 'terrorist', count: 0}
+        ],
+        users: [],
+        chat: [],
+        status: 'collecting'
+    },
+    {
+        id: 3,
         name: 'Test room',
         maxPersons: 10,
         minPersons: 8,

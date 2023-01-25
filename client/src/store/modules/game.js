@@ -18,7 +18,7 @@ export default{
     gamePlayers: state => state.players,
     gameTimer: state => state.timer,
     gameRole: state => state.role,
-    gameStatus: state => state.gameStatus
+    gameStatus: state => state.gameStatus //collecting, countdown, playing
   },
 
   mutations: {
