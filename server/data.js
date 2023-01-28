@@ -73,7 +73,14 @@ const rooms = [
         ],
         users: [], //socketId, id, nickname, gender, role
         chat: [],
-        status: 'collecting' //collecting, countdown, playing
+        status: 'collecting', //collecting, countdown, playing
+        gameData: {
+            gameStage: 0,
+            timerID: null,
+            timeCounter: 0,
+            chatEnable: true,
+            mafiaInChat: false
+        }
     },
     {
         id: 2,
@@ -90,7 +97,14 @@ const rooms = [
         ],
         users: [],
         chat: [],
-        status: 'collecting'
+        status: 'collecting',
+        gameData: {
+            gameStage: 0,
+            timerID: null,
+            timeCounter: 0,
+            chatEnable: true,
+            mafiaInChat: false
+        }
     },
     {
         id: 3,
@@ -107,13 +121,27 @@ const rooms = [
         ],
         users: [],
         chat: [],
-        status: 'collecting'
+        status: 'collecting',
+        gameData: {
+            gameStage: 0,
+            timerID: null,
+            timeCounter: 0,
+            chatEnable: true,
+            mafiaInChat: false
+        }
     }
 ]
 
-// export {
-//     user, rolesList, rooms
-// }
+/*
+ currRoom.users.push({
+    socketId: socket.id,
+    id: currUser.id,
+    nickname: currUser.nickname,
+    gender: currUser.gender,
+    role: 'unknown',
+    isLive: true 
+    });
+ */
 
 module.exports = {
     users, rolesList, rooms

@@ -60,3 +60,10 @@ export default{
   },
 
 };
+
+/*
+обработать эти события на клиенте
+setGameStage = 1-4
+chatEnable TF
+
+*/
