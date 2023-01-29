@@ -79,7 +79,8 @@ const rooms = [
             timerID: null,
             timeCounter: 0,
             chatEnable: true,
-            mafiaInChat: false
+            mafiaInChat: false,
+            killsCandidates: []
         }
     },
     {
@@ -103,7 +104,8 @@ const rooms = [
             timerID: null,
             timeCounter: 0,
             chatEnable: true,
-            mafiaInChat: false
+            mafiaInChat: false,
+            killsCandidates: []
         }
     },
     {
@@ -127,7 +129,8 @@ const rooms = [
             timerID: null,
             timeCounter: 0,
             chatEnable: true,
-            mafiaInChat: false
+            mafiaInChat: false,
+            killsCandidates: []
         }
     }
 ]

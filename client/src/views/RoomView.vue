@@ -2,11 +2,12 @@
   <div class="room">
       <div class="sidebar-wrap">
           <div class="hero sidebar">
-              <div v-for="(player, i) in gamePlayers" :key="i">
+              <div v-for="(player, i) in gamePlayers.filter(pl => pl.id !== userData.id)" :key="i">
                   <CardRole 
                     :nickname="player.nickname"
                     :gender="player.gender"
                     :role="player.role"
+                    @click="sendAction(player.id)"
                   />
               </div>
           </div>
@@ -15,7 +16,7 @@
           <div class="room__head">
               <div class="hero head">
                   <div class="head__card">
-                      <p>Вы<span v-if="gameRole != 'unknown'">: {{gameRole}}</span></p>
+                      <p>Вы ({{userData.nickname}})<span v-if="gameRole != 'unknown'">: {{gameRole}}</span></p>
                       <CardRole 
                         :nickname="userData.nickname"
                         :gender="userData.gender"
@@ -25,7 +26,7 @@
                   </div>
                   <div class="stage">
                       <p>{{gameStatus}}</p>
-                      <div class="timer" v-if="gameTimer > 0"><strong>{{gameTimer}} c</strong></div>
+                      <div class="timer" v-if="gameTimer > 0"><strong>{{gameTimer}} cек</strong></div>
                   </div>
                   <QuiteIcon class="leave" @click="$router.push({name: 'profile.holl'})" />
               </div>
@@ -115,6 +116,12 @@ export default {
                         this.showToast({text: response.text || 'Отправка сообщения не удалась', type: 'error'})
                 })
             }
+        },
+        sendAction(playerId) {
+            this.$socket.emit('gameAction', { userId: this.userData.id, roomId: this.roomId, actionIds: [playerId] }, response => {
+                if (response?.status !== 'ok')
+                    this.showToast({text: response.text || 'Отправка сообщения не удалась', type: 'error'})
+            })
         }
     }
 }

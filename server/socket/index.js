@@ -20,7 +20,7 @@ function mySocket(socket) {
     //распределить роли
     currRoom.users.forEach((user) => {
         if (rolesEntries.length) {
-            const rand = Math.floor( Math.random() * (rolesEntries.length - 1) )
+            const rand = Math.round( Math.random() * (rolesEntries.length - 1) )
             user.role = rolesEntries[rand][0]
 
             if (rolesEntries[rand][1] > 1)
@@ -40,17 +40,64 @@ function mySocket(socket) {
             id: usr.id,
             nickname: usr.nickname,
             gender: usr.gender,
-            role: usr.role !== 'mafia' && usr.role !== 'terrorist' ? 'unknown' : usr.role
+            role: usr.role !== 'mafia' && usr.role !== 'terrorist' ? 'unknown' : usr.role,
+            isLive: usr.isLive
         }
     }))
     })
   }
 
+  const killPlayer = (roomId) => {
+    const currRoom = rooms.find(room => room.id === roomId)
+
+    if (currRoom.gameData.killsCandidates.length) {
+      const rand = Math.round(Math.random() * (currRoom.gameData.killsCandidates.length - 1))
+      const killId = currRoom.gameData.killsCandidates[rand]
+      currRoom.users.find((user) => user.id === killId).isLive = false
+      this.in(roomId).emit('updateUserData', currRoom.users.find((user) => user.id === killId));
+
+      const chatMsg = { 
+        author: 'server', 
+        text: `Игрок ${currRoom.users.find((user) => user.id === killId).nickname} был убит`, 
+        isHidden: false 
+      };
+      currRoom.chat.push(chatMsg);
+      this.in(roomId).emit('newChatMsg', chatMsg);    
+    } else {
+      const chatMsg = { 
+        author: 'server', 
+        text: `Все остались живы`, 
+        isHidden: false 
+      };
+      currRoom.chat.push(chatMsg);
+      this.in(roomId).emit('newChatMsg', chatMsg);   
+    }
+    currRoom.gameData.killsCandidates = []
+  }
+
+  const isEndGameCheck = (roomId) => {
+    const users = rooms.find(room => room.id === roomId).users.filter(user => user.isLive)
+    const mafiaCount = users.filter(user => ['mafia', 'barmen', 'terrorist'].includes(user.role)).length
+    
+    if (mafiaCount === 0 || mafiaCount === users.length) {
+      const text = mafiaCount === 0 ? 'Победили мирные жители' : 'Мафия победила'
+      const chatMsg = { 
+        author: 'server', 
+        text: text, 
+        isHidden: false 
+      };
+      rooms.find(room => room.id === roomId).chat.push(chatMsg);
+      this.in(roomId).emit('newChatMsg', chatMsg);  
+      return true
+    } else return false
+  }
+
   const openNewGameStep = (roomId) => {
     const currRoom = rooms.find(room => room.id === roomId)
 
+    //Ночь. Мафия в чате
     if (currRoom.gameData.gameStage === 1) {
-      this.in(roomId).emit('updateGameStage', 'Ночь. Мафия в чате');
+      this.in(roomId).emit('updateGameTitle', 'Ночь. Мафия в чате');
 
       this.in(roomId).emit('chatEnable', false);
       currRoom.gameData.chatEnable = true
@@ -58,24 +105,31 @@ function mySocket(socket) {
 
       this.in(roomId).emit('setCountdown', currRoom.gameData.timeCounter);
     }
+
+    //Мафия выбирает жертву
     if (currRoom.gameData.gameStage === 2) {
-      this.in(roomId).emit('updateGameStage', 'Мафия выбирает жертву');
+      this.in(roomId).emit('updateGameTitle', 'Мафия выбирает жертву');
 
       currRoom.gameData.chatEnable = false
       currRoom.gameData.mafiaInChat = false
 
       this.in(roomId).emit('setCountdown', currRoom.gameData.timeCounter);
     }
+
+    //День. Общее обсуждение
     if (currRoom.gameData.gameStage === 3) {
-      this.in(roomId).emit('updateGameStage', 'День. Общее обсуждение');
+      //start day
+      this.in(roomId).emit('updateGameTitle', 'День. Общее обсуждение');
 
       this.in(roomId).emit('chatEnable', true);
       currRoom.gameData.chatEnable = true
 
       this.in(roomId).emit('setCountdown', currRoom.gameData.timeCounter);
     }
+
+    //День. Голосование
     if (currRoom.gameData.gameStage === 4) {
-      this.in(roomId).emit('updateGameStage', 'День. Голосование');
+      this.in(roomId).emit('updateGameTitle', 'День. Голосование');
 
       this.in(roomId).emit('chatEnable', false);
       currRoom.gameData.chatEnable = false
@@ -94,17 +148,30 @@ function mySocket(socket) {
     distributeRoles(currRoom)
     
     currRoom.gameData.gameStage = 1
-    this.in(roomId).emit('setGameStage', currRoom.gameData.gameStage);
+    this.in(data.roomId).emit('setGameStage', currRoom.gameData.gameStage);
     currRoom.gameData.timeCounter = STEPS_TIMER_COUNT
     openNewGameStep(data.roomId)
 
     currRoom.gameData.timerID = setInterval(() => {
       currRoom.gameData.timeCounter --
+
       if (currRoom.gameData.timeCounter <= 0) {
-        currRoom.gameData.gameStage = currRoom.gameData.gameStage < 4 ? currRoom.gameData.gameStage + 1 : 1
-        this.in(roomId).emit('setGameStage', currRoom.gameData.gameStage);
-        currRoom.gameData.timeCounter = STEPS_TIMER_COUNT
-        openNewGameStep(data.roomId)
+        if (currRoom.gameData.gameStage === 2 || currRoom.gameData.gameStage === 4)
+          killPlayer(data.roomId)
+        
+        if (!isEndGameCheck(data.roomId)) {
+          currRoom.gameData.gameStage = currRoom.gameData.gameStage < 4 ? currRoom.gameData.gameStage + 1 : 1
+          currRoom.gameData.timeCounter = STEPS_TIMER_COUNT
+          openNewGameStep(data.roomId)
+        } else {
+          //end game
+          currRoom.gameData.gameStage = 5
+          currRoom.gameData.timeCounter = 0
+          clearInterval(currRoom.gameData.timerID)
+          currRoom.gameData.timerID = null
+          this.in(data.roomId).emit('updateGameTitle', 'Игра окончена');
+        }
+        this.in(data.roomId).emit('setGameStage', currRoom.gameData.gameStage);
       }
     }, 1000);
 
@@ -172,12 +239,12 @@ function mySocket(socket) {
       }
 
       if (currRoom.status === 'collecting') {
-        socket.emit('updateGameStage', 'Набор игроков');
+        socket.emit('updateGameTitle', 'Набор игроков');
         socket.emit('setCountdown', 0)
       }
       
       if (currRoom.status === 'countdown') {
-        socket.emit('updateGameStage', 'Игра начнется через:');
+        socket.emit('updateGameTitle', 'Игра начнется через:');
         socket.emit('setCountdown', currRoom.gameData.timeCounter)  
       }
 
@@ -186,7 +253,7 @@ function mySocket(socket) {
         currRoom.gameData.timeCounter =  STEPS_TIMER_COUNT
         currRoom.status = 'countdown';
         this.in(data.roomId).emit('setCountdown', currRoom.gameData.timeCounter);
-        this.in(data.roomId).emit('updateGameStage', 'Игра начнется через:');
+        this.in(data.roomId).emit('updateGameTitle', 'Игра начнется через:');
 
         currRoom.gameData.timerID = setInterval(() => {
           currRoom.gameData.timeCounter --
@@ -240,7 +307,7 @@ function mySocket(socket) {
           currRoom.gameData.timeCounter = 0
         }
         this.in(data.roomId).emit('setCountdown', 0)
-        this.in(data.roomId).emit('updateGameStage', 'Набор игроков')
+        this.in(data.roomId).emit('updateGameTitle', 'Набор игроков')
       }
     }
   })
@@ -263,7 +330,7 @@ function mySocket(socket) {
         return
       }
 
-      if (currRoom.gameData.mafiaInChat && !currRoom.users.find(usr => usr.id === currUser.id).role == 'mafia') {
+      if (currRoom.gameData.mafiaInChat && currRoom.users.find(usr => usr.id === currUser.id).role !== 'mafia') {
         cb({ status: 'error', text: 'You cant send message now. Mafia in chat' })
         return
       }
@@ -274,7 +341,7 @@ function mySocket(socket) {
       //msg to chat
       const chatMsg = { author: data.nickname, text: data.msgText, isHidden: currRoom.gameData.mafiaInChat };
       currRoom.chat.push(chatMsg);
-      if (currRoom.gameData.chatEnable)
+      if (!currRoom.gameData.mafiaInChat)
         this.in(data.roomId).emit('newChatMsg', chatMsg);  
       else 
         currRoom.users.forEach((user) => {
@@ -284,20 +351,33 @@ function mySocket(socket) {
     }
   })
 
-  socket.on('recieveAction', (data, cb) => { //data: { userId, roomId, actionNickname = [] }
+  socket.on('gameAction', (data, cb) => { //data: { userId, roomId, actionIds = [] }
     if (!data.userId || !data.roomId){
       return cb({ status: 'error', text: 'Данные пользователя не корректны' })
     } else {
       const currRoom = rooms.find(room => room.id === data.roomId);
       const currUser = users.find(user => user.id === data.userId);
 
+      if (!currRoom.users.find(user => user.id === currUser.id).isLive) {
+        cb({ status: 'error', text: 'Данные мертвы' })
+        return
+      }
+
       const role = currRoom.users.find((user) => user.id === currUser.id).role
 
       //kill
-      if (role === 'mafia' && currRoom.gameData.gameStage === 2 && actionNickname.length) {
-
+      if ( role === 'mafia' && currRoom.gameData.gameStage === 2 && data?.actionIds?.length ) {
+        if ( currRoom.users.find((user) => user.id === data.actionIds[0]).isLive )
+          currRoom.gameData.killsCandidates.push(data.actionIds[0])
       }
 
+      if ( currRoom.gameData.gameStage === 4 && data?.actionIds?.length ) {
+        if ( currRoom.users.find((user) => user.id === data.actionIds[0]).isLive )
+          currRoom.gameData.killsCandidates.push(data.actionIds[0])
+      }
+
+      //ok
+      cb({ status: 'ok' });
     }
   })
 }

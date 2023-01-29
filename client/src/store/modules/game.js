@@ -27,6 +27,7 @@ export default{
     SOCKET_copyChat: (state, data) => state.chat = data,
     SOCKET_clearChat: (state) => state.chat = [],
     SOCKET_updateUsers: (state, data) => state.players = data,
+    SOCKET_updateUserData: (state, data) => state.players = [...state.players.filter(pl => pl.id !== data.id), data],
     SOCKET_setCountdown: (state, data) => {
       state.timer = data;
       if (data <= 0) {
@@ -44,7 +45,7 @@ export default{
           }
         }, 1000);
     },
-    SOCKET_updateGameStage: (state, data) => state.gameStatus = data,
+    SOCKET_updateGameTitle: (state, data) => state.gameStatus = data,
     SOCKET_setPlayerRole: (state, data) => state.role = data
   },
 
@@ -62,8 +63,12 @@ export default{
 };
 
 /*
-обработать эти события на клиенте
-setGameStage = 1-4
-chatEnable TF
+обработать эти события на клиенте:
+
+setGameStage - 1-4
+chatEnable - TF
+
+//send
+gameAction - data: { userId, roomId, actionNickname = [] }
 
 */
