@@ -99,7 +99,7 @@ function mySocket(socket) {
     if (currRoom.gameData.gameStage === 1) {
       this.in(roomId).emit('updateGameTitle', 'Ночь. Мафия в чате');
 
-      this.in(roomId).emit('chatEnable', false);
+      this.in(roomId).emit('chatEnable', true);
       currRoom.gameData.chatEnable = true
       currRoom.gameData.mafiaInChat = true
 
@@ -110,6 +110,7 @@ function mySocket(socket) {
     if (currRoom.gameData.gameStage === 2) {
       this.in(roomId).emit('updateGameTitle', 'Мафия выбирает жертву');
 
+      this.in(roomId).emit('chatEnable', false);
       currRoom.gameData.chatEnable = false
       currRoom.gameData.mafiaInChat = false
 

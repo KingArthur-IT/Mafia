@@ -1,5 +1,6 @@
 <template>
   <div class="room">
+      <!-- sidebar -->
       <div class="sidebar-wrap">
           <div class="hero sidebar">
               <div v-for="(player, i) in gamePlayers.filter(pl => pl.id !== userData.id)" :key="i">
@@ -8,20 +9,28 @@
                     :gender="player.gender"
                     :role="player.role"
                     @click="sendAction(player.id)"
+                    :killTarget="killTargetActive && !actionSend"
+                    :isAlive="player.isLive"
                   />
               </div>
           </div>
       </div>
+      <!-- main -->
       <div class="room__main">
+          <!-- head -->
           <div class="room__head">
               <div class="hero head">
                   <div class="head__card">
-                      <p>Вы ({{userData.nickname}})<span v-if="gameRole != 'unknown'">: {{gameRole}}</span></p>
+                      <p>
+                          Вы <span class="sm-font">({{ userData.nickname }})</span>
+                          <span v-if="gameRole != 'unknown'">: {{ rolesInfo[gameRole].name[userData.gender] }}</span>
+                      </p>
                       <CardRole 
                         :nickname="userData.nickname"
                         :gender="userData.gender"
                         :role="gameRole"
                         :showNick="false"
+                        :isAlive="gamePlayers?.find(pl => pl.id === userData.id)?.isLive"
                       />
                   </div>
                   <div class="stage">
@@ -31,6 +40,7 @@
                   <QuiteIcon class="leave" @click="$router.push({name: 'profile.holl'})" />
               </div>
           </div>
+          <!-- chat -->
           <div class="hero">
               <div class="dialog">
                   <div 
@@ -46,15 +56,28 @@
                   </div>
               </div>
               <div class="dialog-inputs">
-                  <input v-model="inputMsgText" type="text">
-                  <button class="btn secondary-btn" @click="sendMsg"></button>
+                  <input 
+                    v-model="inputMsgText" 
+                    type="text"
+                    :disabled="!isChatEnable" 
+                    :class="{'disable': !isChatEnable}"
+                    @keydown.enter="sendMsg"
+                  >
+                  <button 
+                    class="btn secondary-btn" 
+                    :class="{'disable': !isChatEnable}"
+                    @click="sendMsg"
+                  ></button>
               </div>
           </div>
       </div>
   </div>
   <ModalWrapper v-model="isModalOpened" :title="'ВАША ИГРОВАЯ РОЛЬ'">
     <img :src="getImageUrl('room-cards', `${gameRole}-${userData.gender[0]}`, 'png')" :alt="gameRole" class="modal-img">
-    <p class="modal-text">{{ rolesInfo[gameRole]?.description }}</p>
+    <p class="modal-text">
+        <strong>{{ rolesInfo[gameRole]?.name[userData.gender] }}</strong> <br>
+        {{ rolesInfo[gameRole]?.description }}
+    </p>
   </ModalWrapper>
 </template>
 
@@ -77,12 +100,20 @@ export default {
             roomId: -1,
             isModalOpened: false,
             rolesInfo,
-            inputMsgText: ''
+            inputMsgText: '',
+            actionSend: false
         }
     },
-    computed:{
-        ...mapGetters('game', ['gameChat', 'gamePlayers', 'gameRole', 'gameTimer', 'gameStatus']),
+    computed: {
+        ...mapGetters('game', ['gameChat', 'gameChatEnable', 'gamePlayers', 'gameRole', 'gameTimer', 'gameStatus', 'gameStage']),
         ...mapGetters('user', ['userData']),
+        isChatEnable() {
+            const chatEnable = this.gameStage === 1 ? this.gameRole === 'mafia' : true
+            return this.gameChatEnable && chatEnable
+        },
+        killTargetActive() {
+            return this.gameStage === 4 || this.gameStage === 2 && this.gameRole === 'mafia'
+        }
     },
     mounted() {
         this.roomId = Number(this.$route.params.id)
@@ -93,6 +124,9 @@ export default {
     watch: {
         gameRole() {
             this.isModalOpened = true
+        },
+        gameStage() {
+            this.actionSend = false
         }
     },
     methods: {
@@ -110,18 +144,22 @@ export default {
             }
         },
         sendMsg() {
-            if (this.userData?.id){
+            if (this.userData?.id && this.inputMsgText){
                 this.$socket.emit('sendMsg', { userId: this.userData.id, nickname: this.userData.nickname, roomId: this.roomId, msgText: this.inputMsgText }, response => {
                     if (response?.status !== 'ok')
                         this.showToast({text: response.text || 'Отправка сообщения не удалась', type: 'error'})
+                    else this.inputMsgText = ''
                 })
             }
         },
         sendAction(playerId) {
-            this.$socket.emit('gameAction', { userId: this.userData.id, roomId: this.roomId, actionIds: [playerId] }, response => {
-                if (response?.status !== 'ok')
-                    this.showToast({text: response.text || 'Отправка сообщения не удалась', type: 'error'})
-            })
+            if (this.killTargetActive && !this.actionSend) {
+                this.actionSend = true
+                this.$socket.emit('gameAction', { userId: this.userData.id, roomId: this.roomId, actionIds: [playerId] }, response => {
+                    if (response?.status !== 'ok')
+                        this.showToast({text: response.text || 'Отправка сообщения не удалась', type: 'error'})
+                })
+            }
         }
     }
 }
@@ -178,8 +216,14 @@ export default {
             margin-right: 10px
             background: var(--color-background-soft)
             color: #fff
+            &.disable
+                color: var(--color-background-soft)
+                border: 1px solid darken(#fff, 40%)
         & button
             width: 60px
+            &.disable
+                background-color: transparent
+                border-color: darken(#fff, 40%)
 
     .chat-msg
         text-align: left
