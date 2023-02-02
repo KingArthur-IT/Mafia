@@ -158,10 +158,10 @@ export default {
             this.terrorist.max = this.mafia > 3 ? this.mafia < 7 ? 1 : 2 : 0;
 
             this.bodyguard.max = this.mafia > 3 ? this.mafia < 7 ? 1 : 2 : 0;
-            this.reporter.max = this.citizens > 6 ? this.citizens < 12 ? 2 : 3 : 1;
+            this.reporter.max = this.citizens > 8 ? this.citizens < 12 ? 2 : 3 : 1;
             this.doctor.max = this.citizens > 5 ? this.citizens < 12 ? 2 : 3 : 1;
             this.lover.max = this.citizens > 7 ? 2 : 1;
-            this.sheriff.max = this.citizens > 8 ? this.citizens < 12 ? 2 : 3 : 1;
+            this.sheriff.max = this.citizens > 6 ? this.citizens < 12 ? 2 : 3 : 1;
 
             if (roomPlayersMax < roomPlayersMin)
                     this.roomPlayers[0] = roomPlayersMax;

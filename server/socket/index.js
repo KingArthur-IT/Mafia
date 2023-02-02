@@ -1,7 +1,7 @@
 const getRolesCount = require('../game/getRolesCount')
 const { rooms, users } = require('../data')
 
-const STEPS_TIMER_COUNT = 20; //60 csec
+const STEPS_TIMER_COUNT = 30; //60 csec
 
 // Main function
 function mySocket(socket) {
@@ -55,6 +55,7 @@ function mySocket(socket) {
       const killId = currRoom.gameData.killsCandidates[rand]
       currRoom.users.find((user) => user.id === killId).isLive = false
       this.in(roomId).emit('updateUserData', currRoom.users.find((user) => user.id === killId));
+      this.to(currRoom.users.find((user) => user.id === killId).socketId).emit('wasKilled', true)
 
       const chatMsg = { 
         author: 'server', 
@@ -234,7 +235,8 @@ function mySocket(socket) {
           nickname: currUser.nickname,
           gender: currUser.gender,
           role: 'unknown',
-          isLive: true 
+          isLive: true,
+          labels: []
         });
         this.in(data.roomId).emit('updateUsers', currRoom.users);
       }
@@ -360,7 +362,7 @@ function mySocket(socket) {
       const currUser = users.find(user => user.id === data.userId);
 
       if (!currRoom.users.find(user => user.id === currUser.id).isLive) {
-        cb({ status: 'error', text: 'Данные мертвы' })
+        cb({ status: 'error', text: 'Вы мертвы' })
         return
       }
 
@@ -377,6 +379,71 @@ function mySocket(socket) {
           currRoom.gameData.killsCandidates.push(data.actionIds[0])
       }
 
+      //sheriff
+      if ( role === 'sheriff' && currRoom.gameData.gameStage === 2 && data?.actionIds?.length)
+        if ( currRoom.users.find((user) => user.id === data.actionIds[0]).isLive ) {
+          const selectedUser = currRoom.users.find((user) => user.id === data.actionIds[0])
+          const currUserSocket = currRoom.users.find(user => user.id === currUser.id).socketId
+          this.to(currUserSocket).emit('updateUserData', selectedUser);
+          this.to(selectedUser.socketId).emit('wasWatched', true);
+        }
+
+      //reporter
+      if ( role === 'reporter' && currRoom.gameData.gameStage === 2 && data?.actionIds?.length > 1)
+        if ( currRoom.users.find((user) => user.id === data.actionIds[0]).isLive &&
+             currRoom.users.find((user) => user.id === data.actionIds[1]).isLive
+        ) {
+          const isMafia1 = ['mafia', 'barmen', 'terrorist'].includes( currRoom.users.find((user) => user.id === data.actionIds[0]).role )
+          const isMafia2 = ['mafia', 'barmen', 'terrorist'].includes( currRoom.users.find((user) => user.id === data.actionIds[1]).role )
+
+          const nickname1 = currRoom.users.find((user) => user.id === data.actionIds[0]).nickname
+          const nickname2 = currRoom.users.find((user) => user.id === data.actionIds[1]).nickname
+          
+          const isOneTeam = (isMafia1 && isMafia2) || (!isMafia1 && !isMafia2) ? true : false
+          const txt = isOneTeam ? 'одной команде' : 'разных командах'
+
+          //msg to chat
+          const chatMsg = { 
+            author: 'server', 
+            text: `Игроки [${nickname1}] [${nickname2}] играют в ${txt}`, 
+            isHidden: false 
+          }
+          currRoom.chat.push(chatMsg)
+          this.in(data.roomId).emit('newChatMsg', chatMsg)
+        }
+
+      //lover
+      if ( role === 'lover' && currRoom.gameData.gameStage === 1 && data?.actionIds?.length)
+        if ( currRoom.users.find((user) => user.id === data.actionIds[0]).isLive ) {
+          const selectedUser = currRoom.users.find((user) => user.id === data.actionIds[0])
+          selectedUser.labels.push('lover')
+          this.to(selectedUser.socketId).emit('setLabel', 'lover');
+        }
+
+      //doctor
+      if ( role === 'doctor' && currRoom.gameData.gameStage === 2 && data?.actionIds?.length)
+        if ( currRoom.users.find((user) => user.id === data.actionIds[0]).isLive ) {
+          const selectedUser = currRoom.users.find((user) => user.id === data.actionIds[0])
+          selectedUser.labels.push('doctor')
+          this.to(selectedUser.socketId).emit('setLabel', 'doctor');
+        }
+
+      //barmen
+      if ( role === 'barmen' && currRoom.gameData.gameStage === 2 && data?.actionIds?.length)
+        if ( currRoom.users.find((user) => user.id === data.actionIds[0]).isLive ) {
+          const selectedUser = currRoom.users.find((user) => user.id === data.actionIds[0])
+          selectedUser.labels.push('barmen')
+          this.to(selectedUser.socketId).emit('setLabel', 'barmen');
+        }
+
+      //bodyguard
+      if ( role === 'bodyguard' && currRoom.gameData.gameStage === 3 && data?.actionIds?.length)
+        if ( currRoom.users.find((user) => user.id === data.actionIds[0]).isLive ) {
+          const selectedUser = currRoom.users.find((user) => user.id === data.actionIds[0])
+          selectedUser.labels.push('bodyguard')
+          this.to(selectedUser.socketId).emit('setLabel', 'bodyguard');
+        }
+        
       //ok
       cb({ status: 'ok' });
     }

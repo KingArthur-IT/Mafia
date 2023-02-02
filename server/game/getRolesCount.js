@@ -12,27 +12,29 @@ function getRolesCount(usersCount, roles) {
         sheriff: 0
     }
 
-    players.mafia = Math.round(usersCount / 2)
+    players.mafia = Math.round(usersCount / 3)
     players.citizen = usersCount - players.mafia
 
     const playersMax = {
         barmen: players.mafia > 2 ? players.mafia < 7 ? 1 : 2 : 0,
         terrorist: players.mafia > 3 ? players.mafia < 7 ? 1 : 2 : 0,
         bodyguard: players.mafia > 3 ? players.mafia < 7 ? 1 : 2 : 0,
-        reporter: players.citizen > 6 ? players.citizen < 12 ? 2 : 3 : 0, //1
+        reporter: players.citizen > 8 ? players.citizen < 12 ? 2 : 3 : 1, 
         doctor: players.citizen > 5 ? players.citizen < 12 ? 2 : 3 : 0, //1
         lover: players.citizen > 7 ? 2 : 0, //1
-        sheriff: players.citizen > 8 ? players.citizen < 12 ? 2 : 3 : 0 //1
+        sheriff: players.citizen > 6 ? players.citizen < 12 ? 2 : 3 : 1
     }
 
     //распределить игровые роли по кол-ву игроков и макс заданному клд-ву для каждой роли
-    const arr = ['barmen', 'terrorist', 'bodyguard', 'reporter', 'doctor', 'lover', 'sheriff'] 
+    const arr = ['barmen', 'terrorist', 'bodyguard', 'reporter', 'doctor', 'lover'] 
     arr.forEach(playerRole => {
         const roleCount = roles.find(r => r.role === playerRole)?.count
 
         if (roleCount)
             players[playerRole] = roleCount > playersMax[playerRole] ? playersMax[playerRole] : roleCount
     });
+
+    players['sheriff'] = playersMax['sheriff']
     
     //посчитать сумму всех игроков в игровых ролях кроме просто мирных
     const count = Object.entries(players).reduce((acc, val) => { 

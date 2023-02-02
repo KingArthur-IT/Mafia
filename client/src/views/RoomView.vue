@@ -8,9 +8,10 @@
                     :nickname="player.nickname"
                     :gender="player.gender"
                     :role="player.role"
-                    @click="sendAction(player.id)"
                     :killTarget="killTargetActive && !actionSend"
+                    :detectTarget="sheriffDetectorActive || (reporterDetectorActive && !reporterIds.includes(player.id))"
                     :isAlive="player.isLive"
+                    @click="sendAction(player.id, player.isLive)"
                   />
               </div>
           </div>
@@ -21,17 +22,20 @@
           <div class="room__head">
               <div class="hero head">
                   <div class="head__card">
-                      <p>
-                          Вы <span class="sm-font">({{ userData.nickname }})</span>
-                          <span v-if="gameRole != 'unknown'">: {{ rolesInfo[gameRole].name[userData.gender] }}</span>
-                      </p>
-                      <CardRole 
-                        :nickname="userData.nickname"
-                        :gender="userData.gender"
-                        :role="gameRole"
-                        :showNick="false"
-                        :isAlive="gamePlayers?.find(pl => pl.id === userData.id)?.isLive"
-                      />
+                      <div>
+                          <p>
+                              Вы <span class="sm-font">({{ userData.nickname }})</span>
+                              <span v-if="gameRole != 'unknown'">: {{ rolesInfo[gameRole].name[userData.gender] }}</span>
+                          </p>
+                          <CardRole 
+                            :nickname="userData.nickname"
+                            :gender="userData.gender"
+                            :role="gameRole"
+                            :showNick="false"
+                            :isAlive="gamePlayerIsAlive"
+                          />
+                      </div>
+                      <img src="@/assets/sheriff-badge.png" alt="sheriff" class="sheriff-badge" :class="{'badge-visible': gameWasWatched}">
                   </div>
                   <div class="stage">
                       <p>{{gameStatus}}</p>
@@ -101,18 +105,25 @@ export default {
             isModalOpened: false,
             rolesInfo,
             inputMsgText: '',
-            actionSend: false
+            actionSend: false,
+            reporterIds: []
         }
     },
     computed: {
-        ...mapGetters('game', ['gameChat', 'gameChatEnable', 'gamePlayers', 'gameRole', 'gameTimer', 'gameStatus', 'gameStage']),
+        ...mapGetters('game', ['gameChat', 'gameChatEnable', 'gamePlayers', 'gameRole', 'gameTimer', 'gameStatus', 'gameStage', 'gameWasWatched', 'gamePlayerIsAlive']),
         ...mapGetters('user', ['userData']),
         isChatEnable() {
             const chatEnable = this.gameStage === 1 ? this.gameRole === 'mafia' : true
             return this.gameChatEnable && chatEnable
         },
         killTargetActive() {
-            return this.gameStage === 4 || this.gameStage === 2 && this.gameRole === 'mafia'
+            return (this.gameStage === 4 || this.gameStage === 2 && this.gameRole === 'mafia') && this.gamePlayerIsAlive
+        },
+        sheriffDetectorActive() {
+            return this.gameStage === 2 && this.gameRole === 'sheriff' && !this.actionSend && this.gamePlayerIsAlive
+        },
+        reporterDetectorActive() {
+            return this.gameStage === 2 && this.gameRole === 'reporter' && this.reporterIds.length < 2 && !this.actionSend && this.gamePlayerIsAlive
         }
     },
     mounted() {
@@ -152,13 +163,37 @@ export default {
                 })
             }
         },
-        sendAction(playerId) {
+        sendAction(playerId, isAlive) {
+            if (!isAlive) return
+            //убить
             if (this.killTargetActive && !this.actionSend) {
                 this.actionSend = true
                 this.$socket.emit('gameAction', { userId: this.userData.id, roomId: this.roomId, actionIds: [playerId] }, response => {
                     if (response?.status !== 'ok')
-                        this.showToast({text: response.text || 'Отправка сообщения не удалась', type: 'error'})
+                        this.showToast({text: response.text || 'Действие не удалось', type: 'error'})
                 })
+            }
+            //исследовать шерифом
+            if (this.sheriffDetectorActive) {
+                this.actionSend = true
+                this.$socket.emit('gameAction', { userId: this.userData.id, roomId: this.roomId, actionIds: [playerId] }, response => {
+                    if (response?.status !== 'ok')
+                        this.showToast({text: response.text || 'Действие не удалось', type: 'error'})
+                })
+            }
+            //reporter
+            if (this.reporterDetectorActive) {
+                if (!this.reporterIds.includes(playerId))
+                    this.reporterIds.push(playerId)
+
+                if (this.reporterIds.length > 1) {
+                    this.actionSend = true
+                    this.$socket.emit('gameAction', { userId: this.userData.id, roomId: this.roomId, actionIds: this.reporterIds }, response => {
+                        if (response?.status !== 'ok')
+                            this.showToast({text: response.text || 'Действие не удалось', type: 'error'})
+                        this.reporterIds = []
+                    })
+                }
             }
         }
     }
@@ -186,6 +221,20 @@ export default {
         &__head
             width: 100%
             padding-bottom: 20px
+    .head__card
+        display: flex
+        align-items: flex-end
+    .sheriff-badge
+        width: 60px
+        height: 60px
+        margin-bottom: 10px
+        opacity: 0
+        pointer-events: none
+        transition: opacity 1s ease, transform 1s cubic-bezier(.31,2,.22,.51)
+        transform: scale(0)
+        &.badge-visible
+            opacity: 1
+            transform: scale(1)
     .sidebar-wrap
         width: 280px
         padding: 20px

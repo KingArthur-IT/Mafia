@@ -12,7 +12,9 @@ export default{
     timerObj: null,
     gameStatus: 'Набор игроков', 
     role: 'unknown',
-    gameStage: 0
+    gameStage: 0,
+    isAlive: true,
+    wasWatched: false //by sheriff
   },
 
   getters: {
@@ -23,6 +25,8 @@ export default{
     gameRole: state => state.role,
     gameStatus: state => state.gameStatus, //collecting, countdown, playing
     gameStage: state => state.gameStage,
+    gameWasWatched: state => state.wasWatched,
+    gamePlayerIsAlive: state => state.isAlive
   },
 
   mutations: {
@@ -35,7 +39,12 @@ export default{
 
     //users
     SOCKET_updateUsers: (state, data) => state.players = data,
-    SOCKET_updateUserData: (state, data) => state.players = [...state.players.filter(pl => pl.id !== data.id), data],
+    SOCKET_updateUserData: (state, data) => {
+      const index = state.players.findIndex(pl => pl.id === data.id)
+      console.log(index);
+      if (index !== -1)
+        state.players[index] = data
+    },
     SOCKET_setPlayerRole: (state, data) => state.role = data,
 
 
@@ -57,7 +66,10 @@ export default{
         }, 1000);
     },
     SOCKET_updateGameTitle: (state, data) => state.gameStatus = data,
-    SOCKET_setGameStage: (state, data) => state.gameStage = data
+    SOCKET_setGameStage: (state, data) => state.gameStage = data,
+
+    SOCKET_wasWatched: (state, data) => state.wasWatched = data,
+    SOCKET_wasKilled: (state, data) => state.isAlive = !data
   },
 
   actions: {
@@ -75,6 +87,5 @@ export default{
 
 /*
 обработать эти события на клиенте:
-
-chatEnable - TF
+this.to(selectedUser.socketId).emit('setLabel', 'lover');
 */

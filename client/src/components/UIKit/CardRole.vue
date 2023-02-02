@@ -3,6 +3,7 @@
         <div class="card__hero">
             <img :src="getImageUrl('room-cards', getCardName(role, gender) )" :alt="role">
             <img src="@/assets/target.png" class="target" :class="{'active': killTarget && isAlive}">
+            <img src="@/assets/search.png" class="target" :class="{'active': detectTarget && isAlive}">
             <img v-if="!isAlive" src="@/assets/blood.png" class="blood">
         </div>
         <p v-if="showNick" class="card__nick">{{nickname}}</p>
@@ -31,6 +32,10 @@ export default {
             default: true
         },
         killTarget: {
+            type: Boolean,
+            default: false
+        },
+        detectTarget: {
             type: Boolean,
             default: false
         },
@@ -86,8 +91,8 @@ export default {
           opacity: 1
           pointer-events: all
           cursor: pointer  
-          transition: none
-          animation: pulsing 1s infinite ease alternate
+        //   transition: none
+        //   animation: pulsing 1s infinite ease alternate
     .blood
         position: absolute
         top: 0
@@ -97,9 +102,9 @@ export default {
         border-radius: 5px
         pointer-events: none
 
-    @keyframes pulsing
-        0%
-            transform: scale(1.1)
-        100%
-            transform: scale(1.03)
+    // @keyframes pulsing
+    //     0%
+    //         transform: scale(1.1)
+    //     100%
+    //         transform: scale(1.03)
 </style>
