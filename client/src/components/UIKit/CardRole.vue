@@ -2,8 +2,11 @@
     <div class="card" :class="{'no-nick': !showNick}">
         <div class="card__hero">
             <img :src="getImageUrl('room-cards', getCardName(role, gender) )" :alt="role">
-            <img src="@/assets/target.png" class="target" :class="{'active': killTarget && isAlive}">
-            <img src="@/assets/search.png" class="target" :class="{'active': detectTarget && isAlive}">
+            <img src="@/assets/target.png" class="target" :class="{'active': targetName === 'kill' && isAlive}">
+            <img src="@/assets/search.png" class="target" :class="{'active': targetName === 'sheriff' && isAlive}">
+            <img src="@/assets/camera.png" class="target" :class="{'active': targetName === 'reporter' && isAlive}">
+            <img src="@/assets/tablet.png" class="target" :class="{'active': targetName === 'doctor' && isAlive}">
+            <img src="@/assets/heart.png" class="target" :class="{'active': targetName === 'lover' && isAlive}">
             <img v-if="!isAlive" src="@/assets/blood.png" class="blood">
         </div>
         <p v-if="showNick" class="card__nick">{{nickname}}</p>
@@ -31,13 +34,9 @@ export default {
             type: Boolean,
             default: true
         },
-        killTarget: {
-            type: Boolean,
-            default: false
-        },
-        detectTarget: {
-            type: Boolean,
-            default: false
+        targetName: {
+            type: String,
+            default: ''
         },
         isAlive: {
             type: Boolean,
@@ -47,8 +46,9 @@ export default {
     methods:{
         getImageUrl,
         getCardName(role, gender){
+            if (role === 'unknown') return role
             const prefix = gender === 'male' ? '-m' : '-w';
-            return role !== 'unknown' ? role + prefix : role
+            return role + prefix
         }
     }
 }
@@ -58,6 +58,8 @@ export default {
     .card
         flex-basis: 50%
         width: 80px
+        max-width: 80px
+        min-width: 80px
         height: 80px
         padding: 5px
         margin-bottom: 20px
@@ -68,6 +70,7 @@ export default {
             border: 1px solid #fff
             border-radius: 5px
             height: 100%
+            width: 100%
             overflow: hidden
             & img
                 width: 100%

@@ -8,8 +8,7 @@
                     :nickname="player.nickname"
                     :gender="player.gender"
                     :role="player.role"
-                    :killTarget="killTargetActive && !actionSend"
-                    :detectTarget="sheriffDetectorActive || (reporterDetectorActive && !reporterIds.includes(player.id))"
+                    :targetName="activeTargetName(player.id)"
                     :isAlive="player.isLive"
                     @click="sendAction(player.id, player.isLive)"
                   />
@@ -21,21 +20,24 @@
           <!-- head -->
           <div class="room__head">
               <div class="hero head">
-                  <div class="head__card">
+                  <div class="">
                       <div>
                           <p>
                               Вы <span class="sm-font">({{ userData.nickname }})</span>
                               <span v-if="gameRole != 'unknown'">: {{ rolesInfo[gameRole].name[userData.gender] }}</span>
                           </p>
-                          <CardRole 
-                            :nickname="userData.nickname"
-                            :gender="userData.gender"
-                            :role="gameRole"
-                            :showNick="false"
-                            :isAlive="gamePlayerIsAlive"
-                          />
+                          <div class="head__card">
+                              <CardRole 
+                                :nickname="userData.nickname"
+                                :gender="userData.gender"
+                                :role="gameRole"
+                                :showNick="false"
+                                :isAlive="gamePlayerIsAlive"
+                              />
+                              <img src="@/assets/sheriff-badge.png" alt="sheriff" class="label-badge" :class="{ 'badge-visible': gameWasWatched }">
+                              <img src="@/assets/tablet.png" alt="heal" class="label-badge" :class="{ 'badge-visible': gameLabels.includes('doctor') }">
+                          </div>
                       </div>
-                      <img src="@/assets/sheriff-badge.png" alt="sheriff" class="sheriff-badge" :class="{'badge-visible': gameWasWatched}">
                   </div>
                   <div class="stage">
                       <p>{{gameStatus}}</p>
@@ -110,21 +112,12 @@ export default {
         }
     },
     computed: {
-        ...mapGetters('game', ['gameChat', 'gameChatEnable', 'gamePlayers', 'gameRole', 'gameTimer', 'gameStatus', 'gameStage', 'gameWasWatched', 'gamePlayerIsAlive']),
+        ...mapGetters('game', ['gameChat', 'gameChatEnable', 'gamePlayers', 'gameRole', 'gameTimer', 'gameStatus', 'gameStage', 'gameWasWatched', 'gamePlayerIsAlive', 'gameLabels']),
         ...mapGetters('user', ['userData']),
         isChatEnable() {
             const chatEnable = this.gameStage === 1 ? this.gameRole === 'mafia' : true
             return this.gameChatEnable && chatEnable
         },
-        killTargetActive() {
-            return (this.gameStage === 4 || this.gameStage === 2 && this.gameRole === 'mafia') && this.gamePlayerIsAlive
-        },
-        sheriffDetectorActive() {
-            return this.gameStage === 2 && this.gameRole === 'sheriff' && !this.actionSend && this.gamePlayerIsAlive
-        },
-        reporterDetectorActive() {
-            return this.gameStage === 2 && this.gameRole === 'reporter' && this.reporterIds.length < 2 && !this.actionSend && this.gamePlayerIsAlive
-        }
     },
     mounted() {
         this.roomId = Number(this.$route.params.id)
@@ -154,6 +147,16 @@ export default {
                 })
             }
         },
+        activeTargetName(playerId) {
+            if (!this.gamePlayerIsAlive) return ''
+            if (!this.actionSend) {
+                if (this.gameStage === 1 && this.gameRole === 'lover') return 'lover'
+                if (this.gameStage === 4 || this.gameStage === 2 && this.gameRole === 'mafia') return 'kill'
+                if (this.gameStage === 2 && this.gameRole === 'sheriff') return 'sheriff'
+                if (this.gameStage === 2 && this.gameRole === 'doctor') return 'doctor'
+                if (this.gameStage === 2 && this.gameRole === 'reporter' && this.reporterIds.length < 2 && !this.reporterIds.includes(playerId)) return 'reporter'
+            } else return ''
+        },
         sendMsg() {
             if (this.userData?.id && this.inputMsgText){
                 this.$socket.emit('sendMsg', { userId: this.userData.id, nickname: this.userData.nickname, roomId: this.roomId, msgText: this.inputMsgText }, response => {
@@ -164,9 +167,9 @@ export default {
             }
         },
         sendAction(playerId, isAlive) {
-            if (!isAlive) return
+            if (!isAlive && this.actionSend) return
             //убить
-            if (this.killTargetActive && !this.actionSend) {
+            if (this.activeTargetName(playerId) === 'kill') {
                 this.actionSend = true
                 this.$socket.emit('gameAction', { userId: this.userData.id, roomId: this.roomId, actionIds: [playerId] }, response => {
                     if (response?.status !== 'ok')
@@ -174,7 +177,7 @@ export default {
                 })
             }
             //исследовать шерифом
-            if (this.sheriffDetectorActive) {
+            if (this.activeTargetName(playerId) === 'sheriff') {
                 this.actionSend = true
                 this.$socket.emit('gameAction', { userId: this.userData.id, roomId: this.roomId, actionIds: [playerId] }, response => {
                     if (response?.status !== 'ok')
@@ -182,7 +185,7 @@ export default {
                 })
             }
             //reporter
-            if (this.reporterDetectorActive) {
+            if (this.activeTargetName(playerId) === 'reporter') {
                 if (!this.reporterIds.includes(playerId))
                     this.reporterIds.push(playerId)
 
@@ -194,6 +197,22 @@ export default {
                         this.reporterIds = []
                     })
                 }
+            }
+            //doctor
+            if (this.activeTargetName(playerId) === 'doctor') {
+                this.actionSend = true
+                this.$socket.emit('gameAction', { userId: this.userData.id, roomId: this.roomId, actionIds: [playerId] }, response => {
+                    if (response?.status !== 'ok')
+                        this.showToast({text: response.text || 'Действие не удалось', type: 'error'})
+                })
+            }
+            //lover
+            if (this.activeTargetName(playerId) === 'lover') {
+                this.actionSend = true
+                this.$socket.emit('gameAction', { userId: this.userData.id, roomId: this.roomId, actionIds: [playerId] }, response => {
+                    if (response?.status !== 'ok')
+                        this.showToast({text: response.text || 'Действие не удалось', type: 'error'})
+                })
             }
         }
     }
@@ -224,15 +243,17 @@ export default {
     .head__card
         display: flex
         align-items: flex-end
-    .sheriff-badge
-        width: 60px
-        height: 60px
+    .label-badge
+        width: 0px
+        height: 0px
         margin-bottom: 10px
         opacity: 0
         pointer-events: none
         transition: opacity 1s ease, transform 1s cubic-bezier(.31,2,.22,.51)
         transform: scale(0)
         &.badge-visible
+            width: 60px
+            height: 60px
             opacity: 1
             transform: scale(1)
     .sidebar-wrap

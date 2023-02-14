@@ -19,10 +19,10 @@ function getRolesCount(usersCount, roles) {
         barmen: players.mafia > 2 ? players.mafia < 7 ? 1 : 2 : 0,
         terrorist: players.mafia > 3 ? players.mafia < 7 ? 1 : 2 : 0,
         bodyguard: players.mafia > 3 ? players.mafia < 7 ? 1 : 2 : 0,
-        reporter: players.citizen > 8 ? players.citizen < 12 ? 2 : 3 : 1, 
+        reporter: players.citizen > 8 ? players.citizen < 12 ? 2 : 3 : 0, //1 
         doctor: players.citizen > 5 ? players.citizen < 12 ? 2 : 3 : 0, //1
-        lover: players.citizen > 7 ? 2 : 0, //1
-        sheriff: players.citizen > 6 ? players.citizen < 12 ? 2 : 3 : 1
+        lover: players.citizen > 7 ? 2 : 1, //1
+        sheriff: players.citizen > 6 ? players.citizen < 12 ? 2 : 3 : 0 //1
     }
 
     //распределить игровые роли по кол-ву игроков и макс заданному клд-ву для каждой роли

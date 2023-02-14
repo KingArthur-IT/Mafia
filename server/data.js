@@ -142,8 +142,9 @@ const rooms = [
     nickname: currUser.nickname,
     gender: currUser.gender,
     role: 'unknown',
-    isLive: true 
-    });
+    isLive: true,
+    labels: [] 
+});
  */
 
 module.exports = {

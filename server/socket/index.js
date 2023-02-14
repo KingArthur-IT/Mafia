@@ -41,21 +41,51 @@ function mySocket(socket) {
             nickname: usr.nickname,
             gender: usr.gender,
             role: usr.role !== 'mafia' && usr.role !== 'terrorist' ? 'unknown' : usr.role,
-            isLive: usr.isLive
+            isLive: usr.isLive,
+            labels: usr.labels
         }
     }))
     })
   }
 
-  const killPlayer = (roomId) => {
+  const killPlayer = (roomId, isMafiaKilling = false) => {
     const currRoom = rooms.find(room => room.id === roomId)
 
+    //doctor healing
+    if (isMafiaKilling) {
+      currRoom.gameData.killsCandidates = currRoom.gameData.killsCandidates.filter(cand => 
+        !currRoom.users.find(usr => usr.id === cand).labels.includes('doctor'))      
+    }
+
     if (currRoom.gameData.killsCandidates.length) {
-      const rand = Math.round(Math.random() * (currRoom.gameData.killsCandidates.length - 1))
-      const killId = currRoom.gameData.killsCandidates[rand]
+      //count voices
+      const candidatesWithVoiceCount = currRoom.gameData.killsCandidates.reduce((acc, curr) => {
+        acc[curr] = 0 | acc[curr] + 1
+        return acc
+      }, {});
+
+      //find max voices
+      let candidates = []; //ids of candidates for killing
+      let max = 0 //max voices for candidate
+
+      Object.entries(candidatesWithVoiceCount).forEach(el => {
+        if (el[1] > max) {
+          max = el[1]
+          candidates = [el[0]]
+        } else if (el[1] === max) candidates.push(el[0])
+      })
+
+      let killIndex = 0
+
+      if (candidates.length > 1) 
+        killIndex = Math.round(Math.random() * (candidates.length - 1))
+
+      const killId = Number(candidates[killIndex])
+
       currRoom.users.find((user) => user.id === killId).isLive = false
       this.in(roomId).emit('updateUserData', currRoom.users.find((user) => user.id === killId));
       this.to(currRoom.users.find((user) => user.id === killId).socketId).emit('wasKilled', true)
+
 
       const chatMsg = { 
         author: 'server', 
@@ -158,10 +188,17 @@ function mySocket(socket) {
       currRoom.gameData.timeCounter --
 
       if (currRoom.gameData.timeCounter <= 0) {
-        if (currRoom.gameData.gameStage === 2 || currRoom.gameData.gameStage === 4)
+        //еще не увеличился счетчик gameStage, поэтому это конец 2 или 4 этапов
+        if (currRoom.gameData.gameStage === 2)
+          killPlayer(data.roomId, true)
+        //clear labels
+        if (currRoom.gameData.gameStage === 4) {
           killPlayer(data.roomId)
+          currRoom.users.forEach(user => user.labels = [])
+        }
         
         if (!isEndGameCheck(data.roomId)) {
+          //new step
           currRoom.gameData.gameStage = currRoom.gameData.gameStage < 4 ? currRoom.gameData.gameStage + 1 : 1
           currRoom.gameData.timeCounter = STEPS_TIMER_COUNT
           openNewGameStep(data.roomId)
@@ -172,6 +209,7 @@ function mySocket(socket) {
           clearInterval(currRoom.gameData.timerID)
           currRoom.gameData.timerID = null
           this.in(data.roomId).emit('updateGameTitle', 'Игра окончена');
+          this.to(data.roomId).emit("updateUsers", currRoom.users);
         }
         this.in(data.roomId).emit('setGameStage', currRoom.gameData.gameStage);
       }
@@ -366,21 +404,32 @@ function mySocket(socket) {
         return
       }
 
+      if (!data?.actionIds?.length) {
+        cb({ status: 'error', text: 'No action ids' })
+        return
+      }
+
       const role = currRoom.users.find((user) => user.id === currUser.id).role
+      const labels = currRoom.users.find((user) => user.id === currUser.id).labels
+
+      if (labels.includes('lover')) {
+        cb({ status: 'error', text: 'U R by lover' })
+        return
+      }
 
       //kill
-      if ( role === 'mafia' && currRoom.gameData.gameStage === 2 && data?.actionIds?.length ) {
+      if ( role === 'mafia' && currRoom.gameData.gameStage === 2 ) {
         if ( currRoom.users.find((user) => user.id === data.actionIds[0]).isLive )
           currRoom.gameData.killsCandidates.push(data.actionIds[0])
       }
 
-      if ( currRoom.gameData.gameStage === 4 && data?.actionIds?.length ) {
+      if ( currRoom.gameData.gameStage === 4 ) {
         if ( currRoom.users.find((user) => user.id === data.actionIds[0]).isLive )
           currRoom.gameData.killsCandidates.push(data.actionIds[0])
       }
 
       //sheriff
-      if ( role === 'sheriff' && currRoom.gameData.gameStage === 2 && data?.actionIds?.length)
+      if ( role === 'sheriff' && currRoom.gameData.gameStage === 2)
         if ( currRoom.users.find((user) => user.id === data.actionIds[0]).isLive ) {
           const selectedUser = currRoom.users.find((user) => user.id === data.actionIds[0])
           const currUserSocket = currRoom.users.find(user => user.id === currUser.id).socketId
@@ -413,7 +462,7 @@ function mySocket(socket) {
         }
 
       //lover
-      if ( role === 'lover' && currRoom.gameData.gameStage === 1 && data?.actionIds?.length)
+      if ( role === 'lover' && currRoom.gameData.gameStage === 1)
         if ( currRoom.users.find((user) => user.id === data.actionIds[0]).isLive ) {
           const selectedUser = currRoom.users.find((user) => user.id === data.actionIds[0])
           selectedUser.labels.push('lover')
@@ -421,7 +470,7 @@ function mySocket(socket) {
         }
 
       //doctor
-      if ( role === 'doctor' && currRoom.gameData.gameStage === 2 && data?.actionIds?.length)
+      if ( role === 'doctor' && currRoom.gameData.gameStage === 2)
         if ( currRoom.users.find((user) => user.id === data.actionIds[0]).isLive ) {
           const selectedUser = currRoom.users.find((user) => user.id === data.actionIds[0])
           selectedUser.labels.push('doctor')
@@ -429,7 +478,7 @@ function mySocket(socket) {
         }
 
       //barmen
-      if ( role === 'barmen' && currRoom.gameData.gameStage === 2 && data?.actionIds?.length)
+      if ( role === 'barmen' && currRoom.gameData.gameStage === 2)
         if ( currRoom.users.find((user) => user.id === data.actionIds[0]).isLive ) {
           const selectedUser = currRoom.users.find((user) => user.id === data.actionIds[0])
           selectedUser.labels.push('barmen')
@@ -437,7 +486,7 @@ function mySocket(socket) {
         }
 
       //bodyguard
-      if ( role === 'bodyguard' && currRoom.gameData.gameStage === 3 && data?.actionIds?.length)
+      if ( role === 'bodyguard' && currRoom.gameData.gameStage === 3)
         if ( currRoom.users.find((user) => user.id === data.actionIds[0]).isLive ) {
           const selectedUser = currRoom.users.find((user) => user.id === data.actionIds[0])
           selectedUser.labels.push('bodyguard')
