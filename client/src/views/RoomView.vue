@@ -38,6 +38,7 @@
                               <img src="@/assets/tablet.png" alt="heal" class="label-badge" :class="{ 'badge-visible': gameLabels.includes('doctor') }">
                               <img src="@/assets/heart.png" alt="heal" class="label-badge" :class="{ 'badge-visible': gameLabels.includes('lover') }">
                               <img src="@/assets/barmen.png" alt="heal" class="label-badge" :class="{ 'badge-visible': gameLabels.includes('barmen') }">
+                              <img src="@/assets/shield.png" alt="heal" class="label-badge" :class="{ 'badge-visible': gameLabels.includes('bodyguard') }">
                           </div>
                       </div>
                   </div>
@@ -159,6 +160,7 @@ export default {
                 if (this.gameStage === 2 && this.gameRole === 'sheriff') return 'sheriff'
                 if (this.gameStage === 2 && this.gameRole === 'doctor') return 'doctor'
                 if (this.gameStage === 2 && this.gameRole === 'barmen') return 'barmen'
+                if (this.gameStage === 3 && this.gameRole === 'bodyguard') return 'bodyguard'
                 if (this.gameStage === 2 && this.gameRole === 'reporter' && this.reporterIds.length < 2 && !this.reporterIds.includes(playerId)) return 'reporter'
             } else return ''
         },
@@ -214,6 +216,14 @@ export default {
             }
             //lover
             if (this.activeTargetName(playerId) === 'lover') {
+                this.actionSend = true
+                this.$socket.emit('gameAction', { userId: this.userData.id, roomId: this.roomId, actionIds: [playerId] }, response => {
+                    if (response?.status !== 'ok')
+                        this.showToast({text: response.text || 'Действие не удалось', type: 'error'})
+                })
+            }
+            //lover
+            if (this.activeTargetName(playerId) === 'bodyguard') {
                 this.actionSend = true
                 this.$socket.emit('gameAction', { userId: this.userData.id, roomId: this.roomId, actionIds: [playerId] }, response => {
                     if (response?.status !== 'ok')

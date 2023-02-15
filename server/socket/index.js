@@ -515,19 +515,27 @@ function mySocket(socket) {
       //terrorist
       if ( role === 'terrorist' && currRoom.gameData.gameStage === 4)
         if ( currRoom.users.find((user) => user.id === data.actionIds[0]).isLive ) {
+          let chatMsg;
           const selectedUser = currRoom.users.find((user) => user.id === data.actionIds[0])
-          currRoom.users.find((user) => user.id === data.actionIds[0]).isLive = false
-          this.in(currRoom.id).emit('updateUserData', currRoom.users.find((user) => user.id === data.actionIds[0]));
-          this.to(selectedUser.socketId).emit('wasKilled', true);
-
           const me = currRoom.users.find((user) => user.id === currUser.id)
+
           currRoom.users.find((user) => user.id === currUser.id).isLive = false
           this.in(currRoom.id).emit('updateUserData', currRoom.users.find((user) => user.id === currUser.id));
           this.to(me.socketId).emit('wasKilled', true);
 
-          const chatMsg = { 
-            author: 'server', text: `${me.nickname} взорвал ${selectedUser.nickname}`, isHidden: false 
-          };
+          if (!selectedUser.labels.includes('bodyguard')) {
+            currRoom.users.find((user) => user.id === data.actionIds[0]).isLive = false
+            this.in(currRoom.id).emit('updateUserData', currRoom.users.find((user) => user.id === data.actionIds[0]));
+            this.to(selectedUser.socketId).emit('wasKilled', true);
+            chatMsg = { 
+              author: 'server', text: `${me.nickname} взорвал ${selectedUser.nickname}`, isHidden: false 
+            };
+          } else {
+            chatMsg = { 
+              author: 'server', text: `Игрок ${me.nickname} не смог взорвать ${selectedUser.nickname}`, isHidden: false 
+            }
+          }
+
           currRoom.chat.push(chatMsg);
           this.in(currRoom.id).emit('newChatMsg', chatMsg); 
         }
