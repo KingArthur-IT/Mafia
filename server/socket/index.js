@@ -3,6 +3,19 @@ const { rooms, users } = require('../data')
 
 const STEPS_TIMER_COUNT = 30; //60 csec
 
+const shuffle = (str) => {
+  var a = str.split(""),
+      n = a.length;
+
+  for(var i = n - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = a[i];
+      a[i] = a[j];
+      a[j] = tmp;
+  }
+  return a.join("");
+}
+
 // Main function
 function mySocket(socket) {
 
@@ -379,8 +392,14 @@ function mySocket(socket) {
       //ok
       cb({ status: 'ok' });
 
+      const labels = currRoom.users.find((user) => user.id === currUser.id).labels
       //msg to chat
-      const chatMsg = { author: data.nickname, text: data.msgText, isHidden: currRoom.gameData.mafiaInChat };
+      const chatMsg = { 
+        author: data.nickname, 
+        text: !labels.includes('barmen') ? data.msgText : shuffle(data.msgText), 
+        isHidden: currRoom.gameData.mafiaInChat 
+      };
+      
       currRoom.chat.push(chatMsg);
       if (!currRoom.gameData.mafiaInChat)
         this.in(data.roomId).emit('newChatMsg', chatMsg);  
@@ -423,7 +442,7 @@ function mySocket(socket) {
           currRoom.gameData.killsCandidates.push(data.actionIds[0])
       }
 
-      if ( currRoom.gameData.gameStage === 4 ) {
+      if ( currRoom.gameData.gameStage === 4 && !labels.includes('barmen')) {
         if ( currRoom.users.find((user) => user.id === data.actionIds[0]).isLive )
           currRoom.gameData.killsCandidates.push(data.actionIds[0])
       }
@@ -491,6 +510,26 @@ function mySocket(socket) {
           const selectedUser = currRoom.users.find((user) => user.id === data.actionIds[0])
           selectedUser.labels.push('bodyguard')
           this.to(selectedUser.socketId).emit('setLabel', 'bodyguard');
+        }
+
+      //terrorist
+      if ( role === 'terrorist' && currRoom.gameData.gameStage === 4)
+        if ( currRoom.users.find((user) => user.id === data.actionIds[0]).isLive ) {
+          const selectedUser = currRoom.users.find((user) => user.id === data.actionIds[0])
+          currRoom.users.find((user) => user.id === data.actionIds[0]).isLive = false
+          this.in(currRoom.id).emit('updateUserData', currRoom.users.find((user) => user.id === data.actionIds[0]));
+          this.to(selectedUser.socketId).emit('wasKilled', true);
+
+          const me = currRoom.users.find((user) => user.id === currUser.id)
+          currRoom.users.find((user) => user.id === currUser.id).isLive = false
+          this.in(currRoom.id).emit('updateUserData', currRoom.users.find((user) => user.id === currUser.id));
+          this.to(me.socketId).emit('wasKilled', true);
+
+          const chatMsg = { 
+            author: 'server', text: `${me.nickname} взорвал ${selectedUser.nickname}`, isHidden: false 
+          };
+          currRoom.chat.push(chatMsg);
+          this.in(currRoom.id).emit('newChatMsg', chatMsg); 
         }
         
       //ok

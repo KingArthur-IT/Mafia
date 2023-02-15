@@ -1,7 +1,7 @@
 const users = [
     {
         id: 1,
-        nickname: 'KingArthur199',
+        nickname: 'Artem',
         gender: 'male',
         email: 'king@king.com',
         emailNotification: true,
@@ -12,7 +12,7 @@ const users = [
     },
     {
         id: 2,
-        nickname: 'KingArthur123',
+        nickname: 'Peter',
         gender: 'male',
         email: 'king2@king.com',
         emailNotification: true,
@@ -23,7 +23,7 @@ const users = [
     },
     {
         id: 3,
-        nickname: 'King123',
+        nickname: 'Alex',
         gender: 'male',
         email: 'king3@king.com',
         emailNotification: true,
@@ -34,8 +34,8 @@ const users = [
     },
     {
         id: 4,
-        nickname: 'King',
-        gender: 'male',
+        nickname: 'Elena',
+        gender: 'female',
         email: 'king4@king.com',
         emailNotification: true,
         accountType: 'vip',
@@ -64,12 +64,12 @@ const rooms = [
         maxPersons: 3,
         minPersons: 2,
         roles: [
-            {role: 'lover', count: 1},
-            {role: 'reporter', count: 1},
-            {role: 'barmen', count: 1},
-            {role: 'doctor', count: 1},
-            {role: 'bodyguard', count: 1},
-            {role: 'terrorist', count: 1}
+            { role: 'lover', count: 1 },
+            { role: 'reporter', count: 1 },
+            { role: 'barmen', count: 1 },
+            { role: 'doctor', count: 1 },
+            { role: 'bodyguard', count: 1 },
+            { role: 'terrorist', count: 1 }
         ],
         users: [], //socketId, id, nickname, gender, role
         chat: [],
@@ -89,12 +89,12 @@ const rooms = [
         maxPersons: 10,
         minPersons: 4,
         roles: [
-            {role: 'lover', count: 0},
-            {role: 'reporter', count: 0},
-            {role: 'barmen', count: 0},
-            {role: 'doctor', count: 0},
-            {role: 'bodyguard', count: 0},
-            {role: 'terrorist', count: 0}
+            { role: 'lover', count: 0 },
+            { role: 'reporter', count: 0 },
+            { role: 'barmen', count: 0 },
+            { role: 'doctor', count: 0 },
+            { role: 'bodyguard', count: 0 },
+            { role: 'terrorist', count: 0 }
         ],
         users: [],
         chat: [],
@@ -114,12 +114,12 @@ const rooms = [
         maxPersons: 10,
         minPersons: 8,
         roles: [
-            {role: 'lover', count: 1},
-            {role: 'reporter', count: 1},
-            {role: 'barmen', count: 1},
-            {role: 'doctor', count: 1},
-            {role: 'bodyguard', count: 1},
-            {role: 'terrorist', count: 1}
+            { role: 'lover', count: 1 },
+            { role: 'reporter', count: 1 },
+            { role: 'barmen', count: 1 },
+            { role: 'doctor', count: 1 },
+            { role: 'bodyguard', count: 1 },
+            { role: 'terrorist', count: 1 }
         ],
         users: [],
         chat: [],

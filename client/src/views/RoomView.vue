@@ -36,6 +36,8 @@
                               />
                               <img src="@/assets/sheriff-badge.png" alt="sheriff" class="label-badge" :class="{ 'badge-visible': gameWasWatched }">
                               <img src="@/assets/tablet.png" alt="heal" class="label-badge" :class="{ 'badge-visible': gameLabels.includes('doctor') }">
+                              <img src="@/assets/heart.png" alt="heal" class="label-badge" :class="{ 'badge-visible': gameLabels.includes('lover') }">
+                              <img src="@/assets/barmen.png" alt="heal" class="label-badge" :class="{ 'badge-visible': gameLabels.includes('barmen') }">
                           </div>
                       </div>
                   </div>
@@ -79,7 +81,7 @@
       </div>
   </div>
   <ModalWrapper v-model="isModalOpened" :title="'ВАША ИГРОВАЯ РОЛЬ'">
-    <img :src="getImageUrl('room-cards', `${gameRole}-${userData.gender[0]}`, 'png')" :alt="gameRole" class="modal-img">
+    <img :src="getImageUrl('room-cards', getCardName(gameRole, userData.gender), 'png')" :alt="gameRole" class="modal-img">
     <p class="modal-text">
         <strong>{{ rolesInfo[gameRole]?.name[userData.gender] }}</strong> <br>
         {{ rolesInfo[gameRole]?.description }}
@@ -89,7 +91,7 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
-import { getImageUrl } from '@/use/imgLinks.js'
+import { getImageUrl, getCardName } from '@/use/imgLinks.js'
 import { rolesInfo } from '@/data/data'
 import CardRole from '@/components/UIKit/CardRole.vue'
 import QuiteIcon from '@/components/icons/LogoutIcon.vue'
@@ -135,7 +137,7 @@ export default {
     },
     methods: {
         ...mapActions('toast', ['showToast']),
-        getImageUrl,
+        getImageUrl, getCardName,
         isOtherPlayerMsg(msg) { //msg.text, msg.author
             return msg.author !== 'server' && msg.author !== this.userData.nickname
         },
@@ -149,11 +151,14 @@ export default {
         },
         activeTargetName(playerId) {
             if (!this.gamePlayerIsAlive) return ''
+            if (this.gameLabels.includes('lover')) return ''
             if (!this.actionSend) {
                 if (this.gameStage === 1 && this.gameRole === 'lover') return 'lover'
-                if (this.gameStage === 4 || this.gameStage === 2 && this.gameRole === 'mafia') return 'kill'
+                if (this.gameStage === 4 && this.gameRole === 'terrorist') return 'terrorist'
+                if (this.gameStage === 4 && !this.gameLabels.includes('barmen') || this.gameStage === 2 && this.gameRole === 'mafia') return 'kill'
                 if (this.gameStage === 2 && this.gameRole === 'sheriff') return 'sheriff'
                 if (this.gameStage === 2 && this.gameRole === 'doctor') return 'doctor'
+                if (this.gameStage === 2 && this.gameRole === 'barmen') return 'barmen'
                 if (this.gameStage === 2 && this.gameRole === 'reporter' && this.reporterIds.length < 2 && !this.reporterIds.includes(playerId)) return 'reporter'
             } else return ''
         },
@@ -168,6 +173,7 @@ export default {
         },
         sendAction(playerId, isAlive) {
             if (!isAlive && this.actionSend) return
+            if (this.gameLabels.includes('lover')) return
             //убить
             if (this.activeTargetName(playerId) === 'kill') {
                 this.actionSend = true
@@ -208,6 +214,22 @@ export default {
             }
             //lover
             if (this.activeTargetName(playerId) === 'lover') {
+                this.actionSend = true
+                this.$socket.emit('gameAction', { userId: this.userData.id, roomId: this.roomId, actionIds: [playerId] }, response => {
+                    if (response?.status !== 'ok')
+                        this.showToast({text: response.text || 'Действие не удалось', type: 'error'})
+                })
+            }
+            //barmen
+            if (this.activeTargetName(playerId) === 'barmen') {
+                this.actionSend = true
+                this.$socket.emit('gameAction', { userId: this.userData.id, roomId: this.roomId, actionIds: [playerId] }, response => {
+                    if (response?.status !== 'ok')
+                        this.showToast({text: response.text || 'Действие не удалось', type: 'error'})
+                })
+            }
+            //terrorist
+            if (this.activeTargetName(playerId) === 'terrorist') {
                 this.actionSend = true
                 this.$socket.emit('gameAction', { userId: this.userData.id, roomId: this.roomId, actionIds: [playerId] }, response => {
                     if (response?.status !== 'ok')

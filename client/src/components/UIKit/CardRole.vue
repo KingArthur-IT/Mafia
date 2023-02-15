@@ -7,9 +7,11 @@
             <img src="@/assets/camera.png" class="target" :class="{'active': targetName === 'reporter' && isAlive}">
             <img src="@/assets/tablet.png" class="target" :class="{'active': targetName === 'doctor' && isAlive}">
             <img src="@/assets/heart.png" class="target" :class="{'active': targetName === 'lover' && isAlive}">
+            <img src="@/assets/barmen.png" class="target" :class="{'active': targetName === 'barmen' && isAlive}">
+            <img src="@/assets/grenade.png" class="target" :class="{'active': targetName === 'terrorist' && isAlive}">
             <img v-if="!isAlive" src="@/assets/blood.png" class="blood">
         </div>
-        <p v-if="showNick" class="card__nick">{{nickname}}</p>
+        <p v-if="showNick" class="card__nick">{{ nickname }}</p>
     </div>
 </template>
 
