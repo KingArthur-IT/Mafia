@@ -70,6 +70,7 @@ export default{
     SOCKET_wasWatched: (state, data) => state.wasWatched = data,
     SOCKET_wasKilled: (state, data) => state.isAlive = !data,
     SOCKET_setLabel: (state, data) => state.labels.push(data),
+    SOCKET_setLabels: (state, data) => state.labels = [...data],
     clearLabels: (state) => state.labels = [],
   },
 

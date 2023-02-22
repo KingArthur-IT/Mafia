@@ -1,5 +1,5 @@
 // import {user} from '../data'
-const {users} = require('../data')
+const { users } = require('../data')
 
 class UserController{
     getUserInfo(req, res){
