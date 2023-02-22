@@ -1,5 +1,5 @@
 const getRolesCount = require('../game/getRolesCount')
-const { rooms, users } = require('../data')
+const { rooms, users, gameHallId } = require('../data')
 
 const STEPS_TIMER_COUNT = 30; //60 csec
 
@@ -14,6 +14,20 @@ const shuffle = (str) => {
       a[j] = tmp;
   }
   return a.join("");
+}
+
+const getRoomsList = () => {
+  return rooms.map(r => {
+    return {
+        id: r.id,
+        name: r.name,
+        maxPersons: r.maxPersons,
+        minPersons: r.minPersons,
+        roles: r.roles,
+        usersCount: r.users.length,
+        status: r.status
+    }
+  })
 }
 
 // Main function
@@ -57,7 +71,7 @@ function mySocket(socket) {
             isLive: usr.isLive,
             labels: usr.labels
         }
-    }))
+      }))
     })
   }
 
@@ -187,6 +201,7 @@ function mySocket(socket) {
     const currRoom = rooms.find(room => room.id === data.roomId)
 
     currRoom.status = 'playing';
+    this.in(gameHallId).emit('setRoomsList', getRoomsList()); //update in hall
     clearTimer(data.roomId)
     
     //распределить роли
@@ -230,6 +245,21 @@ function mySocket(socket) {
 
   }
 
+  //enter game hall
+  socket.on('enterGameHall', (data, cb) => {  // data: { userId }
+    if (!data.userId)
+      return cb({ status: 'error', text: 'Данные пользователя не корректны' })
+    
+    //ok
+    cb({ status: 'ok' });
+    socket.join(gameHallId); //join user to game hall
+
+    //send data
+    socket.emit('setRoomsList', getRoomsList())
+
+    //this.in(gameHallId)
+  })
+
   // enter room
   socket.on('enterRoom', (data, cb) => { // data: { userId, nickname, roomId }
     if (!data.userId || !data.roomId){
@@ -237,18 +267,7 @@ function mySocket(socket) {
     } else {
       const currRoom = rooms.find(room => room.id === data.roomId);
       const currUser = users.find(user => user.id === data.userId);
-
-      //check max players
-      if (currRoom.users.length >= currRoom.maxPersons){
-        cb({ status: 'error', text: 'В комнате уже максимальное количество игроков' });
-        return
-      }
-
-      //check if game is started
-      if (currRoom.status === 'playing' && !currRoom.users.some((user) => user.id === data.userId)) {
-        cb({ status: 'error', text: 'Игра в этой комнате уже началась' });
-        return
-      }
+      const isAlreadyInThisRoom = currRoom.users.some((user) => user.id === data.userId)
 
       //Вы уже играете в другой комнате
       if (rooms.filter((r) => r.id !== data.roomId).some((r) => r.users.some((user) => user.id === data.userId))) {
@@ -258,16 +277,44 @@ function mySocket(socket) {
 
       //chat
       socket.emit('clearChat')
-      if (currRoom.users.some((user) => user.id === data.userId)) {
-        if (currRoom.users.find(usr => usr.id === currUser.id).role === 'mafia')
+
+      if (!isAlreadyInThisRoom) { //игрок не числится в комнате
+        //check max players
+        if (currRoom.users.length >= currRoom.maxPersons){
+          cb({ status: 'error', text: 'В комнате уже максимальное количество игроков' });
+          return
+        }
+        //check if game is started
+        if (currRoom.status === 'playing') {
+          cb({ status: 'error', text: 'Игра в этой комнате уже началась' });
+          return
+        }
+      } else { //игрок уже числится в комнате
+        const isPlayerMafia = currRoom.users.find(usr => usr.id === currUser.id).role === 'mafia'
+        //chat
+        if (isPlayerMafia)
           socket.emit('copyChat', currRoom.chat)
         else socket.emit('copyChat', currRoom.chat.filter((msg) => !msg.isHidden))
+
+        //роли игроков
+        socket.emit("updateUsers", currRoom.users.map((usr) => {
+          return {
+              socketId: usr.socketId,
+              id: usr.id,
+              nickname: usr.nickname,
+              gender: usr.gender,
+              role: !usr.isLive ? usr.role : isPlayerMafia && (usr.role === 'mafia' || usr.role === 'terrorist') ? usr.role : 'unknown',
+              isLive: usr.isLive,
+              labels: []
+          }
+        }))
       }
 
       //ok
       cb({ status: 'ok' });
 
-      socket.join(data.roomId); //join user to room
+      socket.leave(gameHallId)
+      socket.join(data.roomId) //join user to room
 
       if (currRoom.status !== 'playing') {
         //msg to chat
@@ -289,7 +336,8 @@ function mySocket(socket) {
           isLive: true,
           labels: []
         });
-        this.in(data.roomId).emit('updateUsers', currRoom.users);
+        this.in(data.roomId).emit('updateUsers', currRoom.users); //update users in room
+        this.in(gameHallId).emit('setRoomsList', getRoomsList()); //update in hall
       }
 
       if (currRoom.status === 'collecting') {
@@ -306,6 +354,7 @@ function mySocket(socket) {
       if (currRoom.users.length == currRoom.minPersons && currRoom.status === 'collecting') {
         currRoom.gameData.timeCounter =  STEPS_TIMER_COUNT
         currRoom.status = 'countdown';
+        this.in(gameHallId).emit('setRoomsList', getRoomsList()); //update in hall
         this.in(data.roomId).emit('setCountdown', currRoom.gameData.timeCounter);
         this.in(data.roomId).emit('updateGameTitle', 'Игра начнется через:');
 
@@ -322,9 +371,9 @@ function mySocket(socket) {
 
   //leave the room
   socket.on('leaveRoom', (data, cb) => { //data: { userId, nickname, roomId }
-    if (!data.userId || !data.roomId){
+    if (!data.userId || !data.roomId)
       return cb({ status: 'error', text: 'Данные пользователя не корректны' })
-    } else {
+    else {
       const currRoom = rooms.find(room => room.id === data.roomId);
       const currUser = users.find(user => user.id === data.userId);
       
@@ -336,6 +385,7 @@ function mySocket(socket) {
       cb({ status: 'ok' });
 
       socket.leave(data.roomId); //left the room
+      socket.join()
 
       if (currRoom.status !== 'playing') {
         //msg to chat
@@ -346,7 +396,7 @@ function mySocket(socket) {
         };
         currRoom.chat.push(chatMsg);
         this.in(data.roomId).emit('newChatMsg', chatMsg);  
-  
+
         //remove user
         currRoom.users = currRoom.users.filter((user) => user.id !== data.userId)
         this.in(data.roomId).emit('updateUsers', currRoom.users);

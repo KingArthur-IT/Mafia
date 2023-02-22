@@ -8,18 +8,23 @@
         </div>
         <table v-if="currentPageArray?.length" class="table table-no-spacing">
             <tr class="table__row">
-                <th width="30%">Название комнаты</th>
+                <th width="20%">Название комнаты</th>
+                <th width="20%">Статус</th>
                 <th width="15%">Количество игроков</th>
                 <th width="20%">Мин/Макс игроков</th>
-                <th width="35%">Дополнительные роли</th>
+                <th width="25%">Дополнительные роли</th>
             </tr>
             <tr v-for="room in currentPageArray" :key="room.id" @click="goToRoom(room.id)">
                 <td>{{room.name}}</td>
-                <td>{{room.users.length}}</td>
+                <td>{{room.status}}</td>
+                <td>{{room.usersCount}}</td>
                 <td>{{room.minPersons}} / {{room.maxPersons}}</td>
                 <td class="holl__rolles-list">
                     <div class="holl__role" v-for="(role, i) in room.roles" :key="i">
-                        <img :src="getImageUrl('short-cards', role.role ,'png')" :alt="role.role"><span>x{{role.count}}</span>
+                        <div v-if="role.count">
+                            <img :src="getImageUrl('short-cards', role.role ,'png')" :alt="role.role">
+                            <span>x{{role.count}}</span>
+                        </div>
                     </div>
                 </td>
             </tr>
@@ -40,12 +45,12 @@ import { getImageUrl } from '@/use/imgLinks.js'
 import Pagination from '@/components/UIKit/Pagination.vue'
 
 export default {
-    components:{
+    components: {
         PlusIcon,
         Pagination
     },
-    data(){
-        return{
+    data() {
+        return {
             currentPage: 1,
             perPage: 10,
             roomsListData: [],
@@ -57,11 +62,15 @@ export default {
         },
     },
     mounted(){
-        this.getRoomsList();
-        this.roomsListData = [...this.roomsList];
+        //enterGameHall socket
+        if (this.userData?.id){
+            this.$socket.emit('enterGameHall', { userId: this.userData.id }, response => {
+                if (response?.status !== 'ok')
+                    this.showToast({ text: response.text || 'Ошибка при полкчении списка комнат', type: 'error' })
+            })
+        } else this.showToast({ text: response.text || 'Не могу идентифицировать пользователя', type: 'error' })
     },
     methods:{
-        ...mapActions('rooms', ['getRoomsList']),
         ...mapActions('toast', ['showToast']),
         getImageUrl,
         goToRoom(id){

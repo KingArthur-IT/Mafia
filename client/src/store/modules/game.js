@@ -1,5 +1,3 @@
-import { sendRequest } from '@/use/useRequest' 
-
 export default{
   name: 'game', 
   namespaced: true,
@@ -32,7 +30,6 @@ export default{
   },
 
   mutations: {
-    // setRoomsList: (state, data) => state.user = [...data],
     //chat
     SOCKET_newChatMsg: (state, data) => state.chat.push(data),
     SOCKET_copyChat: (state, data) => state.chat = data,
@@ -77,19 +74,7 @@ export default{
   },
 
   actions: {
-    // async getRoomsList ({ commit }) {
-    //   const res = await sendRequest('/rooms');
-    //   if (res?.data?.data)
-    //     commit('setRoomsList', res.data.data);
-    //   else {
-    //     this.dispatch('toast/showToast', {text: 'Failed to get rooms list', type: 'error'}, { root: true })
-    //   }
-    // },
+
   },
 
 };
-
-/*
-обработать эти события на клиенте:
-this.to(selectedUser.socketId).emit('setLabel', 'lover');
-*/
