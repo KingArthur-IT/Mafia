@@ -34,7 +34,7 @@
                                 :showNick="false"
                                 :isAlive="gamePlayerIsAlive"
                               />
-                              <img src="@/assets/sheriff-badge.png" alt="sheriff" class="label-badge" :class="{ 'badge-visible': gameWasWatched }">
+                              <img src="@/assets/sheriff-badge.png" alt="sheriff" class="label-badge" :class="{ 'badge-visible': gameLabels.includes('sheriff') }">
                               <img src="@/assets/tablet.png" alt="heal" class="label-badge" :class="{ 'badge-visible': gameLabels.includes('doctor') }">
                               <img src="@/assets/heart.png" alt="heal" class="label-badge" :class="{ 'badge-visible': gameLabels.includes('lover') }">
                               <img src="@/assets/barmen.png" alt="heal" class="label-badge" :class="{ 'badge-visible': gameLabels.includes('barmen') }">
@@ -115,7 +115,7 @@ export default {
         }
     },
     computed: {
-        ...mapGetters('game', ['gameChat', 'gameChatEnable', 'gamePlayers', 'gameRole', 'gameTimer', 'gameStatus', 'gameStage', 'gameWasWatched', 'gamePlayerIsAlive', 'gameLabels']),
+        ...mapGetters('game', ['gameChat', 'gameChatEnable', 'gamePlayers', 'gameRole', 'gameTimer', 'gameStatus', 'gameStage', 'gamePlayerIsAlive', 'gameLabels', 'gameVoicesCount']),
         ...mapGetters('user', ['userData']),
         isChatEnable() {
             const chatEnable = this.gameStage === 1 ? this.gameRole === 'mafia' : true
@@ -134,6 +134,9 @@ export default {
         },
         gameStage() {
             this.actionSend = false
+        },
+        gameVoicesCount() {
+            console.log(this.gameVoicesCount);
         }
     },
     methods: {

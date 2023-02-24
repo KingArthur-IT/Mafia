@@ -63,8 +63,8 @@ const rooms = [
     {
         id: 1,
         name: 'Test room',
-        maxPersons: 3,
-        minPersons: 2,
+        maxPersons: 4,
+        minPersons: 4,
         roles: [
             { role: 'lover', count: 1 },
             { role: 'reporter', count: 1 },

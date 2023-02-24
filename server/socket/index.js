@@ -124,20 +124,12 @@ function mySocket(socket) {
     if (currRoom.gameData.killsCandidates.length) {
       //count voices
       const candidatesWithVoiceCount = currRoom.gameData.killsCandidates.reduce((acc, curr) => {
-        acc[curr] = 0 | acc[curr] + 1
+        acc[curr] = (acc[curr] || 0) + 1
         return acc
       }, {});
 
-      //find max voices
-      let candidates = []; //ids of candidates for killing
-      let max = 0 //max voices for candidate
-
-      Object.entries(candidatesWithVoiceCount).forEach(el => {
-        if (el[1] > max) {
-          max = el[1]
-          candidates = [el[0]]
-        } else if (el[1] === max) candidates.push(el[0])
-      })
+      const maxVals = Math.max(...Object.values(candidatesWithVoiceCount)); //max voices for candidate
+      const candidates = Object.keys(candidatesWithVoiceCount).filter(key => candidatesWithVoiceCount[key] === maxVals); //ids of candidates for killing
 
       let killIndex = 0
 
@@ -149,6 +141,9 @@ function mySocket(socket) {
       currRoom.users.find((user) => user.id === killId).isLive = false
       this.in(roomId).emit('updateUserData', currRoom.users.find((user) => user.id === killId));
       this.to(currRoom.users.find((user) => user.id === killId).socketId).emit('wasKilled', true)
+
+      if (currRoom.users.find((user) => user.id === killId).role === 'bodyguard')
+        removeBodyguardLabel(roomId)
 
       sendChatMsg(roomId, 'server', `Игрок ${currRoom.users.find((user) => user.id === killId).nickname} был убит`, false) 
     } else {
@@ -167,18 +162,49 @@ function mySocket(socket) {
     } else return false
   }
 
+  const clearLabelsList = (roomId) => {
+    rooms.find(room => room.id === roomId).users.forEach((user) => {
+      user.labels = user.labels.filter(lbl => lbl === 'sheriff' || lbl === 'reporter' || lbl === 'bodyguard');
+      this.to(user.socketId).emit('setLabels', user.labels)
+    })
+  }
+
+  const setLabel = (roomId, actionUserId, labelName) => {
+    const selectedUser = rooms.find(room => room.id === roomId).users.find((user) => user.id === actionUserId)
+    selectedUser.labels.push(labelName)
+    this.to(selectedUser.socketId).emit('setLabel', labelName);
+  }
+
+  const removeBodyguardLabel = (roomId) => {
+    rooms.find(room => room.id === roomId).users.forEach((user) => {
+      user.labels = user.labels.filter(lbl => lbl !== 'bodyguard');
+      this.to(user.socketId).emit('setLabels', user.labels)
+    })
+  }
+
+  const killInstantly = (roomId, userId) => {
+    const currUser = rooms.find(room => room.id === roomId).users.find((user) => user.id === userId)
+    currUser.isLive = false
+    this.in(roomId).emit('updateUserData', currUser);
+    this.to(currUser.socketId).emit('wasKilled', true);
+  }
+
   //--------------------------------------------------------------------------------
 
   const openNewGameStep = (roomId) => {
     const gameStage = rooms.find(room => room.id === roomId).gameData.gameStage
     rooms.find(room => room.id === roomId).gameData.timeCounter = STEPS_TIMER_COUNT
 
-    if (gameStage === 1)
+    if (gameStage === 1) {
       sendGameDataToRoom(roomId, 'Ночь. Мафия в чате', true, true)
+      clearLabelsList(roomId)
+    }
     if (gameStage === 2)
       sendGameDataToRoom(roomId, 'Мафия выбирает жертву', false, false)
-    if (gameStage === 3) 
+    if (gameStage === 3) {
       sendGameDataToRoom(roomId, 'День. Общее обсуждение', true, false)
+      removeBodyguardLabel(roomId)
+    }
     if (gameStage === 4) 
       sendGameDataToRoom(roomId, 'День. Голосование', false, false)
   }
@@ -205,10 +231,8 @@ function mySocket(socket) {
         //еще не увеличился счетчик gameStage, поэтому это конец 2 или 4 этапов
         if (currRoom.gameData.gameStage === 2)
           killPlayer(data.roomId, true)
-        if (currRoom.gameData.gameStage === 4) {
+        if (currRoom.gameData.gameStage === 4)
           killPlayer(data.roomId)
-          currRoom.users.forEach(user => user.labels = user.labels.filter(lbl => lbl === 'sheriff' || lbl === 'reporter'))
-        }
         
         if (!isEndGameCheck(data.roomId)) {
           //new step
@@ -429,6 +453,11 @@ function mySocket(socket) {
         return
       }
 
+      if ( !currRoom.users.find((user) => user.id === data.actionIds[0]).isLive ) {
+        cb({ status: 'error', text: 'Requested user is not alive. Yoo can not affect him' })
+        return
+      }
+
       const role = currRoom.users.find((user) => user.id === currUser.id).role
       const labels = currRoom.users.find((user) => user.id === currUser.id).labels
       const gameStage = currRoom.gameData.gameStage
@@ -440,29 +469,43 @@ function mySocket(socket) {
 
       //kill
       if ( role === 'mafia' && gameStage === 2 ) {
-        if ( currRoom.users.find((user) => user.id === data.actionIds[0]).isLive )
+        if (!currRoom.users.find(user => user.id === data.actionIds[0]).labels.includes('bodyguard'))
           currRoom.gameData.killsCandidates.push(data.actionIds[0])
       }
 
-      if ( gameStage === 4 && !labels.includes('barmen')) {
-        if ( currRoom.users.find((user) => user.id === data.actionIds[0]).isLive )
-          currRoom.gameData.killsCandidates.push(data.actionIds[0])
+      if ( gameStage === 4 && !labels.includes('barmen') ) {
+        currRoom.gameData.killsCandidates.push(data.actionIds[0])
+        //count voices
+        const candidatesWithVoiceCount = currRoom.gameData.killsCandidates.reduce((acc, curr) => {
+          acc[curr] = (acc[curr] || 0) + 1
+          return acc
+        }, {});
+        this.in(data.roomId).emit('updateVoicesCount', candidatesWithVoiceCount);
       }
 
       //sheriff
-      if ( role === 'sheriff' && gameStage === 2)
-        if ( currRoom.users.find((user) => user.id === data.actionIds[0]).isLive ) {
-          const selectedUser = currRoom.users.find((user) => user.id === data.actionIds[0])
+      if ( role === 'sheriff' && gameStage === 2) {
+        const selectedUser = currRoom.users.find((user) => user.id === data.actionIds[0])
+        if (!selectedUser.labels.includes('sheriff')) {
           const currUserSocket = currRoom.users.find(user => user.id === currUser.id).socketId
+          
           this.to(currUserSocket).emit('updateUserData', selectedUser);
-          this.to(selectedUser.socketId).emit('wasWatched', true);
+          setLabel(data.roomId, data.actionIds[0], 'sheriff')
+        } else {
+          cb({ status: 'error', text: 'Selected user has already been checked by sheriff' })
+          return
         }
+      }
 
       //reporter
-      if ( role === 'reporter' && gameStage === 2 && data?.actionIds?.length > 1)
-        if ( currRoom.users.find((user) => user.id === data.actionIds[0]).isLive &&
-             currRoom.users.find((user) => user.id === data.actionIds[1]).isLive
+      if ( role === 'reporter' && gameStage === 2 && data?.actionIds?.length > 1) {
+        if (currRoom.users.find((user) => user.id === data.actionIds[0]).labels.includes('reporter') || 
+            currRoom.users.find((user) => user.id === data.actionIds[1]).labels.includes('reporter')  
         ) {
+          cb({ status: 'error', text: 'At leat one of the users have been already checked by reporter' })
+          return
+        }
+        if ( currRoom.users.find((user) => user.id === data.actionIds[1]).isLive ) {
           const isMafia1 = ['mafia', 'barmen', 'terrorist'].includes( currRoom.users.find((user) => user.id === data.actionIds[0]).role )
           const isMafia2 = ['mafia', 'barmen', 'terrorist'].includes( currRoom.users.find((user) => user.id === data.actionIds[1]).role )
 
@@ -473,67 +516,43 @@ function mySocket(socket) {
           const txt = isOneTeam ? 'одной команде' : 'разных командах'
 
           sendChatMsg(data.roomId, 'server', `Игроки [${nickname1}] [${nickname2}] играют в ${txt}`, false)
+          setLabel(data.roomId, data.actionIds[0], 'reporter')
+          setLabel(data.roomId, data.actionIds[1], 'reporter')
         }
+      }
 
       //lover
       if ( role === 'lover' && gameStage === 1)
-        if ( currRoom.users.find((user) => user.id === data.actionIds[0]).isLive ) {
-          const selectedUser = currRoom.users.find((user) => user.id === data.actionIds[0])
-          selectedUser.labels.push('lover')
-          this.to(selectedUser.socketId).emit('setLabel', 'lover');
-        }
+        setLabel(data.roomId, data.actionIds[0], 'lover')
 
-      //doctor
-      if ( role === 'doctor' && gameStage === 2)
-        if ( currRoom.users.find((user) => user.id === data.actionIds[0]).isLive ) {
-          const selectedUser = currRoom.users.find((user) => user.id === data.actionIds[0])
-          selectedUser.labels.push('doctor')
-          this.to(selectedUser.socketId).emit('setLabel', 'doctor');
-        }
-
-      //barmen
-      if ( role === 'barmen' && gameStage === 2)
-        if ( currRoom.users.find((user) => user.id === data.actionIds[0]).isLive ) {
-          const selectedUser = currRoom.users.find((user) => user.id === data.actionIds[0])
-          selectedUser.labels.push('barmen')
-          this.to(selectedUser.socketId).emit('setLabel', 'barmen');
-        }
+      //doctor & barmen
+      if ( (role === 'doctor' || role === 'barmen') && gameStage === 2)
+        setLabel(data.roomId, data.actionIds[0], role)
 
       //bodyguard
       if ( role === 'bodyguard' && gameStage === 3)
-        if ( currRoom.users.find((user) => user.id === data.actionIds[0]).isLive ) {
-          const selectedUser = currRoom.users.find((user) => user.id === data.actionIds[0])
-          selectedUser.labels.push('bodyguard')
-          this.to(selectedUser.socketId).emit('setLabel', 'bodyguard');
-        }
+        setLabel(data.roomId, data.actionIds[0], 'bodyguard')
 
       //terrorist
-      if ( role === 'terrorist' && gameStage === 4)
-        if ( currRoom.users.find((user) => user.id === data.actionIds[0]).isLive ) {
-          let chatMsg;
-          const selectedUser = currRoom.users.find((user) => user.id === data.actionIds[0])
-          const me = currRoom.users.find((user) => user.id === currUser.id)
+      if ( role === 'terrorist' && gameStage === 4) {
+        let msgText;
+        const selectedUser = currRoom.users.find((user) => user.id === data.actionIds[0])
+        const myNickname = currRoom.users.find((user) => user.id === data.userId).nickname
 
-          currRoom.users.find((user) => user.id === currUser.id).isLive = false
-          this.in(currRoom.id).emit('updateUserData', currRoom.users.find((user) => user.id === currUser.id));
-          this.to(me.socketId).emit('wasKilled', true);
+        killInstantly(data.roomId, data.userId) //взорвался
 
-          if (!selectedUser.labels.includes('bodyguard')) {
-            currRoom.users.find((user) => user.id === data.actionIds[0]).isLive = false
-            this.in(currRoom.id).emit('updateUserData', currRoom.users.find((user) => user.id === data.actionIds[0]));
-            this.to(selectedUser.socketId).emit('wasKilled', true);
-            chatMsg = { 
-              author: 'server', text: `${me.nickname} взорвал ${selectedUser.nickname}`, isHidden: false 
-            };
-          } else {
-            chatMsg = { 
-              author: 'server', text: `Игрок ${me.nickname} не смог взорвать ${selectedUser.nickname}`, isHidden: false 
-            }
-          }
-
-          currRoom.chat.push(chatMsg);
-          this.in(currRoom.id).emit('newChatMsg', chatMsg); 
+        if (!selectedUser.labels.includes('bodyguard')) {
+          killInstantly(data.roomId, data.actionIds[0]) //взорвал
+          if (selectedUser.role === 'bodyguard') //если взорвали боди - убрать лейбы защиты
+            removeBodyguardLabel(data.roomId)
+          msgText = `${myNickname} взорвал ${selectedUser.nickname}`;
+          currRoom.gameData.killsCandidates = currRoom.gameData.killsCandidates.filter(candId => candId !== data.actionIds[0]) //убрать из голосования
+        } else {
+          msgText = `Игрок ${myNickname} не смог взорвать ${selectedUser.nickname}`
         }
+
+        sendChatMsg(data.roomId, 'server', msgText, false)
+      }
         
       //ok
       cb({ status: 'ok' });

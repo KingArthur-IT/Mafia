@@ -12,8 +12,8 @@ export default{
     role: 'unknown',
     gameStage: 0,
     isAlive: true,
-    wasWatched: false, //by sheriff
-    labels: []
+    labels: [],
+    voicesCount: {}
   },
 
   getters: {
@@ -24,9 +24,9 @@ export default{
     gameRole: state => state.role,
     gameStatus: state => state.gameStatus, //collecting, countdown, playing
     gameStage: state => state.gameStage,
-    gameWasWatched: state => state.wasWatched,
     gamePlayerIsAlive: state => state.isAlive,
-    gameLabels: state => state.labels
+    gameLabels: state => state.labels,
+    gameVoicesCount: state => state.voicesCount,
   },
 
   mutations: {
@@ -67,11 +67,12 @@ export default{
     SOCKET_updateGameTitle: (state, data) => state.gameStatus = data,
     SOCKET_setGameStage: (state, data) => state.gameStage = data,
 
-    SOCKET_wasWatched: (state, data) => state.wasWatched = data,
     SOCKET_wasKilled: (state, data) => state.isAlive = !data,
     SOCKET_setLabel: (state, data) => state.labels.push(data),
     SOCKET_setLabels: (state, data) => state.labels = [...data],
     clearLabels: (state) => state.labels = [],
+
+    SOCKET_updateVoicesCount: (state, data) => state.voicesCount = {...data}
   },
 
   actions: {
