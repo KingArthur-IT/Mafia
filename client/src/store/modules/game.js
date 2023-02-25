@@ -3,17 +3,25 @@ export default{
   namespaced: true,
 
   state: {
-    chat: [],
-    isChatEnable: true,
-    players: [],
-    timer: -1,
-    timerObj: null,
-    gameStatus: 'Набор игроков', 
+    //me
     role: 'unknown',
-    gameStage: 0,
     isAlive: true,
     labels: [],
-    voicesCount: {}
+    //players
+    players: [],
+    //about game
+    gameStatus: 'Набор игроков', 
+    gameStage: 0,
+    //chat
+    chat: [],
+    isChatEnable: true,
+    //timer
+    timer: -1,
+    timerObj: null,
+    //votes
+    voicesCount: {},
+    //rezult
+    gameRezult: {}
   },
 
   getters: {
@@ -40,7 +48,6 @@ export default{
     SOCKET_updateUsers: (state, data) => state.players = data,
     SOCKET_updateUserData: (state, data) => {
       const index = state.players.findIndex(pl => pl.id === data.id)
-      console.log(index);
       if (index !== -1)
         state.players[index] = data
     },
@@ -72,11 +79,32 @@ export default{
     SOCKET_setLabels: (state, data) => state.labels = [...data],
     clearLabels: (state) => state.labels = [],
 
-    SOCKET_updateVoicesCount: (state, data) => state.voicesCount = {...data}
+    SOCKET_updateVoicesCount: (state, data) => state.voicesCount = {...data},
+
+    SOCKET_showGameResult: (state, data) => {
+      state.gameRezult = {...data}
+    },
+
+    clearAllStates: (state) => {
+      state.role = 'unknown'
+      state.isAlive = true
+      state.labels = []
+      state.players = []
+      state.gameStatus = 'Набор игроков'
+      state.gameStage = 0
+      state.chat = []
+      state.isChatEnable = true
+      state.timer = -1
+      state.timerObj = null
+      state.voicesCount = {}
+      state.gameRezult = {}
+    }
   },
 
   actions: {
-
+    clearAllGameStates: ({ commit }) => {
+      commit('clearAllStates')
+    }
   },
 
 };

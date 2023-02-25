@@ -64,7 +64,7 @@ const rooms = [
         id: 1,
         name: 'Test room',
         maxPersons: 4,
-        minPersons: 4,
+        minPersons: 2,
         roles: [
             { role: 'lover', count: 1 },
             { role: 'reporter', count: 1 },
@@ -82,7 +82,9 @@ const rooms = [
             timeCounter: 0,
             chatEnable: true,
             mafiaInChat: false,
-            killsCandidates: []
+            killsCandidates: [],
+            votedUsers: [],
+            winnerTeam: ''
         }
     },
     {
@@ -107,7 +109,9 @@ const rooms = [
             timeCounter: 0,
             chatEnable: true,
             mafiaInChat: false,
-            killsCandidates: []
+            killsCandidates: [],
+            votedUsers: [],
+            winnerTeam: ''
         }
     },
     {
@@ -132,7 +136,9 @@ const rooms = [
             timeCounter: 0,
             chatEnable: true,
             mafiaInChat: false,
-            killsCandidates: []
+            killsCandidates: [],
+            votedUsers: [],
+            winnerTeam: ''
         }
     }
 ]

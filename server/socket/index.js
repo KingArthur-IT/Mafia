@@ -45,6 +45,7 @@ function mySocket(socket) {
     const currRoom = rooms.find(room => room.id === roomId)
 
     const isPlayerMafia = currRoom.users.find(usr => usr.id === userId).role === 'mafia'
+    const isPlayerSheriff = currRoom.users.find(usr => usr.id === userId).role === 'sheriff'
 
     //chat
     if (isPlayerMafia)
@@ -53,7 +54,8 @@ function mySocket(socket) {
 
     //роли игроков
     socket.emit("updateUsers", currRoom.users.map(({ socketId, id, nickname, gender, role, isLive, labels }) =>
-      ({ socketId, id, nickname, gender, isLive, labels, role: !isLive || isPlayerMafia && (role === 'mafia' || role === 'terrorist') ? role : 'unknown' })
+      ({ socketId, id, nickname, gender, isLive, labels, 
+        role: !isLive || isPlayerMafia && (role === 'mafia' || role === 'terrorist') || isPlayerSheriff && labels.includes('sheriff') ? role : 'unknown' })
     ))
 
     //game info
@@ -152,15 +154,14 @@ function mySocket(socket) {
     currRoom.gameData.killsCandidates = []
   }
 
-  const isEndGameCheck = (roomId) => {
-    const users = rooms.find(room => room.id === roomId).users.filter(user => user.isLive)
-    const mafiaCount = users.filter(user => ['mafia', 'barmen', 'terrorist'].includes(user.role)).length
-    
-    if (mafiaCount === 0 || mafiaCount === users.length) {
-      sendChatMsg(roomId, 'server', mafiaCount === 0 ? 'Победили мирные жители' : 'Мафия победила', false) 
-      return true
-    } else return false
+  const killInstantly = (roomId, userId) => {
+    const currUser = rooms.find(room => room.id === roomId).users.find((user) => user.id === userId)
+    currUser.isLive = false
+    this.in(roomId).emit('updateUserData', currUser);
+    this.to(currUser.socketId).emit('wasKilled', true);
   }
+
+  //--------------------------------------------------------------------------------
 
   const clearLabelsList = (roomId) => {
     rooms.find(room => room.id === roomId).users.forEach((user) => {
@@ -182,13 +183,6 @@ function mySocket(socket) {
     })
   }
 
-  const killInstantly = (roomId, userId) => {
-    const currUser = rooms.find(room => room.id === roomId).users.find((user) => user.id === userId)
-    currUser.isLive = false
-    this.in(roomId).emit('updateUserData', currUser);
-    this.to(currUser.socketId).emit('wasKilled', true);
-  }
-
   //--------------------------------------------------------------------------------
 
   const openNewGameStep = (roomId) => {
@@ -199,14 +193,18 @@ function mySocket(socket) {
       sendGameDataToRoom(roomId, 'Ночь. Мафия в чате', true, true)
       clearLabelsList(roomId)
     }
-    if (gameStage === 2)
+    if (gameStage === 2) {
+      rooms.find(room => room.id === roomId).gameData.votedUsers = []
       sendGameDataToRoom(roomId, 'Мафия выбирает жертву', false, false)
+    }
     if (gameStage === 3) {
       sendGameDataToRoom(roomId, 'День. Общее обсуждение', true, false)
       removeBodyguardLabel(roomId)
     }
-    if (gameStage === 4) 
+    if (gameStage === 4) {
+      rooms.find(room => room.id === roomId).gameData.votedUsers = []
       sendGameDataToRoom(roomId, 'День. Голосование', false, false)
+    }
   }
 
   //--------------------------------------------------------------------------------
@@ -244,10 +242,47 @@ function mySocket(socket) {
           clearTimer(data.roomId)
           this.in(data.roomId).emit('updateGameTitle', 'Игра окончена');
           this.to(data.roomId).emit("updateUsers", currRoom.users);
+          
+          endGameActions(data.roomId)
         }
       }
 
     }, 1000);
+  }
+
+  const endGameActions = (roomId) => {
+    const currRoom = rooms.find(room => room.id === roomId);
+
+    //результат игры
+    const gameRezult = {
+      winnerTeam: currRoom.gameData.winnerTeam
+    }
+    this.in(roomId).emit('showGameResult', gameRezult); 
+
+    //отписать всех от сокетов комнаты
+    rooms.find(room => room.id === roomId).users.forEach(user => {
+      this.sockets.get(user.socketId).leave(roomId);
+    })
+
+    //удалить комнату
+    const roomIndex = rooms.findIndex(r => r.id === roomId);
+    if (roomIndex !== -1) {
+      rooms.splice(roomIndex, 1);
+    }
+
+  }
+
+  const isEndGameCheck = (roomId) => {
+    const users = rooms.find(room => room.id === roomId).users.filter(user => user.isLive)
+    const mafiaCount = users.filter(user => ['mafia', 'barmen', 'terrorist'].includes(user.role)).length
+    
+    if (mafiaCount === 0 || mafiaCount === users.length) {
+      if (mafiaCount === 0)
+        rooms.find(room => room.id === roomId).gameData.winnerTeam = 'citizen'
+      else rooms.find(room => room.id === roomId).gameData.winnerTeam = 'mafia'
+      sendChatMsg(roomId, 'server', mafiaCount === 0 ? 'Победили мирные жители' : 'Мафия победила', false) 
+      return true
+    } else return false
   }
 
   //--------------------------------------------------------------------------------
@@ -295,7 +330,8 @@ function mySocket(socket) {
           return
         }
       } else { 
-        //игрок уже числится в комнате - восстановить ему все данные
+        //игрок уже числится в комнате - восстановить ему все данные и обновить сокет ид
+        currRoom.users.find(user => user.id === data.userId).socketId = socket.id
         returnDataToFallenUser(data.userId, data.roomId)
       }
 
@@ -359,8 +395,13 @@ function mySocket(socket) {
       const currRoom = rooms.find(room => room.id === data.roomId);
       const currUser = users.find(user => user.id === data.userId);
       
-      if (!currRoom || !currUser) {
-        cb({ status: 'error', text: 'Room or user not found' })
+      if (!currUser) {
+        cb({ status: 'error', text: 'User not found' })
+        return
+      }
+
+      if (!currRoom) { //комнаты может уже не быть после окончания игры
+        cb({ status: 'ok' });
         return
       }
       //ok
@@ -434,7 +475,7 @@ function mySocket(socket) {
   })
 
   //--------------------------------------------------------------------------------
-  //
+  //game actions
   //--------------------------------------------------------------------------------
   socket.on('gameAction', (data, cb) => { //data: { userId, roomId, actionIds = [] }
     if (!data.userId || !data.roomId){
@@ -469,12 +510,23 @@ function mySocket(socket) {
 
       //kill
       if ( role === 'mafia' && gameStage === 2 ) {
-        if (!currRoom.users.find(user => user.id === data.actionIds[0]).labels.includes('bodyguard'))
+        if (currRoom.gameData.votedUsers.includes(currUser.id)) {
+          cb({ status: 'error', text: 'You have already voted' })
+          return
+        }
+        if (!currRoom.users.find(user => user.id === data.actionIds[0]).labels.includes('bodyguard')) {
           currRoom.gameData.killsCandidates.push(data.actionIds[0])
+          currRoom.gameData.votedUsers.push(currUser.id)
+        }
       }
 
       if ( gameStage === 4 && !labels.includes('barmen') ) {
+        if (currRoom.gameData.votedUsers.includes(currUser.id)) {
+          cb({ status: 'error', text: 'You have already voted' })
+          return
+        }
         currRoom.gameData.killsCandidates.push(data.actionIds[0])
+        currRoom.gameData.votedUsers.push(currUser.id)
         //count voices
         const candidatesWithVoiceCount = currRoom.gameData.killsCandidates.reduce((acc, curr) => {
           acc[curr] = (acc[curr] || 0) + 1
@@ -558,6 +610,31 @@ function mySocket(socket) {
       cb({ status: 'ok' });
     }
   })
+
+  //--------------------------------------------------------------------------------
+  //disconnect
+  //--------------------------------------------------------------------------------
+  socket.on("disconnect", () => {
+    const currRoom = rooms.find(r => r.users.some(user => user.socketId === socket.id))
+
+    if (currRoom && currRoom.status !== 'playing') {
+      socket.leave(currRoom.id);
+
+      sendChatMsg(currRoom.id, 'server', `Игрок ${currRoom.users.find(user => user.socketId === socket.id).nickname} вышел`, false)
+
+      //remove user
+      currRoom.users = currRoom.users.filter((user) => user.socketId !== socket.id)
+      this.in(currRoom.id).emit('updateUsers', currRoom.users)
+      this.in(gameHallId).emit('setRoomsList', getRoomsList()); //update in hall
+
+      //check if was countdown
+      if (currRoom.status === 'countdown' && currRoom.users.length < currRoom.minPersons){
+        currRoom.status = 'collecting';
+        clearTimer(currRoom.id)
+        this.in(currRoom.id).emit('updateGameTitle', 'Набор игроков')
+      }
+    }
+  });
 }
 
 module.exports = mySocket
