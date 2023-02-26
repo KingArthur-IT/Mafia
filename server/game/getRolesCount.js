@@ -12,14 +12,14 @@ function getRolesCount(usersCount, roles) {
         sheriff: 0
     }
 
-    players.mafia = Math.round(usersCount / 3) 
+    players.mafia = Math.round(usersCount / 2) 
     players.citizen = usersCount - players.mafia
 
     const playersMax = {
         barmen: players.mafia > 2 ? players.mafia < 7 ? 1 : 2 : 0, //0
         terrorist: players.mafia > 3 ? players.mafia < 7 ? 1 : 2 : 0,
         bodyguard: players.mafia > 3 ? players.mafia < 7 ? 1 : 2 : 0,
-        reporter: players.citizen > 8 ? players.citizen < 12 ? 2 : 3 : 0, //1 
+        reporter: players.citizen > 8 ? players.citizen < 12 ? 2 : 3 : 1, //1 
         doctor: players.citizen > 5 ? players.citizen < 12 ? 2 : 3 : 0, //1
         lover: players.citizen > 7 ? 2 : 0, //1
         sheriff: players.citizen > 6 ? players.citizen < 12 ? 2 : 3 : 1 //1

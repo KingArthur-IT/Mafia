@@ -66,7 +66,6 @@ export default {
         //enterGameHall socket
         if (this.userData?.id){
             this.$socket.emit('enterGameHall', { userId: this.userData.id }, response => {
-                console.log('1', response.text);
                 if (response?.status !== 'ok')
                     this.showToast({ text: response.text || 'Ошибка при получении списка комнат', type: 'error' })
             })

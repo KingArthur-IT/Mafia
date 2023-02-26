@@ -11,6 +11,11 @@
             <img src="@/assets/grenade.png" class="target" :class="{'active': targetName === 'terrorist' && isAlive}">
             <img src="@/assets/shield.png" class="target" :class="{'active': targetName === 'bodyguard' && isAlive}">
             <img v-if="!isAlive" src="@/assets/blood.png" class="blood">
+            <div v-if="votesCount > 0" class="card__votes" :class="{'backdrop': gameActionSended}">
+                <div class="card__votes-hero">
+                    {{ votesCount }}
+                </div>
+            </div>
         </div>
         <p v-if="showNick" class="card__nick">{{ nickname }}</p>
     </div>
@@ -44,6 +49,14 @@ export default {
         isAlive: {
             type: Boolean,
             default: true
+        },
+        votesCount: {
+            type: Number, 
+            default: 0
+        },
+        gameActionSended: {
+            type: Boolean,
+            default: false
         }
     },
     methods:{
@@ -82,6 +95,50 @@ export default {
             text-align: center
             word-break: break-all
             font-size: 12px
+        &__votes
+            position: absolute
+            top: 0
+            bottom: 0
+            left: 0
+            right: 0
+            border-radius: 5px
+            pointer-events: none
+            &.backdrop
+                backdrop-filter: blur(2px)
+            &-hero
+                top: 50%
+                left: 50%
+                transform: translate(-55%, -55%)
+                width: 20px
+                height: 20px
+                border-radius: 50%
+                background: red
+                display: flex
+                justify-content: center
+                align-items: center
+                font-size: 14px
+                font-weight: 600
+                &::before
+                    content: ''
+                    position: absolute
+                    top: 50%
+                    left: 50%
+                    transform: translate(-55%, -52%)
+                    width: 1px
+                    height: 30px
+                    background: red
+                    z-index: -1
+                &::after
+                    content: ''
+                    position: absolute
+                    top: 50%
+                    left: 50%
+                    transform: translate(-51%, -55%)
+                    height: 1px
+                    width: 30px
+                    background: red
+                    z-index: -1
+
     .target
         position: absolute
         top: 0

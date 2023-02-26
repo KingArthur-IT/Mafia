@@ -10,6 +10,8 @@
                     :role="player.role"
                     :targetName="activeTargetName(player.id)"
                     :isAlive="player.isLive"
+                    :votesCount="gameVoicesCount[player.id] || 0"
+                    :gameActionSended="gameActionSended"
                     @click="sendAction(player.id, player.isLive)"
                   />
               </div>
@@ -33,6 +35,8 @@
                                 :role="gameRole"
                                 :showNick="false"
                                 :isAlive="gamePlayerIsAlive"
+                                :votesCount="gameVoicesCount[userData.id] || 0"
+                                :gameActionSended="true"
                               />
                               <img src="@/assets/sheriff-badge.png" alt="sheriff" class="label-badge" :class="{ 'badge-visible': gameLabels.includes('sheriff') }">
                               <img src="@/assets/tablet.png" alt="heal" class="label-badge" :class="{ 'badge-visible': gameLabels.includes('doctor') }">
@@ -40,6 +44,9 @@
                               <img src="@/assets/barmen.png" alt="heal" class="label-badge" :class="{ 'badge-visible': gameLabels.includes('barmen') }">
                               <img src="@/assets/shield.png" alt="heal" class="label-badge" :class="{ 'badge-visible': gameLabels.includes('bodyguard') }">
                           </div>
+                      </div>
+                      <div v-if="this.gameStage > 0">
+                          Мафия: {{ gameMafiaPlayersCount }} Мирные: {{ gamePlayers?.filter(pl => pl.isLive).length -  gameMafiaPlayersCount}}
                       </div>
                   </div>
                   <div class="stage">
@@ -110,12 +117,11 @@ export default {
             isModalOpened: false,
             rolesInfo,
             inputMsgText: '',
-            actionSend: false,
             reporterIds: []
         }
     },
     computed: {
-        ...mapGetters('game', ['gameChat', 'gameChatEnable', 'gamePlayers', 'gameRole', 'gameTimer', 'gameStatus', 'gameStage', 'gamePlayerIsAlive', 'gameLabels', 'gameVoicesCount']),
+        ...mapGetters('game', ['gameChat', 'gameChatEnable', 'gamePlayers', 'gameRole', 'gameTimer', 'gameStatus', 'gameStage', 'gamePlayerIsAlive', 'gameLabels', 'gameVoicesCount', 'gameActionSended', 'gameMafiaPlayersCount']),
         ...mapGetters('user', ['userData']),
         isChatEnable() {
             const chatEnable = this.gameStage === 1 ? this.gameRole === 'mafia' : true
@@ -131,9 +137,6 @@ export default {
     watch: {
         gameRole() {
             this.isModalOpened = true
-        },
-        gameStage() {
-            this.actionSend = false
         },
         gameVoicesCount() {
             console.log(this.gameVoicesCount);
@@ -156,15 +159,20 @@ export default {
         activeTargetName(playerId) {
             if (!this.gamePlayerIsAlive) return ''
             if (this.gameLabels.includes('lover')) return ''
-            if (!this.actionSend) {
+            if (!this.gameActionSended) {
                 if (this.gameStage === 1 && this.gameRole === 'lover') return 'lover'
                 if (this.gameStage === 4 && this.gameRole === 'terrorist') return 'terrorist'
                 if (this.gameStage === 4 && !this.gameLabels.includes('barmen') || this.gameStage === 2 && this.gameRole === 'mafia') return 'kill'
-                if (this.gameStage === 2 && this.gameRole === 'sheriff') return 'sheriff'
+                if (this.gameStage === 2 && this.gameRole === 'sheriff' && !this.gamePlayers.find(pl => pl.id === playerId).labels.includes('sheriff')) return 'sheriff'
                 if (this.gameStage === 2 && this.gameRole === 'doctor') return 'doctor'
                 if (this.gameStage === 2 && this.gameRole === 'barmen') return 'barmen'
                 if (this.gameStage === 3 && this.gameRole === 'bodyguard') return 'bodyguard'
-                if (this.gameStage === 2 && this.gameRole === 'reporter' && this.reporterIds.length < 2 && !this.reporterIds.includes(playerId)) return 'reporter'
+                if (this.gameStage === 2 && this.gameRole === 'reporter' && 
+                    this.reporterIds.length < 2 && !this.reporterIds.includes(playerId) &&
+                    this.gamePlayers.find(pl => pl.id === playerId).role === 'unknown' &&
+                    !this.gamePlayers.find(pl => pl.id === playerId).labels.includes('reporter') &&
+                    this.gamePlayers.filter(pl => !pl.labels.includes('reporter')).length > 2
+                ) return 'reporter'
             } else return ''
         },
         sendMsg() {
@@ -177,11 +185,15 @@ export default {
             }
         },
         sendAction(playerId, isAlive) {
-            if (!isAlive && this.actionSend) return
-            if (this.gameLabels.includes('lover')) return
+            //add user nick to chat
+            if (!this.activeTargetName(playerId) || this.gameActionSended)
+                this.inputMsgText += this.gamePlayers.find(pl => pl.id === playerId).nickname + ' '
+
+            //actions
+            if (!isAlive && this.gameActionSended) return
+            // if (this.gameLabels.includes('lover')) return
             //убить
             if (this.activeTargetName(playerId) === 'kill') {
-                this.actionSend = true
                 this.$socket.emit('gameAction', { userId: this.userData.id, roomId: this.roomId, actionIds: [playerId] }, response => {
                     if (response?.status !== 'ok')
                         this.showToast({text: response.text || 'Действие не удалось', type: 'error'})
@@ -189,7 +201,6 @@ export default {
             }
             //исследовать шерифом
             if (this.activeTargetName(playerId) === 'sheriff') {
-                this.actionSend = true
                 this.$socket.emit('gameAction', { userId: this.userData.id, roomId: this.roomId, actionIds: [playerId] }, response => {
                     if (response?.status !== 'ok')
                         this.showToast({text: response.text || 'Действие не удалось', type: 'error'})
@@ -197,11 +208,10 @@ export default {
             }
             //reporter
             if (this.activeTargetName(playerId) === 'reporter') {
-                if (!this.reporterIds.includes(playerId))
+                if (!this.reporterIds.includes(playerId) && this.gamePlayers.find(pl => pl.id === playerId).role === 'unknown')
                     this.reporterIds.push(playerId)
 
                 if (this.reporterIds.length > 1) {
-                    this.actionSend = true
                     this.$socket.emit('gameAction', { userId: this.userData.id, roomId: this.roomId, actionIds: this.reporterIds }, response => {
                         if (response?.status !== 'ok')
                             this.showToast({text: response.text || 'Действие не удалось', type: 'error'})
@@ -211,7 +221,6 @@ export default {
             }
             //doctor
             if (this.activeTargetName(playerId) === 'doctor') {
-                this.actionSend = true
                 this.$socket.emit('gameAction', { userId: this.userData.id, roomId: this.roomId, actionIds: [playerId] }, response => {
                     if (response?.status !== 'ok')
                         this.showToast({text: response.text || 'Действие не удалось', type: 'error'})
@@ -219,7 +228,6 @@ export default {
             }
             //lover
             if (this.activeTargetName(playerId) === 'lover') {
-                this.actionSend = true
                 this.$socket.emit('gameAction', { userId: this.userData.id, roomId: this.roomId, actionIds: [playerId] }, response => {
                     if (response?.status !== 'ok')
                         this.showToast({text: response.text || 'Действие не удалось', type: 'error'})
@@ -227,7 +235,6 @@ export default {
             }
             //lover
             if (this.activeTargetName(playerId) === 'bodyguard') {
-                this.actionSend = true
                 this.$socket.emit('gameAction', { userId: this.userData.id, roomId: this.roomId, actionIds: [playerId] }, response => {
                     if (response?.status !== 'ok')
                         this.showToast({text: response.text || 'Действие не удалось', type: 'error'})
@@ -235,7 +242,6 @@ export default {
             }
             //barmen
             if (this.activeTargetName(playerId) === 'barmen') {
-                this.actionSend = true
                 this.$socket.emit('gameAction', { userId: this.userData.id, roomId: this.roomId, actionIds: [playerId] }, response => {
                     if (response?.status !== 'ok')
                         this.showToast({text: response.text || 'Действие не удалось', type: 'error'})
@@ -243,7 +249,6 @@ export default {
             }
             //terrorist
             if (this.activeTargetName(playerId) === 'terrorist') {
-                this.actionSend = true
                 this.$socket.emit('gameAction', { userId: this.userData.id, roomId: this.roomId, actionIds: [playerId] }, response => {
                     if (response?.status !== 'ok')
                         this.showToast({text: response.text || 'Действие не удалось', type: 'error'})

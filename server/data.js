@@ -64,7 +64,7 @@ const rooms = [
         id: 1,
         name: 'Test room',
         maxPersons: 4,
-        minPersons: 2,
+        minPersons: 4,
         roles: [
             { role: 'lover', count: 1 },
             { role: 'reporter', count: 1 },
@@ -73,7 +73,7 @@ const rooms = [
             { role: 'bodyguard', count: 1 },
             { role: 'terrorist', count: 1 }
         ],
-        users: [], //socketId, id, nickname, gender, role
+        users: [], //socketId, id, nickname, gender, role, isActionSend, labels, isLive
         chat: [],
         status: 'collecting', //collecting, countdown, playing
         gameData: {
@@ -151,7 +151,8 @@ const rooms = [
     gender: currUser.gender,
     role: 'unknown',
     isLive: true,
-    labels: [] 
+    labels: [],
+    isActionSend: false
 });
  */
 

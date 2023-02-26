@@ -7,8 +7,10 @@ export default{
     role: 'unknown',
     isAlive: true,
     labels: [],
+    isActionSend: false,
     //players
     players: [],
+    mafiaPlayersCount: 0,
     //about game
     gameStatus: 'Набор игроков', 
     gameStage: 0,
@@ -28,10 +30,12 @@ export default{
     gameChat: state => state.chat,
     gameChatEnable: state => state.isChatEnable,
     gamePlayers: state => state.players,
+    gameMafiaPlayersCount: state => state.mafiaPlayersCount,
     gameTimer: state => state.timer,
     gameRole: state => state.role,
+    gameActionSended: state => state.isActionSend,
     gameStatus: state => state.gameStatus, //collecting, countdown, playing
-    gameStage: state => state.gameStage,
+    gameStage: state => state.gameStage, //0-5
     gamePlayerIsAlive: state => state.isAlive,
     gameLabels: state => state.labels,
     gameVoicesCount: state => state.voicesCount,
@@ -75,6 +79,7 @@ export default{
     SOCKET_setGameStage: (state, data) => state.gameStage = data,
 
     SOCKET_wasKilled: (state, data) => state.isAlive = !data,
+    SOCKET_setActionSend: (state, data) => state.isActionSend = data,
     SOCKET_setLabel: (state, data) => state.labels.push(data),
     SOCKET_setLabels: (state, data) => state.labels = [...data],
     clearLabels: (state) => state.labels = [],
@@ -85,19 +90,24 @@ export default{
       state.gameRezult = {...data}
     },
 
+    SOCKET_setMafiaPlayersCount: (state, data) => state.mafiaPlayersCount = data,
+
     clearAllStates: (state) => {
       state.role = 'unknown'
       state.isAlive = true
+      state.isActionSend = false
       state.labels = []
       state.players = []
       state.gameStatus = 'Набор игроков'
       state.gameStage = 0
       state.chat = []
       state.isChatEnable = true
+      clearInterval(state.timerObj)
       state.timer = -1
       state.timerObj = null
       state.voicesCount = {}
       state.gameRezult = {}
+      state.mafiaPlayersCount = 0
     }
   },
 
