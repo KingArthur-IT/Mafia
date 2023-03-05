@@ -39,6 +39,7 @@ export default{
     gamePlayerIsAlive: state => state.isAlive,
     gameLabels: state => state.labels,
     gameVoicesCount: state => state.voicesCount,
+    gameRezult: state => state.gameRezult
   },
 
   mutations: {

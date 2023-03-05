@@ -77,7 +77,7 @@ export default {
     left: 0
     right: 0
     bottom: 0
-    background: #000000e8
+    background: #100923e8
     transition: opacity .2s ease-in-out
     display: none
     opacity: 0

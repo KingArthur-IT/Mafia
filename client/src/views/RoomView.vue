@@ -2,7 +2,8 @@
   <div class="room">
       <!-- sidebar -->
       <div class="sidebar-wrap">
-          <div class="hero sidebar">
+          <p>Игроки:</p>
+          <div class="hero sidebar custom-scrollbar">
               <div v-for="(player, i) in gamePlayers.filter(pl => pl.id !== userData.id)" :key="i">
                   <CardRole 
                     :nickname="player.nickname"
@@ -21,44 +22,46 @@
       <div class="room__main">
           <!-- head -->
           <div class="room__head">
-              <div class="hero head">
-                  <div class="">
-                      <div>
-                          <p>
-                              Вы <span class="sm-font">({{ userData.nickname }})</span>
-                              <span v-if="gameRole != 'unknown'">: {{ rolesInfo[gameRole].name[userData.gender] }}</span>
-                          </p>
-                          <div class="head__card">
-                              <CardRole 
-                                :nickname="userData.nickname"
-                                :gender="userData.gender"
-                                :role="gameRole"
-                                :showNick="false"
-                                :isAlive="gamePlayerIsAlive"
-                                :votesCount="gameVoicesCount[userData.id] || 0"
-                                :gameActionSended="true"
-                              />
-                              <img src="@/assets/sheriff-badge.png" alt="sheriff" class="label-badge" :class="{ 'badge-visible': gameLabels.includes('sheriff') }">
-                              <img src="@/assets/tablet.png" alt="heal" class="label-badge" :class="{ 'badge-visible': gameLabels.includes('doctor') }">
-                              <img src="@/assets/heart.png" alt="heal" class="label-badge" :class="{ 'badge-visible': gameLabels.includes('lover') }">
-                              <img src="@/assets/barmen.png" alt="heal" class="label-badge" :class="{ 'badge-visible': gameLabels.includes('barmen') }">
-                              <img src="@/assets/shield.png" alt="heal" class="label-badge" :class="{ 'badge-visible': gameLabels.includes('bodyguard') }">
-                          </div>
-                      </div>
-                      <div v-if="this.gameStage > 0">
-                          Мафия: {{ gameMafiaPlayersCount }} Мирные: {{ gamePlayers?.filter(pl => pl.isLive).length -  gameMafiaPlayersCount}}
-                      </div>
-                  </div>
-                  <div class="stage">
-                      <p>{{gameStatus}}</p>
-                      <div class="timer" v-if="gameTimer > 0"><strong>{{gameTimer}} cек</strong></div>
-                  </div>
-                  <QuiteIcon class="leave" @click="$router.push({name: 'profile.holl'})" />
-              </div>
+            <div>
+                <p>
+                    <span>Вы </span>
+                    <span v-if="userData.id" class="sm-font">({{ userData.nickname }})</span>
+                    <span v-if="gameRole != 'unknown'">: {{ rolesInfo[gameRole].name[userData.gender] }}</span>
+                </p>
+                <div class="head__card">
+                    <CardRole 
+                        :nickname="userData.nickname"
+                        :gender="userData.gender"
+                        :role="gameRole"
+                        :showNick="false"
+                        :isAlive="gamePlayerIsAlive"
+                        :votesCount="gameVoicesCount[userData.id] || 0"
+                        :gameActionSended="true"
+                    />
+                    <img src="@/assets/sheriff-badge.png" alt="sheriff" class="label-badge" :class="{ 'badge-visible': gameLabels.includes('sheriff') }">
+                    <img src="@/assets/tablet.png" alt="heal" class="label-badge" :class="{ 'badge-visible': gameLabels.includes('doctor') }">
+                    <img src="@/assets/heart.png" alt="heal" class="label-badge" :class="{ 'badge-visible': gameLabels.includes('lover') }">
+                    <img src="@/assets/barmen.png" alt="heal" class="label-badge" :class="{ 'badge-visible': gameLabels.includes('barmen') }">
+                    <img src="@/assets/shield.png" alt="heal" class="label-badge" :class="{ 'badge-visible': gameLabels.includes('bodyguard') }">
+                </div>
+            </div>
+            <div class="stage">
+                <div class="stage__title">
+                    <p>{{gameStatus}}</p>
+                    <div class="timer" v-if="gameTimer > 0"><strong>{{gameTimer}} cек</strong></div>
+                </div>
+                <div v-if="this.gameStage">
+                    Мафия: {{ gameMafiaPlayersCount }} Мирные: {{ gamePlayers?.filter(pl => pl.isLive).length -  gameMafiaPlayersCount}}
+                </div>
+            </div>
+            <div class="leave">
+                <QuiteIcon @click="$router.push({name: 'profile.holl'})" />
+                <p>В холл</p>
+            </div>
           </div>
           <!-- chat -->
-          <div class="hero">
-              <div class="dialog">
+          <div class="chat-wrapper">
+              <div class="dialog custom-scrollbar">
                   <div 
                     v-for="(msg, i) in gameChat" 
                     :key="i" class="chat-msg" 
@@ -80,10 +83,14 @@
                     @keydown.enter="sendMsg"
                   >
                   <button 
-                    class="btn secondary-btn" 
+                    class="btn" 
                     :class="{'disable': !isChatEnable}"
                     @click="sendMsg"
-                  ></button>
+                  >
+                    <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20.33 3.66996C20.1408 3.48213 19.9035 3.35008 19.6442 3.28833C19.3849 3.22659 19.1135 3.23753 18.86 3.31996L4.23 8.19996C3.95867 8.28593 3.71891 8.45039 3.54099 8.67255C3.36307 8.89471 3.25498 9.16462 3.23037 9.44818C3.20576 9.73174 3.26573 10.0162 3.40271 10.2657C3.5397 10.5152 3.74754 10.7185 4 10.85L10.07 13.85L13.07 19.94C13.1906 20.1783 13.3751 20.3785 13.6029 20.518C13.8307 20.6575 14.0929 20.7309 14.36 20.73H14.46C14.7461 20.7089 15.0192 20.6023 15.2439 20.4239C15.4686 20.2456 15.6345 20.0038 15.72 19.73L20.67 5.13996C20.7584 4.88789 20.7734 4.6159 20.7132 4.35565C20.653 4.09541 20.5201 3.85762 20.33 3.66996ZM4.85 9.57996L17.62 5.31996L10.53 12.41L4.85 9.57996ZM14.43 19.15L11.59 13.47L18.68 6.37996L14.43 19.15Z" fill="#fff"/>
+                    </svg>
+                  </button>
               </div>
           </div>
       </div>
@@ -93,6 +100,19 @@
     <p class="modal-text">
         <strong>{{ rolesInfo[gameRole]?.name[userData.gender] }}</strong> <br>
         {{ rolesInfo[gameRole]?.description }}
+    </p>
+  </ModalWrapper>
+  <ModalWrapper v-model="isEndGameModalOpened" :title="'Игра окончена'">
+    <p class="modal-text">
+        <span class="md-font">
+            <strong v-if="isInMafiaTeam">Поздравляем!</strong>
+            <strong v-else>Вы проиграли</strong>
+        </span>
+        <br>
+        <span>Победила команда
+            <span v-if="gameRezult.winnerTeam === 'mafia'"> мафии</span>
+            <span v-else> мирных жителей</span>
+        </span> <br>
     </p>
   </ModalWrapper>
 </template>
@@ -115,18 +135,22 @@ export default {
         return {
             roomId: -1,
             isModalOpened: false,
+            isEndGameModalOpened: false,
             rolesInfo,
             inputMsgText: '',
             reporterIds: []
         }
     },
     computed: {
-        ...mapGetters('game', ['gameChat', 'gameChatEnable', 'gamePlayers', 'gameRole', 'gameTimer', 'gameStatus', 'gameStage', 'gamePlayerIsAlive', 'gameLabels', 'gameVoicesCount', 'gameActionSended', 'gameMafiaPlayersCount']),
+        ...mapGetters('game', ['gameChat', 'gameChatEnable', 'gamePlayers', 'gameRole', 'gameTimer', 'gameStatus', 'gameStage', 'gamePlayerIsAlive', 'gameLabels', 'gameVoicesCount', 'gameActionSended', 'gameMafiaPlayersCount', 'gameRezult']),
         ...mapGetters('user', ['userData']),
         isChatEnable() {
             const chatEnable = this.gameStage === 1 ? this.gameRole === 'mafia' : true
             return this.gameChatEnable && chatEnable
         },
+        isInMafiaTeam() {
+            return ['barmen', 'mafia', 'terrorist'].includes(this.gameRole)
+        }
     },
     mounted() {
         this.roomId = Number(this.$route.params.id)
@@ -140,6 +164,9 @@ export default {
         },
         gameVoicesCount() {
             console.log(this.gameVoicesCount);
+        },
+        gameRezult() {
+            this.isEndGameModalOpened = true
         }
     },
     methods: {
@@ -261,10 +288,8 @@ export default {
 
 <style scoped lang="sass">
     .hero
-        background: var(--color-background-soft)
         height: 100%
         width: 100%
-        border-radius: 30px
         padding: 30px
     .room
         display: flex
@@ -272,6 +297,7 @@ export default {
         align-items: stretch
         background-color: var(--color-background)
         min-height: 100vh
+        overflow: hidden
         &__main
             width: 100%
             display: flex
@@ -280,6 +306,9 @@ export default {
         &__head
             width: 100%
             padding-bottom: 20px
+            display: flex
+            justify-content: space-between
+            align-items: center
     .head__card
         display: flex
         align-items: flex-end
@@ -297,18 +326,25 @@ export default {
             opacity: 1
             transform: scale(1)
     .sidebar-wrap
-        width: 280px
-        padding: 20px
+        width: 260px
+        padding: 20px 10px
+        & p
+            padding-left: 12px
     .sidebar
+        max-height: calc(100vh - 65px)
+        overflow-y: auto
         display: flex
         justify-content: space-between
         align-items: stretch
         align-content: flex-start
         flex-wrap: wrap
-        padding: 20px 15px
+        padding: 0px 12px
+        border-radius: 0 22px
     .dialog
         width: 100%
-        height: 90%
+        height: calc(100vh - 210px)
+        max-height: calc(100vh - 210px)
+        overflow: auto
         border: 1px solid #fff
         padding: 10px
         border-radius: 5px
@@ -324,40 +360,58 @@ export default {
             padding: 10px
             border-radius: 5px
             margin-right: 10px
-            background: var(--color-background-soft)
+            background: transparent
             color: #fff
+            caret-color: var(--color-primary)
             &.disable
                 color: var(--color-background-soft)
                 border: 1px solid darken(#fff, 40%)
         & button
             width: 60px
+            background: transparent
+            border: 1px solid #fff
+            border-radius: 5px
+            display: flex
+            justify-content: center
+            align-items: center
+            transition: background .3s ease
+            & svg
+                width: 30px
+                height: 30px
             &.disable
                 background-color: transparent
                 border-color: darken(#fff, 40%)
-
+            &:hover
+                background: #fff
+                & svg path
+                    fill: var(--color-background)
+    .chat-wrapper
+        height: 100%
+        width: 100%
     .chat-msg
         text-align: left
         padding: 5px 0
     .server-msg
         text-align: center
-        color: #fff// #d8ff00
+        color: #fff
         font-style: italic
     .own-msg
         text-align: right
     .author-name
         display: block
         font-style: italic
-    .head
-        display: flex
-        justify-content: space-between
-        align-items: center
     .leave
         cursor: pointer
-        width: 35px
-        height: 35px
-        fill: #fff
+        display: flex
+        align-items: center
+        & p
+            padding-left: 2px
     .stage
         text-align: center
+        &__title
+            font-weight: 600
+            font-size: 22px
+            margin-bottom: 5px
     .modal-img
         width: 200px
         display: block
@@ -367,4 +421,15 @@ export default {
     .modal-text
         max-width: 300px
         text-align: center
+        & .md-font
+            color: var(--color-primary)
+    .custom-scrollbar
+        &::-webkit-scrollbar
+            width: 5px
+        &::-webkit-scrollbar-track
+            background-color: #fff
+            border-radius: 12px
+        &::-webkit-scrollbar-thumb
+            background-color: var(--color-background-soft)
+            border-radius: 12px
 </style>

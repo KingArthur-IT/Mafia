@@ -66,6 +66,7 @@ function mySocket(socket) {
     //game info
     socket.emit('setGameStage', currRoom.gameData.gameStage);
     socket.emit('setCountdown', currRoom.gameData.timeCounter);
+    socket.emit('setMafiaPlayersCount', rooms.find(room => room.id === roomId).users.filter(user => user.isLive && ['mafia', 'barmen', 'terrorist'].includes(user.role)).length);
     socket.emit('updateVoicesCount', {});
 
     if (currRoom.gameData.gameStage === 1) {

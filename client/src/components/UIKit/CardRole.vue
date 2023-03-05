@@ -77,7 +77,6 @@ export default {
         max-width: 80px
         min-width: 80px
         height: 80px
-        padding: 5px
         margin-bottom: 20px
         &.no-nick
             margin-bottom: 0
@@ -112,7 +111,7 @@ export default {
                 width: 20px
                 height: 20px
                 border-radius: 50%
-                background: red
+                background: var(--color-primary)
                 display: flex
                 justify-content: center
                 align-items: center
@@ -126,7 +125,7 @@ export default {
                     transform: translate(-55%, -52%)
                     width: 1px
                     height: 30px
-                    background: red
+                    background: var(--color-primary)
                     z-index: -1
                 &::after
                     content: ''
@@ -136,7 +135,7 @@ export default {
                     transform: translate(-51%, -55%)
                     height: 1px
                     width: 30px
-                    background: red
+                    background: var(--color-primary)
                     z-index: -1
 
     .target
