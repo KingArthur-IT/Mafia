@@ -18,4 +18,11 @@ export default {
     width: 40px;
     height: 40px;
 }
+
+@media screen and (max-width: 540px) {
+    .icon{ 
+        width: 30px;
+        height: 30px;
+    }
+}
 </style>

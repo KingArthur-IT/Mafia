@@ -16,7 +16,7 @@ function getRolesCount(usersCount, roles) {
     players.citizen = usersCount - players.mafia
 
     const playersMax = {
-        barmen: players.mafia > 2 ? players.mafia < 7 ? 1 : 2 : 0, //0
+        barmen: players.mafia > 2 ? players.mafia < 7 ? 1 : 2 : 1, //0
         terrorist: players.mafia > 3 ? players.mafia < 7 ? 1 : 2 : 0,
         bodyguard: players.mafia > 3 ? players.mafia < 7 ? 1 : 2 : 0,
         reporter: players.citizen > 8 ? players.citizen < 12 ? 2 : 3 : 1, //1 

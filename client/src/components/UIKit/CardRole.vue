@@ -169,4 +169,25 @@ export default {
     //         transform: scale(1.1)
     //     100%
     //         transform: scale(1.03)
+
+@media screen and (max-width: 1024px)
+    .card
+        width: 70px
+        max-width: 70px
+        min-width: 70px
+        height: 70px
+
+@media screen and (max-width: 600px)
+    .card
+        width: 60px
+        max-width: 60px
+        min-width: 60px
+        height: 60px
+
+@media screen and (max-width: 540px)
+    .card
+        width: 50px
+        max-width: 50px
+        min-width: 50px
+        height: 50px
 </style>

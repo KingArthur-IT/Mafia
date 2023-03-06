@@ -22,39 +22,43 @@
       <div class="room__main">
           <!-- head -->
           <div class="room__head">
-            <div>
+            <div class="head-col">
                 <p>
                     <span>Вы </span>
                     <span v-if="userData.id" class="sm-font">({{ userData.nickname }})</span>
                     <span v-if="gameRole != 'unknown'">: {{ rolesInfo[gameRole].name[userData.gender] }}</span>
                 </p>
                 <div class="head__card">
-                    <CardRole 
-                        :nickname="userData.nickname"
-                        :gender="userData.gender"
-                        :role="gameRole"
-                        :showNick="false"
-                        :isAlive="gamePlayerIsAlive"
-                        :votesCount="gameVoicesCount[userData.id] || 0"
-                        :gameActionSended="true"
-                    />
-                    <img src="@/assets/sheriff-badge.png" alt="sheriff" class="label-badge" :class="{ 'badge-visible': gameLabels.includes('sheriff') }">
-                    <img src="@/assets/tablet.png" alt="heal" class="label-badge" :class="{ 'badge-visible': gameLabels.includes('doctor') }">
-                    <img src="@/assets/heart.png" alt="heal" class="label-badge" :class="{ 'badge-visible': gameLabels.includes('lover') }">
-                    <img src="@/assets/barmen.png" alt="heal" class="label-badge" :class="{ 'badge-visible': gameLabels.includes('barmen') }">
-                    <img src="@/assets/shield.png" alt="heal" class="label-badge" :class="{ 'badge-visible': gameLabels.includes('bodyguard') }">
+                    <div style="margin-right: 5px">
+                        <CardRole 
+                            :nickname="userData.nickname"
+                            :gender="userData.gender"
+                            :role="gameRole"
+                            :showNick="false"
+                            :isAlive="gamePlayerIsAlive"
+                            :votesCount="gameVoicesCount[userData.id] || 0"
+                            :gameActionSended="true"
+                        />
+                    </div>
+                    <div class="head__labels">
+                        <img src="@/assets/sheriff-badge.png" alt="sheriff" class="label-badge" :class="{ 'badge-visible': gameLabels.includes('sheriff') }">
+                        <img src="@/assets/tablet.png" alt="heal" class="label-badge" :class="{ 'badge-visible': gameLabels.includes('doctor') }">
+                        <img src="@/assets/heart.png" alt="heal" class="label-badge" :class="{ 'badge-visible': gameLabels.includes('lover') }">
+                        <img src="@/assets/barmen.png" alt="heal" class="label-badge" :class="{ 'badge-visible': gameLabels.includes('barmen') }">
+                        <img src="@/assets/shield.png" alt="heal" class="label-badge" :class="{ 'badge-visible': gameLabels.includes('bodyguard') }">
+                    </div>
                 </div>
             </div>
-            <div class="stage">
+            <div class="stage head-col">
                 <div class="stage__title">
                     <p>{{gameStatus}}</p>
                     <div class="timer" v-if="gameTimer > 0"><strong>{{gameTimer}} cек</strong></div>
                 </div>
-                <div v-if="this.gameStage">
+                <div v-if="this.gameStage" class="stage__count">
                     Мафия: {{ gameMafiaPlayersCount }} Мирные: {{ gamePlayers?.filter(pl => pl.isLive).length -  gameMafiaPlayersCount}}
                 </div>
             </div>
-            <div class="leave">
+            <div class="leave head-col">
                 <QuiteIcon @click="$router.push({name: 'profile.holl'})" />
                 <p>В холл</p>
             </div>
@@ -309,6 +313,8 @@ export default {
             display: flex
             justify-content: space-between
             align-items: center
+    .head-col
+        flex-basis: 33.33%
     .head__card
         display: flex
         align-items: flex-end
@@ -326,7 +332,8 @@ export default {
             opacity: 1
             transform: scale(1)
     .sidebar-wrap
-        width: 260px
+        min-width: 210px
+        max-width: 210px
         padding: 20px 10px
         & p
             padding-left: 12px
@@ -339,7 +346,6 @@ export default {
         align-content: flex-start
         flex-wrap: wrap
         padding: 0px 12px
-        border-radius: 0 22px
     .dialog
         width: 100%
         height: calc(100vh - 210px)
@@ -381,8 +387,14 @@ export default {
             &.disable
                 background-color: transparent
                 border-color: darken(#fff, 40%)
+                & svg path
+                    fill: darken(#fff, 40%)
+                &:hover
+                    background-color: transparent
+                    & svg path
+                        fill: darken(#fff, 40%)
             &:hover
-                background: #fff
+                background-color: #fff
                 & svg path
                     fill: var(--color-background)
     .chat-wrapper
@@ -404,6 +416,7 @@ export default {
         cursor: pointer
         display: flex
         align-items: center
+        justify-content: flex-end
         & p
             padding-left: 2px
     .stage
@@ -432,4 +445,92 @@ export default {
         &::-webkit-scrollbar-thumb
             background-color: var(--color-background-soft)
             border-radius: 12px
+
+
+@media screen and (max-width: 1024px)
+    .sidebar-wrap
+        min-width: 170px
+        max-width: 170px
+        padding: 20px 0
+    .label-badge
+        &.badge-visible
+            width: 40px
+            height: 40px
+    
+@media screen and (max-width: 800px)
+    .label-badge
+        margin-bottom: 0
+        &.badge-visible
+            width: 25px
+            height: 25px
+    .head__labels
+        position: absolute
+        z-index: 2
+        top: -3px
+        left: 75px
+        flex-direction: column
+        display: flex
+    .room__head
+        padding-bottom: 10px
+
+@media screen and (max-width: 680px)
+    .head-col
+        flex-basis: 20%
+    .stage.head-col
+        flex-basis: 60%
+    .leave
+        & p
+            display: none
+
+@media screen and (max-width: 600px)
+    .sidebar-wrap
+        min-width: 150px
+        max-width: 150px
+        padding: 10px 0
+    .room
+        &__main
+            padding: 10px 10px 10px 0
+        &__head
+            padding-bottom: 10px
+    .sidebar
+        max-height: calc(100vh - 85px)
+    .dialog
+        height: calc(100vh - 170px)
+        max-height: calc(100vh - 170px)
+    .stage
+        &__title
+            font-size: 18px
+        &__count
+            font-size: 16px
+    .label-badge
+        &.badge-visible
+            width: 20px
+            height: 20px
+    .head__labels
+        top: 0
+        left: 63px
+
+@media screen and (max-width: 540px)
+    .sidebar-wrap
+        min-width: 115px
+        max-width: 115px
+        & p
+            font-size: 14px
+    .sidebar
+        padding: 0 6px
+    .stage
+        &__title
+            font-size: 16px
+        &__count
+            font-size: 12px
+    .room__head div p
+        font-size: 14px
+    .head__labels
+        left: 53px
+
+@media screen and (max-width: 375px)
+    .head-col
+        flex-basis: 33.33%
+    .stage.head-col
+        flex-basis: 40%
 </style>
