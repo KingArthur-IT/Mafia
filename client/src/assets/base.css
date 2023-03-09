@@ -1,7 +1,8 @@
 /* semantic color variables for this project */
 :root {
   --color-background: #100923;
-  --color-background-soft: #231544;
+  --color-background-soft: #233651;
+  /* /#231544; */
 
   --color-primary: #be0c22;
   --color-edit: #f3b703;
@@ -40,7 +41,6 @@ ul{
 
 body {
   min-height: 100vh;
-  overflow: hidden;
   color: var(--color-text);
   background: var(--color-background);
   line-height: 1.35;
@@ -49,6 +49,10 @@ body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+main {
+  overflow-x: hidden;
 }
 
 small{
@@ -105,7 +109,7 @@ small{
   border-collapse: collapse;
 }
 
-@media screen and (max-width: 425px){
+@media screen and (max-width: 475px){
   :root {  
     --text-size: 14px
   }

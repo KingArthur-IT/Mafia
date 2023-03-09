@@ -59,7 +59,18 @@ export default {
 
 <style scoped lang="sass">
 .interface
-    background-color: var(--color-background)
+    position: relative
+    &::before
+        position: absolute
+        content: ''
+        background: linear-gradient(103.66deg, #176DAE 6.84%, #82E1E2 94.52%)
+        filter: blur(232px)
+        border-radius: 20px
+        transform: rotate(-20deg)
+        width: 350px
+        height: 350px
+        top: -100px
+        right: -100px
     &__title
         margin-bottom: 30px
         text-align: center
@@ -81,4 +92,49 @@ export default {
         bottom: -120px
         right: 0
         width: 200px
+
+@media screen and (max-width: 1024px)
+    .interface
+        &__list
+            width: calc( 100% + 10px)
+            transform: translateX(-5px)
+        &__item
+            flex-basis: calc(33% - 10px)
+            padding: 30px
+            margin: 0 5px 10px
+        &__icon
+            width: 150px
+
+@media screen and (max-width: 768px)
+    .interface
+        &__item
+            flex-basis: calc(50% - 10px)
+            padding: 20px
+
+@media screen and (max-width: 600px)
+    .interface
+        &::before
+            filter: blur(100px)
+            width: 150px
+            height: 150px
+            top: -50px
+            right: -50px
+        &__icon
+            width: 100px
+            bottom: -70px
+
+@media screen and (max-width: 425px)
+    .interface
+        &__list
+            width: 100%
+            transform: translateX(0px)
+        &__item
+            flex-basis: 100%
+
+
+@media screen and (max-width: 375px)
+    .interface
+        &__icon
+            width: 75px
+            bottom: -40px
 </style>

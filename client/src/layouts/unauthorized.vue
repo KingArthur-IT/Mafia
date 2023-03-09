@@ -1,9 +1,9 @@
 <template>
-  <MainHeader />
   <main>
-      <RouterView />
+    <MainHeader />
+    <RouterView />
+    <MainFooter />
   </main>
-  <MainFooter />
 </template>
 
 <script>

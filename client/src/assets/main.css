@@ -5,6 +5,7 @@
     padding-left: 30px;
     padding-right: 30px;
 }
+
 .section{
     width: 100%;
     position: relative;
@@ -90,3 +91,30 @@
 .secondary-btn:active{
     background-color: transparent;
 }  
+
+@media screen and (max-width: 768px) {
+    .container{
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+    .section-screen{
+        margin-bottom: 70px;
+    }
+}
+
+@media screen and (max-width: 425px) {
+    .container{
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+    .section-screen{
+        margin-bottom: 50px;
+    }
+}
+
+@media screen and (max-width: 350px) {
+    .container{
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+}

@@ -7,13 +7,15 @@ import CallToAction from '@/components/HomePage/CallToAction.vue'
 </script>
 
 <template>
-  <main class="container">
+  <div class="container">
     <HeadSection />
     <AboutSection />
     <InterfaceSection />
-    <GameRolesSection />
+  </div>
+  <GameRolesSection />
+  <div class="container">
     <CallToAction />
-  </main>
+  </div>
 </template>
 
 <style scoped>

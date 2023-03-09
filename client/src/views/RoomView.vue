@@ -58,8 +58,8 @@
                     Мафия: {{ gameMafiaPlayersCount }} Мирные: {{ gamePlayers?.filter(pl => pl.isLive).length -  gameMafiaPlayersCount}}
                 </div>
             </div>
-            <div class="leave head-col">
-                <QuiteIcon @click="$router.push({name: 'profile.holl'})" />
+            <div class="leave head-col" @click="$router.push({name: 'profile.holl'})">
+                <QuiteIcon />
                 <p>В холл</p>
             </div>
           </div>

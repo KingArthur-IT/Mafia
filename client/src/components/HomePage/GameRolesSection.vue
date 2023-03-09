@@ -11,8 +11,11 @@
             :transition="2000"
             :pauseAutoplayOnHover="true"
         >
-            <Slide v-for="(slide, i) in cardsList" :key="i" class="roles__slide">
-                <img :src="getImageUrl(slide)" alt="img" class="roles__img carousel__item">
+            <Slide v-for="(slide) in cardsList" :key="slide.id" class="roles__slide">
+                <div class="roles__card carousel__item">
+                    <img :src="getImageUrl(slide.img)" alt="img" class="roles__img">
+                    <div class="roles__name">{{ slide.name }}</div>
+                </div>
             </Slide>
         </Carousel>
     </section>
@@ -30,44 +33,96 @@ export default {
         SheriffIcon
     },
     setup(){
-        const cardsList : string[] = [
-            'citizen-m',
-            'barmen-w',
-            'doctor-m',
-            'reporter-w',
-            'sheriff-m',
-            'citizen-w',
-            'bodyguard-m',
-            'barmen-m',
-            'bodyguard-w',
-            'lover-m',
-            'doctor-w',
-            'mafia-m',
-            'lover-w',
-            'reporter-m',
-            'terrorist-m'
+        const cardsList = [
+            {
+                id: 0,
+                img: 'citizen-m',
+                name: 'Горожанин'
+            },
+            {
+                id: 1,
+                img: 'barmen-w',
+                name: 'Барменша'
+            },
+            {
+                id: 2,
+                img: 'doctor-m',
+                name: 'Доктор'
+            },
+            {
+                id: 3,
+                img: 'reporter-w',
+                name: 'Репортерша'
+            },
+            {
+                id: 4,
+                img: 'sheriff-m',
+                name: 'Шериф'
+            },
+            {
+                id: 5,
+                img: 'citizen-w',
+                name: 'Горожанка'
+            },
+            {
+                id: 6,
+                img: 'bodyguard-m',
+                name: 'Телохранитель'
+            },
+            {
+                id: 7,
+                img: 'barmen-m',
+                name: 'Бармен'
+            },
+            {
+                id: 8,
+                img: 'bodyguard-w',
+                name: 'Телохранительница'
+            },
+            {
+                id: 9,
+                img: 'lover-m',
+                name: 'Любовник'
+            },
+            {
+                id: 10,
+                img: 'doctor-w',
+                name: 'Докторша'
+            },
+            {
+                id: 11,
+                img: 'mafia-m',
+                name: 'Мафиози'
+            },
+            {
+                id: 12,
+                img: 'lover-w',
+                name: 'Любовница'
+            },
+            {
+                id: 13,
+                img: 'terrorist-m',
+                name: 'Террорист'
+            }
         ]
 
         const breakpoints: object = {
-                // 320:{
-                //     itemsToShow: 1.15,
-                // },
-                // 425: {
-                //     itemsToShow: 1.2,
-                // },
-                // 600: {
-                //     itemsToShow: 1.5,
-                // },
-                // 860: {
-                //     itemsToShow: 1.8,
-                // },
-                // 1024 and up
-                1240: {
-                    itemsToShow: 5.0,
-                },
-            }
+            0: {
+                itemsToShow: 2,
+            },
+            650: {
+                itemsToShow: 3,
+            },
+            768: {
+                itemsToShow: 4,
+            },
+            // 1024 and up
+            1240: {
+                itemsToShow: 5.0,
+            },
+        }
 
-        const getImageUrl = (imgName: string) => { return new URL(`../../assets/cards/${imgName}.jpg`, import.meta.url).href }
+        const getImageUrl = (imgName: string) => { return new URL(`../../assets/cards/${imgName}.png`, import.meta.url).href }
 
         return{
             cardsList, getImageUrl, breakpoints
@@ -78,15 +133,35 @@ export default {
 
 <style scoped lang="sass">
     .roles
+        position: relative
+        &::before
+            position: absolute
+            content: ''
+            background: linear-gradient(103.66deg, #176DAE 6.84%, #82E1E2 94.52%)
+            filter: blur(232px)
+            border-radius: 20px
+            transform: rotate(-20deg)
+            width: 350px
+            height: 350px
+            top: 0px
+            left: -100px
         &__title
             text-align: center
             margin-bottom: 30px
         &__slide
             padding: 0 30px
+        &__card
+            padding: 15px
+            backdrop-filter: blur(5px)
+            border-radius: 15px
+            user-select: none
         &__img
             width: 100%
             border-radius: 10px
-            pointer-events: none
+        &__name
+            font-weight: 600
+            padding: 5px
+            font-size: 22px
         &__icon
             position: absolute
             top: -50px
@@ -107,4 +182,32 @@ export default {
         transform: scale(0.95) translate(10px)
     .carousel__slide--active > .carousel__item 
         transform: scale(1.0)
+
+@media screen and (max-width: 1024px)
+    .roles
+        &__icon
+            width: 110px
+
+@media screen and (max-width: 600px)
+    .roles
+        &::before
+            filter: blur(100px)
+            width: 150px
+            height: 150px
+            top: -50px
+            left: -50px
+        &__icon
+            width: 80px
+            top: 30px
+
+@media screen and (max-width: 425px)
+    .roles
+        &__title
+            margin-bottom: 0
+
+@media screen and (max-width: 375px)
+    .roles
+        &__icon
+            width: 60px
+            top: 50px
 </style>
