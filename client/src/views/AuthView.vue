@@ -1,6 +1,8 @@
 <template>
   <div class="auth">
-      <div class="auth__logo" @click="$router.push({name: 'home'})">MafiaWorld</div>
+      <div class="auth__logo" @click="$router.push({ name: 'home' })">
+        <Logo />
+      </div>
       <div class="auth__hero">
           <div class="auth__tabs">
               <button class="btn auth__tab-btn" :class="{'active': isLoginTab}" @click="isLoginTab = true">Войти</button>
@@ -10,6 +12,7 @@
           <form class="auth__login" v-if="isLoginTab">
               <div class="auth__input-wrapper">
                   <CustomInput 
+                    :id="'loginEmailInput'"
                     :label="'Email'"  
                     :type="'email'"
                     :isValid="loginData.isEmailValid"
@@ -33,7 +36,7 @@
                     </ul>
                   </CustomInput>
               </div>
-              <button :class="{'disable': !isLoginAvailable}" class="btn sm-font primary-btn auth__btn" @click.prevent="loginEvent">Войти</button>
+              <button :class="{'disable': !isLoginAvailable}" class="btn primary-btn auth__btn" @click.prevent="loginEvent">Войти</button>
           </form>
           <!-- register form  -->
           <form class="auth__login" v-else>
@@ -77,7 +80,7 @@
                     v-model="regData.confirmPassword"
                 >Пароли не совпадают</CustomInput>
               </div>
-              <button :class="{'disable': !isRegAvailable}" class="btn sm-font primary-btn auth__btn" @click.prevent="regEvent">Зарегистрироваться</button>
+              <button :class="{'disable': !isRegAvailable}" class="btn primary-btn auth__btn" @click.prevent="regEvent">Зарегистрироваться</button>
           </form>
       </div>
   </div>
@@ -87,10 +90,12 @@
 import { mapActions } from 'vuex'
 import { validatePassword, validateEmail } from '@/use/validation.js'
 import CustomInput from '@/components/UIKit/CustomInput.vue'
+import Logo from '@/components/icons/ProjectLogo.vue'
 
 export default {
     components:{
-        CustomInput
+        CustomInput,
+        Logo
     },
     data: () => {
         return{
@@ -116,10 +121,15 @@ export default {
             }
         }
     },
+    mounted() {
+        document.querySelector('#loginEmailInput')?.focus()
+        // console.log(this.$refs.loginInput);
+        // this.$refs.loginInput.focus()
+    },
     methods:{
         ...mapActions('user', ['getUserData']),
         goToMainPage(){
-            this.$router.push({name: 'home'})
+            this.$router.push({ name: 'home' })
         },
         regEvent(){
             if (!this.isRegAvailable) return;
@@ -164,13 +174,12 @@ export default {
         align-items: center
         justify-content: center
         &__logo
-            color: var(--color-text)
-            font-family: 'Kaushan Script', cursive
-            font-size: 60px
             cursor: pointer
             position: absolute
             top: 20px
             left: 30px
+            & svg
+                width: 240px
         &__hero
             min-width: 520px
             padding: 100px 30px
@@ -198,11 +207,15 @@ export default {
             padding: 15px 40px
             margin: auto
             margin-top: 24px
+            font-size: 16px
 
 @media screen and (max-width: 768px)
     .auth
+        &__hero
+            padding: 0px 20px
         &__logo
-            font-size: 48px
+            & svg
+                width: 180px
 
 @media screen and (max-width: 520px)
     .auth
@@ -212,11 +225,24 @@ export default {
         &__logo
             left: 20px
 
+@media screen and (max-width: 475px)
+    .auth
+        &__btn
+            padding: 13px 40px
+            font-size: 14px
+        &__logo
+            & svg
+                width: 140px
+
 @media screen and (max-width: 425px)
     .auth
         &__hero
-            padding: 0px 20px
+            padding: 0px 15px
         &__logo
-            font-size: 32px
             left: 15px
+
+@media screen and (max-width: 350px)
+    .auth
+        &__hero
+            padding: 0px 10px
 </style>

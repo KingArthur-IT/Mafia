@@ -3,6 +3,7 @@
         <label v-if="label" class="label">{{label}}</label>
         <div class="input-wrap d-flex">
             <input 
+                :id="id"
                 class="input" 
                 :class="{'disable': !isEditing && isWithEdit}"
                 :type="inputType" 
@@ -30,6 +31,10 @@ export default {
         OpenedEyeIcon, ClosedEyeIcon, SaveEditButton
     },
     props:{
+        id: {
+            type: String,
+            default: ''
+        },
         modelValue: {
             type: String,
             default: ''

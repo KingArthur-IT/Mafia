@@ -122,6 +122,7 @@
 </template>
 
 <script>
+import SocketioService from '@/services/socketio.service.js';
 import { mapGetters, mapActions } from 'vuex'
 import { getImageUrl, getCardName } from '@/use/imgLinks.js'
 import { rolesInfo } from '@/data/data'
@@ -181,7 +182,7 @@ export default {
         },
         leaveTheRoom() {
             if (this.userData?.id){
-                this.$socket.emit('leaveRoom', { userId: this.userData.id, nickname: this.userData.nickname, roomId: this.roomId }, response => {
+                SocketioService.socket.emit('leaveRoom', { userId: this.userData.id, nickname: this.userData.nickname, roomId: this.roomId }, response => {
                     if (response?.status !== 'ok')
                         this.showToast({text: response.text || 'Ошибка при выходе из комнаты', type: 'error'})
                 })
@@ -208,7 +209,7 @@ export default {
         },
         sendMsg() {
             if (this.userData?.id && this.inputMsgText){
-                this.$socket.emit('sendMsg', { userId: this.userData.id, nickname: this.userData.nickname, roomId: this.roomId, msgText: this.inputMsgText }, response => {
+                SocketioService.socket.emit('sendMsg', { userId: this.userData.id, nickname: this.userData.nickname, roomId: this.roomId, msgText: this.inputMsgText }, response => {
                     if (response?.status !== 'ok')
                         this.showToast({text: response.text || 'Отправка сообщения не удалась', type: 'error'})
                     else this.inputMsgText = ''
@@ -225,14 +226,14 @@ export default {
             // if (this.gameLabels.includes('lover')) return
             //убить
             if (this.activeTargetName(playerId) === 'kill') {
-                this.$socket.emit('gameAction', { userId: this.userData.id, roomId: this.roomId, actionIds: [playerId] }, response => {
+                SocketioService.socket.emit('gameAction', { userId: this.userData.id, roomId: this.roomId, actionIds: [playerId] }, response => {
                     if (response?.status !== 'ok')
                         this.showToast({text: response.text || 'Действие не удалось', type: 'error'})
                 })
             }
             //исследовать шерифом
             if (this.activeTargetName(playerId) === 'sheriff') {
-                this.$socket.emit('gameAction', { userId: this.userData.id, roomId: this.roomId, actionIds: [playerId] }, response => {
+                SocketioService.socket.emit('gameAction', { userId: this.userData.id, roomId: this.roomId, actionIds: [playerId] }, response => {
                     if (response?.status !== 'ok')
                         this.showToast({text: response.text || 'Действие не удалось', type: 'error'})
                 })
@@ -243,7 +244,7 @@ export default {
                     this.reporterIds.push(playerId)
 
                 if (this.reporterIds.length > 1) {
-                    this.$socket.emit('gameAction', { userId: this.userData.id, roomId: this.roomId, actionIds: this.reporterIds }, response => {
+                    SocketioService.socket.emit('gameAction', { userId: this.userData.id, roomId: this.roomId, actionIds: this.reporterIds }, response => {
                         if (response?.status !== 'ok')
                             this.showToast({text: response.text || 'Действие не удалось', type: 'error'})
                         this.reporterIds = []
@@ -252,35 +253,35 @@ export default {
             }
             //doctor
             if (this.activeTargetName(playerId) === 'doctor') {
-                this.$socket.emit('gameAction', { userId: this.userData.id, roomId: this.roomId, actionIds: [playerId] }, response => {
+                SocketioService.socket.emit('gameAction', { userId: this.userData.id, roomId: this.roomId, actionIds: [playerId] }, response => {
                     if (response?.status !== 'ok')
                         this.showToast({text: response.text || 'Действие не удалось', type: 'error'})
                 })
             }
             //lover
             if (this.activeTargetName(playerId) === 'lover') {
-                this.$socket.emit('gameAction', { userId: this.userData.id, roomId: this.roomId, actionIds: [playerId] }, response => {
+                SocketioService.socket.emit('gameAction', { userId: this.userData.id, roomId: this.roomId, actionIds: [playerId] }, response => {
                     if (response?.status !== 'ok')
                         this.showToast({text: response.text || 'Действие не удалось', type: 'error'})
                 })
             }
             //lover
             if (this.activeTargetName(playerId) === 'bodyguard') {
-                this.$socket.emit('gameAction', { userId: this.userData.id, roomId: this.roomId, actionIds: [playerId] }, response => {
+                SocketioService.socket.emit('gameAction', { userId: this.userData.id, roomId: this.roomId, actionIds: [playerId] }, response => {
                     if (response?.status !== 'ok')
                         this.showToast({text: response.text || 'Действие не удалось', type: 'error'})
                 })
             }
             //barmen
             if (this.activeTargetName(playerId) === 'barmen') {
-                this.$socket.emit('gameAction', { userId: this.userData.id, roomId: this.roomId, actionIds: [playerId] }, response => {
+                SocketioService.socket.emit('gameAction', { userId: this.userData.id, roomId: this.roomId, actionIds: [playerId] }, response => {
                     if (response?.status !== 'ok')
                         this.showToast({text: response.text || 'Действие не удалось', type: 'error'})
                 })
             }
             //terrorist
             if (this.activeTargetName(playerId) === 'terrorist') {
-                this.$socket.emit('gameAction', { userId: this.userData.id, roomId: this.roomId, actionIds: [playerId] }, response => {
+                SocketioService.socket.emit('gameAction', { userId: this.userData.id, roomId: this.roomId, actionIds: [playerId] }, response => {
                     if (response?.status !== 'ok')
                         this.showToast({text: response.text || 'Действие не удалось', type: 'error'})
                 })

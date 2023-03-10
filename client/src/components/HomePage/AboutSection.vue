@@ -1,28 +1,31 @@
 <template>
     <div class="about-wrapper">
         <img src="@/assets/game.jpg" alt="group-of-friends" class="about-wrapper__img">
-        <section class="section section-screen about-section" style="overflow: hidden">
+        <section class="section section-screen about-section" style="overflow: hidden; position: relative;">
             <div class="section-hero about-section__head">
                 <div class="about-section__hero">
                     <h2 class="about-section__title">
-                        Стратегия, тактика, интриги - все это ждет вас в мафии онлайн!
+                        <strong>THEMafia</strong> это:
                     </h2>
-                    <div class="about-section__description">THEMafia это:</div>
+                    <!-- <div class="about-section__description"><strong>THEMafia</strong> это:</div> -->
                     <ul class="about-section__list">
                         <li class="about-section__item">
-                             <span>✓</span> Отличный способ провести время и найти друзей;
+                             <span>✓</span> Отличный способ провести время в компании людей со всего мира;
                         </li>
                         <li class="about-section__item">
-                            <span>✓</span> Увлекательная командная игра;
+                            <span>✓</span> Увлекательная командная игра - находи союзников и побеждай противников;
                         </li>
                         <li class="about-section__item">
-                            <span>✓</span> Детективный сюжет;
+                            <span>✓</span> Захватывающий детективный сюжет, полный неожиданных поворотов;
                         </li>
                         <li class="about-section__item">
-                            <span>✓</span> Интриги и альянсы;
+                            <span>✓</span> Возможность строить альянсы и замышлять интриги;
                         </li>
                         <li class="about-section__item">
-                            <span>✓</span> Возможность быть кем-угодно.
+                            <span>✓</span> Возможность быть кем угодно и раскрыться в роли выбранного персонажа;
+                        </li>
+                        <li class="about-section__item">
+                            <span>✓</span> Возможность играть в любое время и в любом месте - все, что нужно это доступ к интернету и желание побеждать.
                         </li>
                     </ul>
                 </div>
@@ -57,6 +60,7 @@ export default {
         display: none
         border-radius: 15px
 .about-section
+    position: relative
     overflow: hidden
     border-radius: 15px
     z-index: 2
@@ -82,6 +86,7 @@ export default {
     &__list
         padding-left: 12px
     &__item
+        margin-bottom: 5px
         & span
             margin-right: 4px
     &__img

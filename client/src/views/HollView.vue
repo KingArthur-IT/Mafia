@@ -39,7 +39,8 @@
 </template>
 
 <script>
-import {mapActions, mapGetters} from 'vuex'
+import SocketioService from '@/services/socketio.service.js';
+import { mapActions, mapGetters } from 'vuex'
 import PlusIcon from '@/components/icons/PlusIcon.vue'
 import { getImageUrl } from '@/use/imgLinks.js'
 import Pagination from '@/components/UIKit/Pagination.vue'
@@ -56,28 +57,26 @@ export default {
             roomsListData: [],
         }
     },
-    sockets: {
-        connect: function () {
-            console.log('socket connected')
-        },
+    created() {
+        SocketioService.setupSocketConnection();
     },
     mounted(){
         this.clearAllGameStates()
         //enterGameHall socket
         if (this.userData?.id){
-            this.$socket.emit('enterGameHall', { userId: this.userData.id }, response => {
+            SocketioService.socket.emit('enterGameHall', { userId: this.userData.id }, response => {
                 if (response?.status !== 'ok')
                     this.showToast({ text: response.text || 'Ошибка при получении списка комнат', type: 'error' })
             })
-        } else this.showToast({ text: response.text || 'Не могу идентифицировать пользователя', type: 'error' })
+        } else this.showToast({ text: 'Не могу идентифицировать пользователя', type: 'error' })
     },
-    methods:{
+    methods: {
         ...mapActions('toast', ['showToast']),
         ...mapActions('game', ['clearAllGameStates']),
         getImageUrl,
         goToRoom(id){
             if (this.userData?.id){
-                this.$socket.emit('enterRoom', { userId: this.userData.id, roomId: id }, response => {
+                SocketioService.socket.emit('enterRoom', { userId: this.userData.id, roomId: id }, response => {
                     if (response?.status === 'ok') {
                         this.$router.push({ name: 'room', params: { id: id } })
                     }

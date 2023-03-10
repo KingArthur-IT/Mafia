@@ -1,7 +1,7 @@
 <template>
     <section class="section section-screen roles">
         <SheriffIcon class="roles__icon" />
-        <h2 class="roles__title">Разнообразие игровых ролей</h2>
+        <h2 class="roles__title">Разнообразие игровых ролей - <br> создай свои стратегии для победы</h2>
         <Carousel 
             ref="cardsCarousel" 
             :wrap-around="true" 
@@ -198,7 +198,7 @@ export default {
             left: -50px
         &__icon
             width: 80px
-            top: 30px
+            top: 80px
 
 @media screen and (max-width: 425px)
     .roles
@@ -209,5 +209,4 @@ export default {
     .roles
         &__icon
             width: 60px
-            top: 50px
 </style>

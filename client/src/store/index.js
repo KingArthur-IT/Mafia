@@ -6,7 +6,7 @@ import rooms from './modules/rooms'
 import game from './modules/game'
 
 export default createStore({
-  modules:{
+  modules: {
     user,
     toast,
     rooms,
