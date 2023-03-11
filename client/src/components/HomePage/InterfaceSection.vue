@@ -44,15 +44,18 @@
             </ul>
         </div>
         <GunIcon class="interface__icon"/>
+        <LightPoint />
     </section>
 </template>
 
 <script>
+import LightPoint from '@/components/UIKit/Design/LightPoint.vue'
 import GunIcon from "@/components/icons/GunIcon.vue"
 
 export default {
     components:{
-        GunIcon
+        GunIcon,
+        LightPoint
     }
 }
 </script>
@@ -60,17 +63,6 @@ export default {
 <style scoped lang="sass">
 .interface
     position: relative
-    &::before
-        position: absolute
-        content: ''
-        background: linear-gradient(103.66deg, #176DAE 6.84%, #82E1E2 94.52%)
-        filter: blur(232px)
-        border-radius: 20px
-        transform: rotate(-20deg)
-        width: 350px
-        height: 350px
-        top: -100px
-        right: -100px
     &__title
         margin-bottom: 30px
         text-align: center
@@ -113,12 +105,6 @@ export default {
 
 @media screen and (max-width: 600px)
     .interface
-        &::before
-            filter: blur(100px)
-            width: 150px
-            height: 150px
-            top: -50px
-            right: -50px
         &__icon
             width: 100px
             bottom: -70px

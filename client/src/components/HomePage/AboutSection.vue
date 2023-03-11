@@ -32,30 +32,23 @@
                 <img src="@/assets/game.jpg" alt="group-of-friends" class="about-section__img">
             </div>
         </section>
+        <LightPoint :isLeft="true" />
     </div>
 </template>
 
 <script>
-export default {
+import LightPoint from '@/components/UIKit/Design/LightPoint.vue'
 
+export default {
+    components: {
+        LightPoint
+    }
 }
 </script>
 
 <style scoped lang="sass">
 .about-wrapper
     position: relative
-    &::before
-        position: absolute
-        content: ''
-        background: linear-gradient(103.66deg, #176DAE 6.84%, #82E1E2 94.52%)
-        filter: blur(232px)
-        border-radius: 20px
-        transform: rotate(-20deg)
-        width: 200px
-        height: 200px
-        top: 0px
-        left: -50px
-        pointer-events: none
     &__img
         display: none
         border-radius: 15px

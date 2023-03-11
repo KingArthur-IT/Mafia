@@ -4,15 +4,18 @@
       <Logo />
     </div>
     <button class="btn header__btn" @click="goToAuthPage">Войти</button>
+    <LightPoint />
   </header>
 </template>
 
 <script>
 import Logo from '@/components/icons/ProjectLogo.vue'
+import LightPoint from '@/components/UIKit/Design/LightPoint.vue'
 
 export default {
   components: {
-    Logo
+    Logo, 
+    LightPoint
   },
   methods:{
     goToMainPage() {
@@ -33,18 +36,6 @@ export default {
   display: flex
   justify-content: space-between
   align-items: center
-  &::before
-    position: absolute
-    content: ''
-    background: linear-gradient(103.66deg, #176DAE 6.84%, #82E1E2 94.52%)
-    filter: blur(232px)
-    border-radius: 20px
-    transform: rotate(-20deg)
-    width: 350px
-    height: 350px
-    top: -100px
-    right: -100px
-    pointer-events: none
   &__logo
     cursor: pointer
     & svg

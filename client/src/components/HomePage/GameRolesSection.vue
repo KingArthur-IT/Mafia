@@ -18,10 +18,12 @@
                 </div>
             </Slide>
         </Carousel>
+        <LightPoint :isLeft="true" />
     </section>
 </template>
 
 <script lang="ts">
+import LightPoint from '@/components/UIKit/Design/LightPoint.vue'
 import SheriffIcon from "@/components/icons/SheriffIcon.vue"
 import { Carousel, Slide } from 'vue3-carousel';
 import 'vue3-carousel/dist/carousel.css';
@@ -30,7 +32,8 @@ export default {
     components: {
         Carousel,
         Slide,
-        SheriffIcon
+        SheriffIcon,
+        LightPoint
     },
     setup(){
         const cardsList = [
@@ -134,17 +137,6 @@ export default {
 <style scoped lang="sass">
     .roles
         position: relative
-        &::before
-            position: absolute
-            content: ''
-            background: linear-gradient(103.66deg, #176DAE 6.84%, #82E1E2 94.52%)
-            filter: blur(232px)
-            border-radius: 20px
-            transform: rotate(-20deg)
-            width: 350px
-            height: 350px
-            top: 0px
-            left: -100px
         &__title
             text-align: center
             margin-bottom: 30px
@@ -190,12 +182,6 @@ export default {
 
 @media screen and (max-width: 600px)
     .roles
-        &::before
-            filter: blur(100px)
-            width: 150px
-            height: 150px
-            top: -50px
-            left: -50px
         &__icon
             width: 80px
             top: 80px
