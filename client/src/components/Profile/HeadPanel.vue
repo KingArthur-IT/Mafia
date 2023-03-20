@@ -4,10 +4,10 @@
       <p class="panel__title">{{$route.meta.pageName}}</p>
     </div>
     <div class="panel__icons">
-      <div class="panel__item" @click="$router.push({name: 'profile.message'})">
+      <!-- <div class="panel__item" @click="$router.push({name: 'profile.message'})">
         <LetterIcon class="panel__icon"/>
         <div class="panel__badge">{{messagesCount}}</div>
-      </div>
+      </div> -->
       <div class="panel__item" @click="$router.push({name: 'profile.notifications'})">
         <BellIcon class="panel__icon panel__bell"/>
         <div class="panel__badge">{{notificationsCount}}</div>
@@ -38,7 +38,7 @@ export default {
   .panel
     background: var(--color-background-soft)
     width: 100%
-    border-radius: 30px
+    border-radius: 15px
     padding: 30px
     display: flex
     justify-content: space-between
@@ -74,5 +74,5 @@ export default {
     &__title
       color: #fff
       text-transform: uppercase
-      font-weight: 500
+      font-weight: 600
 </style>

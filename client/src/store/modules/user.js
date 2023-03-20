@@ -15,16 +15,18 @@ export default{
       accountType: 'standart',
       rating: 0,
     }, 
-    userStats:{
+    userStats: {
       allGames: 0,
-      wins: 0,
+      mafiaWins: 0,
+      citizenWins: 0,
       wasMafia: 0,
       wasSheriff: 0,
       wasDoctor: 0,
       wasLover: 0,
       wasTerrorist: 0,
       wasBarmen: 0,
-      wasBodyguard: 0
+      wasBodyguard: 0,
+      friend: 50
     },
     userAchievements: [],
   },
@@ -63,7 +65,7 @@ export default{
       if (res?.data)
         commit('setUserStats', res.data);
       else {
-        this.dispatch('toast/showToast', {text: 'Failed to get statistics', type: 'error'}, { root: true })
+        this.dispatch('toast/showToast', { text: 'Failed to get statistics', type: 'error' }, { root: true })
       }
     },
     async getAchievementsData ({ commit }, userId) {

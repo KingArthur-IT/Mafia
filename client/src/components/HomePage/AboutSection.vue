@@ -32,17 +32,12 @@
                 <img src="@/assets/game.jpg" alt="group-of-friends" class="about-section__img">
             </div>
         </section>
-        <LightPoint :isLeft="true" />
     </div>
 </template>
 
 <script>
-import LightPoint from '@/components/UIKit/Design/LightPoint.vue'
-
 export default {
-    components: {
-        LightPoint
-    }
+
 }
 </script>
 

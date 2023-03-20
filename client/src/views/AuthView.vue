@@ -243,16 +243,20 @@ export default {
     transition: transform .3s ease, opacity .15s ease
     transform-origin: left
     opacity: 0
+    pointer-events: none
     &.active
         opacity: 1
+        pointer-events: all
         transform: translate(0px)
 .register-form
     transform: translate(50px)
     transition: transform .3s ease, opacity .15s ease
     transform-origin: right
     opacity: 0
+    pointer-events: none
     &.active
         opacity: 1
+        pointer-events: all
         transform: translate(0)
 
 @media screen and (max-width: 768px)

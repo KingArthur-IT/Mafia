@@ -97,9 +97,10 @@ export default {
         margin-bottom: 5px
     .input-wrap
         width: 100%
+        position: relative
     .input
         width: 100%
-        background: var(--color-background-soft)
+        background: transparent
         border: 1px solid #ffffff88
         padding: 10px 15px
         outline: none

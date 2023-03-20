@@ -7,7 +7,7 @@
           <div class="profile__head">
               <HeadPanel />
           </div>
-          <div class="profile__hero">
+          <div class="profile__hero custom-scrollbar">
               <router-view></router-view>
           </div>
       </div>
@@ -45,8 +45,10 @@ export default {
             background: var(--color-background-soft)
             height: 100%
             width: 100%
-            border-radius: 30px
+            border-radius: 15px
             padding: 30px
+            overflow-y: auto
+            max-height: calc(100vh - 152px)
     .sidebar-wrap
         min-width: 280px
         padding: 20px

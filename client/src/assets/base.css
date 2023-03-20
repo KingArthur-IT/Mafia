@@ -1,7 +1,8 @@
 /* semantic color variables for this project */
 :root {
   --color-background: #100923;
-  --color-background-soft: #233651;
+  --color-background-soft: #2336513d;
+  /* #233651; */
   /* /#231544; */
 
   --color-primary: #be0c22;

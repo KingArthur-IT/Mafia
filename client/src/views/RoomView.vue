@@ -437,15 +437,6 @@ export default {
         text-align: center
         & .md-font
             color: var(--color-primary)
-    .custom-scrollbar
-        &::-webkit-scrollbar
-            width: 5px
-        &::-webkit-scrollbar-track
-            background-color: #fff
-            border-radius: 12px
-        &::-webkit-scrollbar-thumb
-            background-color: var(--color-background-soft)
-            border-radius: 12px
 
 
 @media screen and (max-width: 1024px)

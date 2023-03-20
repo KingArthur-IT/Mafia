@@ -29,7 +29,7 @@
     </div>
 
     <div class="hero__row hero__notifications">
-      <p class="hero__text">Оповещение о новинках</p>
+      <p class="hero__text">Оповещение о новинках в игре</p>
       <CustomSwitch
         v-model="email.isNotification"
         :colorScheme="'save'"
