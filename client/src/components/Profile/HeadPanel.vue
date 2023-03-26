@@ -8,9 +8,9 @@
         <LetterIcon class="panel__icon"/>
         <div class="panel__badge">{{messagesCount}}</div>
       </div> -->
-      <div class="panel__item" @click="$router.push({name: 'profile.notifications'})">
+      <div class="panel__item" @click="$router.push({ name: 'profile.notifications' })">
         <BellIcon class="panel__icon panel__bell"/>
-        <div class="panel__badge">{{notificationsCount}}</div>
+        <div class="panel__badge">{{ newNotificationsCount }}</div>
       </div>
     </div>
   </div>
@@ -19,17 +19,29 @@
 <script>
 import BellIcon from '@/components/icons/BellIcon.vue'
 import LetterIcon from '@/components/icons/LetterIcon.vue'
+import { mapGetters, mapActions } from 'vuex'
 
 export default {
   components:{
     BellIcon,
     LetterIcon
   },
-  data(){
-    return{
-      notificationsCount: 1,
-      messagesCount: 5,
+  data() {
+    return {
+
     }
+  },
+  mounted() {
+    this.getNotificationsData()
+  },
+  computed: {
+    ...mapGetters('user', ['notificationsList']),
+    newNotificationsCount() {
+      return this.notificationsList.filter(n => !n.isRead).length
+    }
+  },
+  methods: {
+    ...mapActions('user', ['getNotificationsData'])
   }
 }
 </script>

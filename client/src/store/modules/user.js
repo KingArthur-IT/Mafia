@@ -8,6 +8,7 @@ export default{
   state: {
     user: {
       id: 0,
+      name: 'Артем',
       nickname: 'NotFound',
       gender: 'male',
       email: 'NotFound',
@@ -16,66 +17,78 @@ export default{
       rating: 0,
     }, 
     userStats: {
-      allGames: 0,
-      mafiaWins: 0,
-      citizenWins: 0,
-      wasMafia: 0,
-      wasSheriff: 0,
-      wasDoctor: 0,
-      wasLover: 0,
-      wasTerrorist: 0,
-      wasBarmen: 0,
-      wasBodyguard: 0,
-      friend: 50
+      allGames: { count: 0, score: 0 },
+      mafiaWins: { count: 0, score: 0 },
+      citizenWins: { count: 0, score: 0 },
+      wasMafia: { count: 0, score: 0 },
+      wasSheriff: { count: 0, score: 0 },
+      wasDoctor: { count: 0, score: 0 },
+      wasLover: { count: 0, score: 0 },
+      wasTerrorist: { count: 0, score: 0 },
+      wasBarmen: { count: 0, score: 0 },
+      wasBodyguard: { count: 0, score: 0 },
     },
-    userAchievements: [],
+    userAdditions: {
+      friends: { count: 0, score: 0 },
+    },
+    notifications: [
+      {
+          title: 'Очень важное уведомление',
+          msg: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolor maxime, temporibus voluptate eius, quod natus eos sed cum rem eum quam reprehenderit praesentium, fugit laudantium voluptates nulla modi in distinctio!',
+          date: '20.03.2023',
+          isRead: false
+      },
+      {
+          title: 'Очень важное уведомление',
+          msg: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolor maxime, temporibus voluptate eius, quod natus eos sed cum rem eum quam reprehenderit praesentium, fugit laudantium voluptates nulla modi in distinctio!',
+          date: '21.03.2023',
+          isRead: true
+      },
+      {
+          title: 'Очень важное уведомление',
+          msg: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolor maxime, temporibus voluptate eius, quod natus eos sed cum rem eum quam reprehenderit praesentium, fugit laudantium voluptates nulla modi in distinctio!',
+          date: '21.03.2023',
+          isRead: true
+      },
+      {
+          title: 'Очень важное уведомление',
+          msg: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolor maxime, temporibus voluptate eius, quod natus eos sed cum rem eum quam reprehenderit praesentium, fugit laudantium voluptates nulla modi in distinctio!',
+          date: '21.03.2023',
+          isRead: true
+      }
+    ]
   },
 
   getters: {
     userData: state => state.user,
     statsData: state => state.userStats,
-    achievementsData: state => state.userAchievements,
+    additionsData: state => state.userAdditions,
+    notificationsList: state => state.notifications
   },
 
   mutations: {
     setUserData: (state, data) => state.user = {...data},
     setUserStats: (state, data) => state.userStats = {...data},
+    setUserAdditions: (state, data) => state.userAdditions = {...data},
     setUserAchievements: (state, data) => state.userAchievements = data,
+    setUserNotifications: (state, data) => state.notifications = [...data].reverse(),
   },
 
   actions: {
-    async getUserData ({ commit }, {email, password}) {
-      const res = await sendRequest('/user', 'POST', {email, password});
+    async getUserData ({ commit }, { email, password }) {
+      const res = await sendRequest('/user', 'POST', { email, password });
       if (res?.status)
         if (res?.status === 'ok'){
           commit('setUserData', res.data);
           return true
         }
         else {
-          this.dispatch('toast/showToast', {text: res.text, type: 'error'}, { root: true });
+          this.dispatch('toast/showToast', { text: res.text, type: 'error' }, { root: true });
           return false
         }
       else {
-        this.dispatch('toast/showToast', {text: 'Не удалось получить ответ от сервера', type: 'error'}, { root: true });
+        this.dispatch('toast/showToast', { text: 'Не удалось получить ответ от сервера', type: 'error' }, { root: true });
         return false;
-      }
-    },
-    async getStatsData ({ commit }) {
-      const res = await sendRequest('/user/stats');
-      if (res?.data)
-        commit('setUserStats', res.data);
-      else {
-        this.dispatch('toast/showToast', { text: 'Failed to get statistics', type: 'error' }, { root: true })
-      }
-    },
-    async getAchievementsData ({ commit }, userId) {
-      const res = await sendRequest('/user/achievs', 'POST', {userId});
-      if (res?.status)
-        if (res?.status === 'ok') 
-          commit('setUserAchievements', res.data);
-        else this.dispatch('toast/showToast', {text: res.text, type: 'error'}, { root: true });
-      else {
-        this.dispatch('toast/showToast', {text: 'Не удалось получить ответ от сервера', type: 'error'}, { root: true })
       }
     },
     async updateUserInfo ({ commit }, newUserData) {
@@ -88,6 +101,41 @@ export default{
       else 
         this.dispatch('toast/showToast', {text: 'Request failed or new data is epmty', type: 'error'}, { root: true })
     },
+    async getStatsData ({ commit }) {
+      const res = await sendRequest('/user/stats');
+      if (res?.data)
+        commit('setUserStats', res.data);
+      else {
+        this.dispatch('toast/showToast', { text: 'Failed to get statistics', type: 'error' }, { root: true })
+      }
+    },
+    async getAdditionsData ({ commit }) {
+      const res = await sendRequest('/user/additions');
+      if (res?.data)
+        commit('setUserAdditions', res.data);
+      else {
+        this.dispatch('toast/showToast', { text: 'Failed to get additions', type: 'error' }, { root: true })
+      }
+    },
+    async getNotificationsData ({ commit }) {
+      const res = await sendRequest('/user/notifications');
+      if (res?.data)
+        commit('setUserNotifications', res.data);
+      else {
+        this.dispatch('toast/showToast', { text: 'Failed to get notifications', type: 'error' }, { root: true })
+      }
+    },
+    async setAllNotificationsRead({ commit, dispatch }) {
+      dispatch('getNotificationsData')
+      console.log('set all to read');
+      // const res = await sendRequest('/user/notifications', 'POST');
+      // //null if server in not available
+      // if (res?.data){
+      //   commit('setAllNotificationsRead', res.data);
+      // }
+      // else 
+      //   console.error('Cannot set all notifications as read');
+    }
   },
 
   // plugins: [createPersistedState()],

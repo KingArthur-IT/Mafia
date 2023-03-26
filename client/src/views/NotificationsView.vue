@@ -1,43 +1,59 @@
 <template>
-  <ul>
-      <li v-for="(notification, i) in list" :key="i">
-        <div>{{ notification.title }}</div>
-        <p>
+  <ul class="notifications">
+      <li 
+        v-for="(notification, i) in notificationsList" :key="i" 
+        class="notifications__item" 
+        :class="{'new': !notification.isRead}"
+      >
+        <div class="notifications__title md-font">
+            <div>{{ notification.title }}</div>
+        </div>
+        <p class="notifications__msg">
             {{ notification.msg }}
         </p>
-        <div>{{ notification.date }}</div>
+        <div class="notifications__date">{{ notification.date }}</div>
       </li>
   </ul>
 </template>
 
 <script>
+import { mapActions, mapGetters } from 'vuex'
+
 export default {
     data() {
         return {
-            notificationList: [
-                {
-                    title: 'Очень важное уведомление',
-                    msg: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolor maxime, temporibus voluptate eius, quod natus eos sed cum rem eum quam reprehenderit praesentium, fugit laudantium voluptates nulla modi in distinctio!',
-                    date: '20.03.2023',
-                    isRead: false
-                },
-                {
-                    title: 'Очень важное уведомление',
-                    msg: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolor maxime, temporibus voluptate eius, quod natus eos sed cum rem eum quam reprehenderit praesentium, fugit laudantium voluptates nulla modi in distinctio!',
-                    date: '21.03.2023',
-                    isRead: false
-                }
-            ]
         }
     },
     computed: {
-        list() {
-            return this.notificationList.reverse()
-        }
+        ...mapGetters('user', ['notificationsList'])
+    },
+    mounted() {
+        this.setAllNotificationsRead()
+    },
+    methods: {
+        ...mapActions('user', ['setAllNotificationsRead'])
     }
 }
 </script>
 
-<style>
-
+<style scoped lang="sass">
+.notifications
+    &__item
+        padding: 12px
+        border: 1px solid var(--color-background-soft)
+        border-radius: 12px
+        margin-bottom: 12px
+        color: darken(#fff, 20%)
+        &.new
+            color: #fff
+            border-color: #fff
+    &__title
+        display: flex
+        align-items: center
+        justify-content: space-between
+        margin-bottom: 12px
+    &__msg
+        margin-bottom: 5px
+    &__date
+        font-style: italic
 </style>

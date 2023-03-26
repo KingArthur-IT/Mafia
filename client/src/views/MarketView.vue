@@ -10,9 +10,9 @@
       </div>
       <div class="market__wrap">
           <div class="market__item">
-              <h2 class="market__title">VIP аккаунт <CrownIcon /></h2>
+              <h2 class="market__title">Premium аккаунт <CrownIcon /></h2>
               <ul class="market__list">
-                  <li class="market__line">+20% к игровому рейтингу</li>
+                  <li class="market__line">+100% к игровому рейтингу</li>
                   <li class="market__line">возможность выбирать игровую роль</li>
               </ul>
           </div>
