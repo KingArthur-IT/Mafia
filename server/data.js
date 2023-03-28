@@ -4,44 +4,204 @@ const users = [
         nickname: 'Artem',
         gender: 'male',
         email: 'king@king.com',
+        password: 'Qwerty12',
         emailNotification: true,
         accountType: 'standart',
-        rating: 101,
-        achivements: ['sheriff', 'sheriff'],
-        statistics: {}
+        rating: 201,
+        statistics: {
+            allGames: { count: 1, score: 1 },
+            mafiaWins: { count: 0, score: 0 },
+            citizenWins: { count: 0, score: 0 },
+            wasMafia: { count: 0, score: 0 },
+            wasSheriff: { count: 10, score: 10 },
+            wasDoctor: { count: 0, score: 0 },
+            wasLover: { count: 0, score: 0 },
+            wasTerrorist: { count: 0, score: 0 },
+            wasBarmen: { count: 0, score: 0 },
+            wasBodyguard: { count: 0, score: 0 },
+        },
+        userAdditions: {
+            friends: { count: 1, score: 50 },
+        },
+        notifications: [
+            {
+                title: 'Очень важное уведомление',
+                msg: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolor maxime, temporibus voluptate eius, quod natus eos sed cum rem eum quam reprehenderit praesentium, fugit laudantium voluptates nulla modi in distinctio!',
+                date: '20.03.2023',
+                isRead: true
+            },
+            {
+                title: 'Очень важное уведомление',
+                msg: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolor maxime, temporibus voluptate eius, quod natus eos sed cum rem eum quam reprehenderit praesentium, fugit laudantium voluptates nulla modi in distinctio!',
+                date: '21.03.2023',
+                isRead: true
+            },
+            {
+                title: 'Очень важное уведомление',
+                msg: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolor maxime, temporibus voluptate eius, quod natus eos sed cum rem eum quam reprehenderit praesentium, fugit laudantium voluptates nulla modi in distinctio!',
+                date: '21.03.2023',
+                isRead: true
+            },
+            {
+                title: 'Очень важное уведомление',
+                msg: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolor maxime, temporibus voluptate eius, quod natus eos sed cum rem eum quam reprehenderit praesentium, fugit laudantium voluptates nulla modi in distinctio!',
+                date: '21.03.2023',
+                isRead: false
+            }
+        ]
     },
     {
         id: 2,
         nickname: 'Peter',
         gender: 'male',
         email: 'king2@king.com',
+        password: 'Qwerty1',
         emailNotification: true,
-        accountType: 'vip',
+        accountType: 'premium',
         rating: 102,
-        achivements: ['sheriff'],
-        statistics: {}
+        statistics: {
+            allGames: { count: 0, score: 0 },
+            mafiaWins: { count: 0, score: 0 },
+            citizenWins: { count: 0, score: 0 },
+            wasMafia: { count: 0, score: 0 },
+            wasSheriff: { count: 0, score: 0 },
+            wasDoctor: { count: 0, score: 0 },
+            wasLover: { count: 0, score: 0 },
+            wasTerrorist: { count: 0, score: 0 },
+            wasBarmen: { count: 0, score: 0 },
+            wasBodyguard: { count: 0, score: 0 },
+        },
+        userAdditions: {
+            friends: { count: 0, score: 0 },
+        },
+        notifications: [
+            {
+                title: 'Очень важное уведомление',
+                msg: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolor maxime, temporibus voluptate eius, quod natus eos sed cum rem eum quam reprehenderit praesentium, fugit laudantium voluptates nulla modi in distinctio!',
+                date: '20.03.2023',
+                isRead: false
+            },
+            {
+                title: 'Очень важное уведомление',
+                msg: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolor maxime, temporibus voluptate eius, quod natus eos sed cum rem eum quam reprehenderit praesentium, fugit laudantium voluptates nulla modi in distinctio!',
+                date: '21.03.2023',
+                isRead: true
+            },
+            {
+                title: 'Очень важное уведомление',
+                msg: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolor maxime, temporibus voluptate eius, quod natus eos sed cum rem eum quam reprehenderit praesentium, fugit laudantium voluptates nulla modi in distinctio!',
+                date: '21.03.2023',
+                isRead: true
+            },
+            {
+                title: 'Очень важное уведомление',
+                msg: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolor maxime, temporibus voluptate eius, quod natus eos sed cum rem eum quam reprehenderit praesentium, fugit laudantium voluptates nulla modi in distinctio!',
+                date: '21.03.2023',
+                isRead: true
+            }
+        ]
     },
     {
         id: 3,
         nickname: 'Alex',
         gender: 'male',
         email: 'king3@king.com',
+        password: 'Qwerty1',
         emailNotification: true,
-        accountType: 'vip',
+        accountType: 'premium',
         rating: 103,
-        achivements: [],
-        statistics: {}
+        statistics: {
+            allGames: { count: 0, score: 0 },
+            mafiaWins: { count: 0, score: 0 },
+            citizenWins: { count: 0, score: 0 },
+            wasMafia: { count: 0, score: 0 },
+            wasSheriff: { count: 0, score: 0 },
+            wasDoctor: { count: 0, score: 0 },
+            wasLover: { count: 0, score: 0 },
+            wasTerrorist: { count: 0, score: 0 },
+            wasBarmen: { count: 0, score: 0 },
+            wasBodyguard: { count: 0, score: 0 },
+        },
+        userAdditions: {
+            friends: { count: 0, score: 0 },
+        },
+        notifications: [
+            {
+                title: 'Очень важное уведомление',
+                msg: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolor maxime, temporibus voluptate eius, quod natus eos sed cum rem eum quam reprehenderit praesentium, fugit laudantium voluptates nulla modi in distinctio!',
+                date: '20.03.2023',
+                isRead: false
+            },
+            {
+                title: 'Очень важное уведомление',
+                msg: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolor maxime, temporibus voluptate eius, quod natus eos sed cum rem eum quam reprehenderit praesentium, fugit laudantium voluptates nulla modi in distinctio!',
+                date: '21.03.2023',
+                isRead: true
+            },
+            {
+                title: 'Очень важное уведомление',
+                msg: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolor maxime, temporibus voluptate eius, quod natus eos sed cum rem eum quam reprehenderit praesentium, fugit laudantium voluptates nulla modi in distinctio!',
+                date: '21.03.2023',
+                isRead: true
+            },
+            {
+                title: 'Очень важное уведомление',
+                msg: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolor maxime, temporibus voluptate eius, quod natus eos sed cum rem eum quam reprehenderit praesentium, fugit laudantium voluptates nulla modi in distinctio!',
+                date: '21.03.2023',
+                isRead: true
+            }
+        ]
     },
     {
         id: 4,
         nickname: 'Elena',
         gender: 'female',
         email: 'king4@king.com',
+        password: 'Qwerty1',
         emailNotification: true,
-        accountType: 'vip',
+        accountType: 'premium',
         rating: 103,
-        achivements: [],
-        statistics: {}
+        statistics: {
+            allGames: { count: 0, score: 0 },
+            mafiaWins: { count: 0, score: 0 },
+            citizenWins: { count: 0, score: 0 },
+            wasMafia: { count: 0, score: 0 },
+            wasSheriff: { count: 0, score: 0 },
+            wasDoctor: { count: 0, score: 0 },
+            wasLover: { count: 0, score: 0 },
+            wasTerrorist: { count: 0, score: 0 },
+            wasBarmen: { count: 0, score: 0 },
+            wasBodyguard: { count: 0, score: 0 },
+        },
+        userAdditions: {
+            friends: { count: 0, score: 0 },
+        },
+        notifications: [
+            {
+                title: 'Очень важное уведомление',
+                msg: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolor maxime, temporibus voluptate eius, quod natus eos sed cum rem eum quam reprehenderit praesentium, fugit laudantium voluptates nulla modi in distinctio!',
+                date: '20.03.2023',
+                isRead: false
+            },
+            {
+                title: 'Очень важное уведомление',
+                msg: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolor maxime, temporibus voluptate eius, quod natus eos sed cum rem eum quam reprehenderit praesentium, fugit laudantium voluptates nulla modi in distinctio!',
+                date: '21.03.2023',
+                isRead: true
+            },
+            {
+                title: 'Очень важное уведомление',
+                msg: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolor maxime, temporibus voluptate eius, quod natus eos sed cum rem eum quam reprehenderit praesentium, fugit laudantium voluptates nulla modi in distinctio!',
+                date: '21.03.2023',
+                isRead: true
+            },
+            {
+                title: 'Очень важное уведомление',
+                msg: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolor maxime, temporibus voluptate eius, quod natus eos sed cum rem eum quam reprehenderit praesentium, fugit laudantium voluptates nulla modi in distinctio!',
+                date: '21.03.2023',
+                isRead: true
+            }
+        ]
     }
 ];
 

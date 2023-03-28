@@ -15,11 +15,9 @@ async function sendRequest(url, method = 'GET', data = null){
         data: {...data}
     })
         .then((response) => {
-            console.log('from use, res =' + response);
             return response.data
         })
-        .catch((error) => {
-            console.log('from use, err =' + error);
+        .catch(() => {
             return null
         })
 }

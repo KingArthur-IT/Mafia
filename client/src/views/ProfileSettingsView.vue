@@ -2,25 +2,30 @@
   <div class="hero">
     <div class="hero__input-wrapper">
       <CustomInput 
+          :id="'nickname-input'"
           :label="'Никнейм'"  
           v-model="nickname.value"
           :isWithEdit="true"
           @saveEvent="updateUserData"
-        >Никнейм должен быть не короче 6 символов</CustomInput>
+        >Никнейм должен быть не короче 5 символов</CustomInput>
     </div>
 
-    <div class="hero__row">
-      <p class="hero__text">Пол</p>
-      <CustomRadio
-        v-model="gender.value"
-        :isWithEdit="true"
-      />
+    <div class="hero__input-wrapper">
+      <div class="hero__row">
+        <p class="hero__text">Пол</p>
+        <CustomRadio
+          v-model="gender.value"
+          :isWithEdit="true"
+          @saveEvent="updateUserData"
+        />
+      </div>
     </div>
 
     <div class="hero__line"></div>
 
     <div class="hero__input-wrapper">
       <CustomInput 
+        :id="'email-input'"
         :label="'Email'" 
         v-model="email.value" 
         :isWithEdit="true"
@@ -32,7 +37,9 @@
       <p class="hero__text">Оповещение о новинках в игре</p>
       <CustomSwitch
         v-model="email.isNotification"
+        @saveEvent="updateUserData"
         :colorScheme="'save'"
+        :hasSaveAction="true"
       />
     </div>
 
@@ -49,6 +56,7 @@
     <div v-if="password.isChanging">
       <div class="hero__input-wrapper">
         <CustomInput 
+          :id="'old-password-input'"
           :label="'Старый пароль'" 
           :type="'password'"
           :isValid="password.isOldValid"
@@ -57,6 +65,7 @@
       </div>
       <div class="hero__input-wrapper">
         <CustomInput 
+          :id="'new-password-input'"
           :label="'Новый пароль'"  
           :type="'password'"
           :isValid="password.isNewValid"
@@ -74,6 +83,7 @@
       </div>
       <div class="hero__input-wrapper">
         <CustomInput 
+          :id="'repeat-new-password-input'"
           :label="'Повторите новый пароль'" 
           :type="'password'"
           :isValid="password.isRepeatValid"
@@ -107,7 +117,7 @@ export default {
       this.nickname.value = this.userData.nickname;
       this.email.value = this.userData.email;
       this.email.isNotification = this.userData.emailNotification;
-      this.gender = this.userData.gender;
+      this.gender.value = this.userData.gender;
     }
   },
   data(){
@@ -134,27 +144,39 @@ export default {
     }
   },
   methods:{
-    ...mapActions('user', ['updateUserInfo']),
+    ...mapActions('user', ['updateUserInfo', 'updateUserPassword']),
     ...mapActions('toast', ['showToast']),
     savePasswordEvent(){
       this.password.isOldValid = this.password.old !== '';
       this.password.isNewValid = validatePassword(this.password.new);
       this.password.isRepeatValid = this.password.new === this.password.repeatNew && this.password.new !== '';
 
-      // const data = await sendRequest('/auth/password', 'PUT', newPassword);
+      if (this.password.isOldValid && this.password.isNewValid && this.password.isRepeatValid) {
+        const rez = this.updateUserPassword({
+          id: this.userData.id,
+          oldPassword: this.password.old,
+          newPassword: this.password.new
+        })
+        if (rez) {
+          this.password.old = ''
+          this.password.new = ''
+          this.password.repeatNew = ''
+        }
+      }
     },
     updateUserData(){
-      if (this.nickname.value.length < 6){
-        this.showToast({text: 'Никнейм должен быть не короче 6 символов', type: 'error'});
+      if (this.nickname.value.length < 5){
+        this.showToast({ text: 'Никнейм должен быть не короче 5 символов', type: 'error' });
         return
       }
       if (!validateEmail(this.email.value)){
-        this.showToast({text: 'Не валидный email', type: 'error'});
+        this.showToast({ text: 'Не валидный email', type: 'error' });
         return
       }
 
       if (this.smthWasChanged)
         this.updateUserInfo({
+          id: this.userData.id,
           nickname: this.nickname.value,
           gender: this.gender.value,
           email: this.email.value,

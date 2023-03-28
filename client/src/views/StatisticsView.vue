@@ -1,7 +1,7 @@
 <template>
   <div class="stats">
       <p class="stats__text">
-          <span><strong>{{ this.userData.name }}</strong>, Ваш игровой рейтинг: </span>
+          <span><strong>{{ this.userData.nickname }}</strong>, Ваш игровой рейтинг: </span>
           <span><strong>{{ userData.rating }}</strong></span>
           <info-icon @click="openInfo" />
       </p>
@@ -61,12 +61,13 @@
     v-model="isModalVisible"
     :title="'Как повыстить свой уровень?'"
   >
-    <div class="modal">
-        Ваш уровень зависит от очков рейтинга. Рейнтинг можно заработать:
-        <ul>
-            <li>Играя и выигрывая</li>
-            <li>Пригласив друга зарегистрироваться и поиграть с Вами</li>
-            <li>Подключив премиум аккаунт</li>
+    <div class="stats-modal">
+        Ваш уровень зависит от очков рейтинга. <br><br>
+        Рейнтинг можно заработать если:
+        <ul class="stats-modal__list">
+            <li>Просто играть и выигрывать</li>
+            <li>Пригласить друга зарегистрироваться и поиграть с вами</li>
+            <li>Подключить премиум аккаунт и ускорить свой рост</li>
         </ul>
     </div>
   </ModelWrapper>
@@ -110,17 +111,17 @@ export default {
             ]
         }
     },
-    mounted(){
+    mounted() {
         this.getStatsData();
         this.getAdditionsData();
     },
-    methods:{
+    methods: {
         ...mapActions('user', ['getStatsData', 'getAdditionsData']),
         openInfo(){
             this.isModalVisible = true;
         }
     },
-    computed:{
+    computed: {
         ...mapGetters('user', ['statsData', 'additionsData', 'userData']),
         currentLevel() {
             return this.levels.find(el => this.userData.rating >= el.scoreMin && this.userData.rating <= el.scoreMax).name
@@ -148,4 +149,17 @@ export default {
         align-items: center
         & span
             margin-right: 10px
+    .stats-modal
+        &__list
+            & li
+                padding-left: 20px
+                position: relative
+                &::before
+                    content: ''
+                    position: absolute
+                    top: 9px
+                    left: 2px
+                    width: 8px
+                    height: 8px
+                    background: var(--color-primary)
 </style>

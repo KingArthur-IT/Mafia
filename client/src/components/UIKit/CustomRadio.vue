@@ -14,7 +14,7 @@
                 <label :for="item.id" class="label">{{item.value == 'male' ? 'Мужской' : 'Женский'}}</label>
             </div>
         </div>
-        <SaveEditButton v-if="isWithEdit" v-model="isEditing" />
+        <SaveEditButton v-if="isWithEdit" v-model="isEditing" @click="save" />
     </div>
 </template>
 
@@ -29,15 +29,15 @@ export default {
             type: String,
             default: 'male'
         },
-        isWithEdit:{
+        isWithEdit: {
             type: Boolean,
             default: false
         }
     },
-    components:{
+    components: {
         SaveEditButton
     },
-    setup(){
+    setup() {
         const radioList = [
             { id: 'male', value: 'male' },
             { id: 'femail', value: 'female' },
@@ -48,6 +48,12 @@ export default {
         return {
             radioList, isEditing
         }
+    },
+    methods: {
+        save(){
+            if (!this.isEditing)
+                this.$emit('saveEvent')
+        }
     }
 }
 </script>
@@ -56,6 +62,7 @@ export default {
 .wrapper{
     display: flex;
     align-items: center;
+    justify-content: space-between;
 }
 .radio-group{
     display: flex;

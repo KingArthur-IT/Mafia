@@ -1,5 +1,6 @@
 import createPersistedState from "vuex-persistedstate";
 import { sendRequest } from '@/use/useRequest' 
+import store from "..";
 
 export default{
   name: 'user', 
@@ -8,7 +9,6 @@ export default{
   state: {
     user: {
       id: 0,
-      name: 'Артем',
       nickname: 'NotFound',
       gender: 'male',
       email: 'NotFound',
@@ -31,50 +31,25 @@ export default{
     userAdditions: {
       friends: { count: 0, score: 0 },
     },
-    notifications: [
-      {
-          title: 'Очень важное уведомление',
-          msg: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolor maxime, temporibus voluptate eius, quod natus eos sed cum rem eum quam reprehenderit praesentium, fugit laudantium voluptates nulla modi in distinctio!',
-          date: '20.03.2023',
-          isRead: false
-      },
-      {
-          title: 'Очень важное уведомление',
-          msg: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolor maxime, temporibus voluptate eius, quod natus eos sed cum rem eum quam reprehenderit praesentium, fugit laudantium voluptates nulla modi in distinctio!',
-          date: '21.03.2023',
-          isRead: true
-      },
-      {
-          title: 'Очень важное уведомление',
-          msg: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolor maxime, temporibus voluptate eius, quod natus eos sed cum rem eum quam reprehenderit praesentium, fugit laudantium voluptates nulla modi in distinctio!',
-          date: '21.03.2023',
-          isRead: true
-      },
-      {
-          title: 'Очень важное уведомление',
-          msg: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolor maxime, temporibus voluptate eius, quod natus eos sed cum rem eum quam reprehenderit praesentium, fugit laudantium voluptates nulla modi in distinctio!',
-          date: '21.03.2023',
-          isRead: true
-      }
-    ]
+    notifications: []
   },
 
   getters: {
     userData: state => state.user,
+    notificationsList: state => state.notifications,
     statsData: state => state.userStats,
     additionsData: state => state.userAdditions,
-    notificationsList: state => state.notifications
   },
 
   mutations: {
     setUserData: (state, data) => state.user = {...data},
+    setUserNotifications: (state, data) => state.notifications = [...data],
     setUserStats: (state, data) => state.userStats = {...data},
     setUserAdditions: (state, data) => state.userAdditions = {...data},
-    setUserAchievements: (state, data) => state.userAchievements = data,
-    setUserNotifications: (state, data) => state.notifications = [...data].reverse(),
   },
 
   actions: {
+    //user data
     async getUserData ({ commit }, { email, password }) {
       const res = await sendRequest('/user', 'POST', { email, password });
       if (res?.status)
@@ -83,7 +58,7 @@ export default{
           return true
         }
         else {
-          this.dispatch('toast/showToast', { text: res.text, type: 'error' }, { root: true });
+          this.dispatch('toast/showToast', { text: res.message, type: 'error' }, { root: true });
           return false
         }
       else {
@@ -93,49 +68,76 @@ export default{
     },
     async updateUserInfo ({ commit }, newUserData) {
       const res = await sendRequest('/user', 'PUT', newUserData);
-      //null if server in not available
-      if (res?.data){
-        commit('setUserData', res.data);
-        this.dispatch('toast/showToast', {text: res.data.text, type: res.data.type}, { root: true })
+      if (res?.status){
+        if (res?.status === 'ok'){
+          commit('setUserData', res.data);
+          this.dispatch('toast/showToast', { text: res.message, type: 'ok' }, { root: true });
+        }
+        else {
+          this.dispatch('toast/showToast', { text: res.message, type: 'error' }, { root: true });
+        }
       }
       else 
-        this.dispatch('toast/showToast', {text: 'Request failed or new data is epmty', type: 'error'}, { root: true })
+        this.dispatch('toast/showToast', { text: 'Request failed or new data is empty', type: 'error' }, { root: true })
     },
-    async getStatsData ({ commit }) {
-      const res = await sendRequest('/user/stats');
-      if (res?.data)
-        commit('setUserStats', res.data);
-      else {
-        this.dispatch('toast/showToast', { text: 'Failed to get statistics', type: 'error' }, { root: true })
+    async updateUserPassword ({ commit }, passwordData) {
+      const res = await sendRequest('/user/password', 'PUT', passwordData);
+      if (res?.status){
+        if (res?.status === 'ok'){
+          this.dispatch('toast/showToast', { text: res.message, type: 'ok' }, { root: true });
+          return true
+        }
+        else {
+          this.dispatch('toast/showToast', { text: res.message, type: 'error' }, { root: true });
+          return false
+        }
       }
+      else 
+        this.dispatch('toast/showToast', { text: 'Request failed or new data is empty', type: 'error' }, { root: true })
     },
-    async getAdditionsData ({ commit }) {
-      const res = await sendRequest('/user/additions');
-      if (res?.data)
-        commit('setUserAdditions', res.data);
-      else {
-        this.dispatch('toast/showToast', { text: 'Failed to get additions', type: 'error' }, { root: true })
-      }
-    },
-    async getNotificationsData ({ commit }) {
-      const res = await sendRequest('/user/notifications');
-      if (res?.data)
-        commit('setUserNotifications', res.data);
-      else {
+    //notifications
+    async getNotificationsData ({ commit, state }) {
+      const res = await sendRequest('/user/notifications', 'POST', { id: state.user.id });
+      if (res?.status) {
+        if (res?.status === 'ok')
+          commit('setUserNotifications', res.data.reverse())
+        else this.dispatch('toast/showToast', { text: res.message, type: 'error' }, { root: true })
+      } else {
         this.dispatch('toast/showToast', { text: 'Failed to get notifications', type: 'error' }, { root: true })
       }
     },
-    async setAllNotificationsRead({ commit, dispatch }) {
-      dispatch('getNotificationsData')
-      console.log('set all to read');
-      // const res = await sendRequest('/user/notifications', 'POST');
-      // //null if server in not available
-      // if (res?.data){
-      //   commit('setAllNotificationsRead', res.data);
-      // }
-      // else 
-      //   console.error('Cannot set all notifications as read');
-    }
+    async setAllNotificationsRead({ commit, state }) {
+      const res = await sendRequest('/user/notifications', 'PUT', { id: state.user.id });
+      //null if server in not available
+      if (res?.status) {
+        if (res?.status === 'ok')
+          commit('setUserNotifications', res.data.reverse())
+        else this.dispatch('toast/showToast', { text: res.message, type: 'error' }, { root: true })
+      } else {
+        this.dispatch('toast/showToast', { text: 'Cannot set all notifications as read', type: 'error' }, { root: true })
+      }
+    },
+    //statistic
+    async getStatsData ({ commit, state }) {
+      const res = await sendRequest('/user/stats', 'POST', { id: state.user.id });
+      if (res?.status) {
+        if (res?.status === 'ok')
+          commit('setUserStats', res.data)
+        else this.dispatch('toast/showToast', { text: res.message, type: 'error' }, { root: true })
+      } else {
+        this.dispatch('toast/showToast', { text: 'Failed to get statistic', type: 'error' }, { root: true })
+      }
+    },
+    async getAdditionsData ({ commit, state }) {
+      const res = await sendRequest('/user/additions', 'POST', { id: state.user.id });
+      if (res?.status) {
+        if (res?.status === 'ok')
+          commit('setUserAdditions', res.data)
+        else this.dispatch('toast/showToast', { text: res.message, type: 'error' }, { root: true })
+      } else {
+        this.dispatch('toast/showToast', { text: 'Failed to get additions', type: 'error' }, { root: true })
+      }
+    },
   },
 
   // plugins: [createPersistedState()],

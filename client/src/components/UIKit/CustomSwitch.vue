@@ -4,7 +4,7 @@
                 :class="`${colorScheme}`"
                 :checked="modelValue"
                 :value="modelValue"
-                @input="(event) => $emit('update:modelValue', !modelValue)"
+                @input="inputEvent"
         >
         <span class="slider round"></span>
     </label>
@@ -12,17 +12,23 @@
 
 <script>
 export default {
-  emits: ['update:modelValue'],
+  emits: ['update:modelValue', 'saveEvent'],
   props: {
     modelValue: {
         type: Boolean,
         default: false
     },
-    colorScheme:{
+    colorScheme: {
       type: String,
       default: 'primary'
     }
   },
+  methods: {
+    inputEvent() {
+      this.$emit('update:modelValue', !this.modelValue)
+      this.$emit('saveEvent')
+    }
+  }
 }
 </script>
 

@@ -155,7 +155,7 @@ export default {
                 password: this.loginData.password
             });
 
-            if (rez) this.$router.push({name: 'profile.main'})
+            if (rez) this.$router.push({ name: 'profile.main' })
         },
     },
     computed:{

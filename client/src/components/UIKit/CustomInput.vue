@@ -39,7 +39,7 @@ export default {
             type: String,
             default: ''
         },
-        label:{
+        label: {
             type: String,
             default: ''
         },
@@ -47,23 +47,23 @@ export default {
             type: String,
             default: 'text'
         },
-        isValid:{
+        isValid: {
             type: Boolean,
             default: true
         },
-        isWithEdit:{
+        isWithEdit: {
             type: Boolean,
             default: false
         }
     },
     emits: ['update:modelValue' , 'saveEvent'],
-    data(){
+    data() {
         return{
             isPasswordVisible: false,
             isEditing: false
         }
     },
-    computed:{
+    computed: {
         inputType: function(){
             return this.type === 'password' && this.isPasswordVisible ? 'text' : this.type
         },
@@ -74,7 +74,7 @@ export default {
             return this.type === 'password' && this.isPasswordVisible
         },
     },
-    methods:{
+    methods: {
         save(){
             if (!this.isEditing)
                 this.$emit('saveEvent')

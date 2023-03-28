@@ -1,5 +1,5 @@
 <template>
-  <ul class="notifications">
+  <ul v-if="notificationsList.length" class="notifications">
       <li 
         v-for="(notification, i) in notificationsList" :key="i" 
         class="notifications__item" 
@@ -14,21 +14,20 @@
         <div class="notifications__date">{{ notification.date }}</div>
       </li>
   </ul>
+  <p v-else>Уведомлений нет</p>
 </template>
 
 <script>
 import { mapActions, mapGetters } from 'vuex'
 
 export default {
-    data() {
-        return {
-        }
-    },
     computed: {
         ...mapGetters('user', ['notificationsList'])
     },
     mounted() {
-        this.setAllNotificationsRead()
+        setTimeout(() => {
+            this.setAllNotificationsRead()
+        }, 3000);
     },
     methods: {
         ...mapActions('user', ['setAllNotificationsRead'])

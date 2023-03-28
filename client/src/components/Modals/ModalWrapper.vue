@@ -88,7 +88,7 @@ export default {
     &__wrapper
         padding: 30px
         width: 100%
-        max-width: 600px
+        max-width: 500px
         min-width: 300px
     &__hero
         border: 1px solid #fff

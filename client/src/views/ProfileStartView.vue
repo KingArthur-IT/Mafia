@@ -3,7 +3,7 @@
       <div class="hero__row">
           <p class="hero__text" @click="$router.push({name: 'profile.market'})" >
               <span>Тип профиля:</span>
-              <span class="type">{{profileType}}</span> 
+              <span class="type">{{ profileType }}</span> 
               <CrownIcon v-if="isCrownShown" />
               <UpIcon v-else />
           </p>
@@ -46,10 +46,10 @@ export default {
     computed:{
         ...mapGetters('user', ['userData']),
         profileType: function(){
-            return this.userData?.accountType === 'standart' ? 'Базовый' : 'VIP';
+            return this.userData?.accountType === 'standart' ? 'Базовый' : 'premium';
         },
         isCrownShown: function(){
-            return this.userData?.accountType === 'vip'
+            return this.userData?.accountType === 'premium'
         }
     }
 }

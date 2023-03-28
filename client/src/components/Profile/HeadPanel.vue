@@ -10,7 +10,7 @@
       </div> -->
       <div class="panel__item" @click="$router.push({ name: 'profile.notifications' })">
         <BellIcon class="panel__icon panel__bell"/>
-        <div class="panel__badge">{{ newNotificationsCount }}</div>
+        <div v-if="newNotificationsCount" class="panel__badge">{{ newNotificationsCount }}</div>
       </div>
     </div>
   </div>
