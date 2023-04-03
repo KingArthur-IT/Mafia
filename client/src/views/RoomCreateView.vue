@@ -88,7 +88,8 @@
 </template>
 
 <script>
-import {mapActions} from 'vuex'
+import SocketioService from '@/services/socketio.service.js';
+import { mapActions, mapGetters } from 'vuex'
 import RangeSlider from 'vue-simple-range-slider';
 import 'vue-simple-range-slider/css';
 import CustomInput from '@/components/UIKit/CustomInput.vue'
@@ -146,7 +147,7 @@ export default {
             },
         }
     },
-    watch:{
+    watch: {
         roomPlayers: function(){
             const roomPlayersMax = this.roomPlayers[1];
             const roomPlayersMin = this.roomPlayers[0];
@@ -181,17 +182,26 @@ export default {
                 maxPersons: this.roomPlayers[0],
                 minPersons: this.roomPlayers[1],
                 roles: [
-                    {role: 'lover', count: this.lover.value},
-                    {role: 'reporter', count: this.reporter.value},
-                    {role: 'barmen', count: this.barmen.value},
-                    {role: 'doctor', count: this.doctor.value},
-                    {role: 'bodyguard', count: this.bodyguard.value},
-                    {role: 'terrorist', count: this.terrorist.value}
+                    { role: 'lover', count: this.lover.value },
+                    { role: 'reporter', count: this.reporter.value },
+                    { role: 'barmen', count: this.barmen.value },
+                    { role: 'doctor', count: this.doctor.value },
+                    { role: 'bodyguard', count: this.bodyguard.value },
+                    { role: 'terrorist', count: this.terrorist.value }
                 ]
             });
-            if (roomId !== -1)
-                this.$router.push({name: 'room', params:{id: roomId}});
+            if (roomId !== -1 && this.userData?.id) {
+                SocketioService.socket.emit('enterRoom', { userId: this.userData.id, roomId: roomId }, response => {
+                    if (response?.status === 'ok') {
+                        this.$router.push({ name: 'room', params: { id: roomId } })
+                    }
+                    else this.showToast({ text: response.text || 'Ошибка входа в комнату', type: 'error' })
+                })
+            }
         }
+    },
+    computed: {
+        ...mapGetters('user', ['userData']),
     }
 }
 </script>

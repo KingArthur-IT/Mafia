@@ -18,16 +18,19 @@ export default{
   },
 
   actions: {
-    async createRoom({ commit }, data){
+    async createRoom({ commit }, data) {
       const res = await sendRequest('/rooms/create', 'POST', data);
-      if (res?.data?.data && res?.data?.id){
-        commit('setRoomsList', res.data.data);
-        return res.data.id;
-      }
-      else{
-        this.dispatch('toast/showToast', {text: 'Failed to create room', type: 'error'}, { root: true })
-        // return -1
-        return 0
+      if (res?.status === 'ok') {
+        if (res?.data?.id){
+          return res.data.id;
+        }
+        else {
+          this.dispatch('toast/showToast', { text: res.message, type: 'error' }, { root: true })
+          return -1
+        }
+      } else {
+        this.dispatch('toast/showToast', { text: 'Failed to create room', type: 'error' }, { root: true })
+        return -1
       }
     }
   },

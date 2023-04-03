@@ -1,6 +1,6 @@
 <template>
     <div class="input-wrap">
-        <label v-if="label" class="label">{{label}}</label>
+        <label v-if="label" class="label">{{ label }}</label>
         <div class="input-wrap d-flex">
             <input 
                 :id="id"

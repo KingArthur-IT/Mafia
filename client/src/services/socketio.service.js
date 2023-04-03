@@ -8,7 +8,7 @@ class SocketioService {
     setupSocketConnection() {
         this.socket = io(import.meta.env.VITE_ENDPOINT_HOST);
         
-        this.socket.on('setRoomsList', data => store.commit('rooms/SOCKET_setRoomsList', data));
+        this.socket.on('setRoomsList', data => store.commit('rooms/SOCKET_setRoomsList', data.reverse()));
 
         this.socket.on('newChatMsg', data => store.commit('game/SOCKET_newChatMsg', data));
         this.socket.on('copyChat', data => store.commit('game/SOCKET_copyChat', data));

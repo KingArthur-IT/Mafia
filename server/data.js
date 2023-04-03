@@ -222,7 +222,7 @@ const gameHallId = 31415926535;
 const rooms = [
     {
         id: 1,
-        name: 'Test room',
+        name: 'Test room 1',
         maxPersons: 4,
         minPersons: 4,
         roles: [
@@ -249,7 +249,7 @@ const rooms = [
     },
     {
         id: 2,
-        name: 'Test room',
+        name: 'Test room 2',
         maxPersons: 10,
         minPersons: 4,
         roles: [
@@ -281,11 +281,119 @@ const rooms = [
         minPersons: 8,
         roles: [
             { role: 'lover', count: 1 },
-            { role: 'reporter', count: 1 },
+            { role: 'reporter', count: 0 },
             { role: 'barmen', count: 1 },
-            { role: 'doctor', count: 1 },
-            { role: 'bodyguard', count: 1 },
-            { role: 'terrorist', count: 1 }
+            { role: 'doctor', count: 0 },
+            { role: 'bodyguard', count: 0 },
+            { role: 'terrorist', count: 0 }
+        ],
+        users: [],
+        chat: [],
+        status: 'collecting',
+        gameData: {
+            gameStage: 0,
+            timerID: null,
+            timeCounter: 0,
+            chatEnable: true,
+            mafiaInChat: false,
+            killsCandidates: [],
+            votedUsers: [],
+            winnerTeam: ''
+        }
+    },
+    {
+        id: 4,
+        name: 'Test room',
+        maxPersons: 10,
+        minPersons: 8,
+        roles: [
+            { role: 'lover', count: 1 },
+            { role: 'reporter', count: 0 },
+            { role: 'barmen', count: 1 },
+            { role: 'doctor', count: 0 },
+            { role: 'bodyguard', count: 0 },
+            { role: 'terrorist', count: 0 }
+        ],
+        users: [],
+        chat: [],
+        status: 'collecting',
+        gameData: {
+            gameStage: 0,
+            timerID: null,
+            timeCounter: 0,
+            chatEnable: true,
+            mafiaInChat: false,
+            killsCandidates: [],
+            votedUsers: [],
+            winnerTeam: ''
+        }
+    },
+    {
+        id: 5,
+        name: 'Test room',
+        maxPersons: 10,
+        minPersons: 8,
+        roles: [
+            { role: 'lover', count: 1 },
+            { role: 'reporter', count: 0 },
+            { role: 'barmen', count: 1 },
+            { role: 'doctor', count: 0 },
+            { role: 'bodyguard', count: 0 },
+            { role: 'terrorist', count: 0 }
+        ],
+        users: [],
+        chat: [],
+        status: 'collecting',
+        gameData: {
+            gameStage: 0,
+            timerID: null,
+            timeCounter: 0,
+            chatEnable: true,
+            mafiaInChat: false,
+            killsCandidates: [],
+            votedUsers: [],
+            winnerTeam: ''
+        }
+    },
+    {
+        id: 6,
+        name: 'Test room',
+        maxPersons: 10,
+        minPersons: 8,
+        roles: [
+            { role: 'lover', count: 1 },
+            { role: 'reporter', count: 0 },
+            { role: 'barmen', count: 1 },
+            { role: 'doctor', count: 0 },
+            { role: 'bodyguard', count: 0 },
+            { role: 'terrorist', count: 0 }
+        ],
+        users: [],
+        chat: [],
+        status: 'collecting',
+        gameData: {
+            gameStage: 0,
+            timerID: null,
+            timeCounter: 0,
+            chatEnable: true,
+            mafiaInChat: false,
+            killsCandidates: [],
+            votedUsers: [],
+            winnerTeam: ''
+        }
+    },
+    {
+        id: 7,
+        name: 'Test room',
+        maxPersons: 10,
+        minPersons: 8,
+        roles: [
+            { role: 'lover', count: 1 },
+            { role: 'reporter', count: 0 },
+            { role: 'barmen', count: 1 },
+            { role: 'doctor', count: 0 },
+            { role: 'bodyguard', count: 0 },
+            { role: 'terrorist', count: 0 }
         ],
         users: [],
         chat: [],
