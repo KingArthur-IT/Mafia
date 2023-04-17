@@ -8,8 +8,8 @@
               <button class="btn auth__tab-btn" @click="isLoginTab = true">Войти</button>
               <button class="btn auth__tab-btn" @click="isLoginTab = false">Зарегистрироваться</button>
           </div>
-          <!-- login form -->
           <div class="auth__forms-wrapper">
+              <!-- login form -->
               <form class="auth__login login-form" :class="{'active': isLoginTab}">
                   <div class="auth__input-wrapper">
                       <CustomInput 
@@ -45,15 +45,36 @@
                   <div class="auth__input-wrapper">
                       <CustomInput 
                         :id="'registerNickInput'"
-                        :label="'Никнейм'"  
+                        :label="'Никнейм*'"  
                         :isValid="regData.isNicknameValid"
                         v-model="regData.nickname"
                       >Никнейм должен быть не короче 6 символов</CustomInput>
                   </div>
                   <div class="auth__input-wrapper">
                       <CustomInput 
+                        :id="'registerAgeInput'"
+                        :label="'Возраст'"  
+                        :isAgeValue="true"
+                        v-model="regData.age"
+                      />
+                  </div>
+                  <div class="auth__input-wrapper">
+                      Пол
+                      <CustomRadio
+                        v-model="regData.gender"
+                      />
+                  </div>
+                  <div class="auth__input-wrapper">
+                      <CustomInput 
+                        :id="'registerCountryInput'"
+                        :label="'Страна'"  
+                        v-model="regData.country"
+                      />
+                  </div>
+                  <div class="auth__input-wrapper">
+                      <CustomInput 
                         :id="'registerEmailInput'"
-                        :label="'Email'"  
+                        :label="'Email*'"  
                         :type="'email'"
                         :isValid="regData.isEmailValid"
                         v-model="regData.email"
@@ -62,7 +83,7 @@
                   <div class="auth__input-wrapper">
                       <CustomInput 
                         :id="'registerPasswordInput'"
-                        :label="'Пароль'"  
+                        :label="'Пароль*'"  
                         :type="'password'"
                         :isValid="regData.isPasswordValid"
                         v-model="regData.password"
@@ -80,11 +101,15 @@
                   <div class="auth__input-wrapper">
                     <CustomInput 
                         :id="'registerRepeatPasswordInput'"
-                        :label="'Повторите пароль'"  
+                        :label="'Повторите пароль*'"  
                         :type="'password'"
                         :isValid="regData.isConfirmPasswordValid"
                         v-model="regData.confirmPassword"
                     >Пароли не совпадают</CustomInput>
+                  </div>
+                  <div class="auth__checkbox-wrapper">
+                      <CustomCheckbox v-model="regData.isConditionsAccepted"/>
+                      <div class="conditions">Я принимаю <a href="#" target="_blank">условия пользования</a></div>
                   </div>
                   <button :class="{'disable': !isRegAvailable}" class="btn primary-btn auth__btn" @click.prevent="regEvent">Зарегистрироваться</button>
               </form>
@@ -97,15 +122,19 @@
 import { mapActions } from 'vuex'
 import { validatePassword, validateEmail } from '@/use/validation.js'
 import CustomInput from '@/components/UIKit/CustomInput.vue'
+import CustomRadio from '@/components/UIKit/CustomRadio.vue'
+import CustomCheckbox from '@/components/UIKit/CustomCheckbox.vue'
 import Logo from '@/components/icons/ProjectLogo.vue'
 
 export default {
-    components:{
+    components: {
         CustomInput,
+        CustomRadio,
+        CustomCheckbox,
         Logo,
     },
     data: () => {
-        return{
+        return {
             isLoginPasswordVisible: false,
             isRegPasswordVisible: false,
             isRegConfirmPasswordVisible: false,
@@ -118,6 +147,9 @@ export default {
             },
             regData: {
                 nickname: '',
+                age: '',
+                gender: 'male',
+                country: '',
                 email: '',
                 password: '',
                 confirmPassword: '',
@@ -125,25 +157,29 @@ export default {
                 isEmailValid: true,
                 isPasswordValid: true,
                 isConfirmPasswordValid: true,
+                isConditionsAccepted: false
             }
         }
     },
     mounted() {
-        document.querySelector('#loginEmailInput')?.focus()
+        if ("register" in this.$route.query) {
+            this.isLoginTab = false
+        } else
+            document.querySelector('#loginEmailInput')?.focus()
     },
-    methods:{
+    methods: {
         ...mapActions('user', ['getUserData']),
         goToMainPage(){
             this.$router.push({ name: 'home' })
         },
-        regEvent(){
+        regEvent() {
             if (!this.isRegAvailable) return;
             this.regData.isNicknameValid = this.regData.nickname.length > 5;
             this.regData.isEmailValid = validateEmail(this.regData.email);
             this.regData.isConfirmPasswordValid = this.regData.password === this.regData.confirmPassword && !!this.regData.password.length
             this.regData.isPasswordValid = validatePassword(this.regData.password);
         },
-        async loginEvent(){
+        async loginEvent() {
             if (!this.isLoginAvailable) return;
             this.loginData.isEmailValid = validateEmail(this.loginData.email);
             // this.loginData.isPasswordValid = validatePassword(this.loginData.password);
@@ -158,12 +194,12 @@ export default {
             if (rez) this.$router.push({ name: 'profile.main' })
         },
     },
-    computed:{
+    computed: {
         isLoginAvailable: function(){
             return this.loginData.email && this.loginData.password
         },
         isRegAvailable: function(){
-            return this.regData.nickname && this.regData.email && this.regData.password && this.regData.confirmPassword
+            return this.regData.isConditionsAccepted && this.regData.nickname && this.regData.email && this.regData.password && this.regData.confirmPassword
         }
     },
     watch: {
@@ -236,7 +272,15 @@ export default {
             margin: auto
             margin-top: 24px
             font-size: 16px
-
+        &__checkbox-wrapper
+            display: flex
+            & .conditions
+                margin-left: 12px
+            & a
+                font-weight: bold
+                transition: color .3s ease
+                &:hover
+                    color: var(--color-primary)
 .login-form
     position: absolute
     transform: translate(-50px)

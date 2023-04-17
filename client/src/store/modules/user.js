@@ -11,6 +11,8 @@ export default{
       id: 0,
       nickname: 'NotFound',
       gender: 'male',
+      age: '0',
+      country: 'NotFound',
       email: 'NotFound',
       emailNotification: true,
       accountType: 'standart',
@@ -30,6 +32,7 @@ export default{
     },
     userAdditions: {
       friends: { count: 0, score: 0 },
+      socials: { count: 0, score: 0 },
     },
     notifications: []
   },

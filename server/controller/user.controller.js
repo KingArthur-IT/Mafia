@@ -12,6 +12,8 @@ class UserController {
                 data: {
                     id: user.id,
                     nickname: user.nickname,
+                    age: user.age,
+                    country: user.country,
                     gender: user.gender,
                     email: user.email,
                     emailNotification: user.emailNotification,
@@ -38,12 +40,16 @@ class UserController {
                 user.nickname = req.body.nickname
                 user.gender = req.body.gender
                 user.emailNotification = req.body.emailNotification
+                user.age = req.body.age
+                user.country = req.body.country
                 rez = { 
                     status: 'ok', 
                     message: 'User data updated successfully', 
                     data: {
                         id: user.id,
                         nickname: user.nickname,
+                        age: user.age,
+                        country: user.country,
                         gender: user.gender,
                         email: user.email,
                         emailNotification: user.emailNotification,

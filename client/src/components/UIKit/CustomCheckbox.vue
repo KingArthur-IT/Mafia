@@ -47,12 +47,13 @@ export default {
   background-color: #fff;
   margin: 0;
   font: inherit;
-  color: var(--primary-button-color);
+  color: var(--color-primary);
   width: 20px;
   height: 20px;
-  border: 1px solid var(--primary-button-color);
-  background-color: var(--background-color);
+  border: 1px solid var(--color-primary);
+  background-color: transparent;
   cursor: pointer;
+  border-radius: 3px;
 }
 .custom-checkbox.error {
   border: 1px solid #ff0000;
@@ -61,11 +62,11 @@ export default {
   content: '';
   position: absolute;
   top: 3px;
-  bottom: 0;
-  left: 2px;
-  right: 0;
-  background-color: var(--primary-button-color);
-  background: url('@/assets/img/icons/check.svg') no-repeat;
+  bottom: 3px;
+  left: 3px;
+  right: 3px;
+  border-radius: 1px;
+  background-color: var(--color-primary);
 }
 </style>
 

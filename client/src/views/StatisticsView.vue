@@ -31,7 +31,7 @@
           <tr v-for="(item, i) in Object.keys(additionsData)" :key="i" class="row">
               <td class="cell-flex">
                   <span>{{ descriptions[item] }}</span>
-                  <info-icon />
+                  <info-icon @click="$router.push({ name: 'profile.about' })" />
               </td>
               <td>{{ additionsData[item].count }}</td>
               <td>{{ additionsData[item].score }}</td>
@@ -95,7 +95,8 @@ export default {
                 wasTerrorist: 'Играл в роли террориста',
                 wasBarmen: 'Играл в роли бармена',
                 wasBodyguard: 'Играл в роли телохранителя',
-                friends: 'Приведи друга'
+                friends: 'Приведи друга',
+                socials: 'Пост в соцсетях',
             },
             levels: [
                 { name: 'Новичок', scoreMin: 0, scoreMax: 199 },

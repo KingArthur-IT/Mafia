@@ -1,17 +1,20 @@
 <template>
   <div class="hero">
       <div class="hero__row">
-          <p class="hero__text" @click="$router.push({name: 'profile.market'})" >
+          <p class="hero__text" @click="$router.push({ name: 'profile.market' })" >
               <span>Тип профиля:</span>
               <span class="type">{{ profileType }}</span> 
               <CrownIcon v-if="isCrownShown" />
               <UpIcon v-else />
           </p>
           <div @click="$router.push({ name: 'profile.statistics' })">
-              <p class="hero__text">Рейтинг: {{userData.rating}} (Горожанин) <StarIcon /> </p>
+              <p class="hero__text">Рейтинг: {{ userData.rating }} (Горожанин) <StarIcon /> </p>
           </div>
       </div>
       <!-- <Achivements /> -->
+      <!-- <div>
+          <h3>Инфлюэнсеры проекта</h3>
+      </div> -->
       <button class="btn secondary-btn hero__btn" @click="goToPage('profile.holl')">Играть</button>
       <button class="btn secondary-btn hero__btn" @click="goToPage('profile.rules')">Правила</button>
       <button class="btn secondary-btn hero__btn" @click="goToPage('profile.statistics')">Рейтинг и статистика</button>

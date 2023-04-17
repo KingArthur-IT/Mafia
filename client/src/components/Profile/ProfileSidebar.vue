@@ -18,9 +18,9 @@
         <SettingsIcon class="sidebar__icon" />
         <div class="sidebar__item-name">Настройки</div>
       </div>
-      <div class="sidebar__item" @click="goToPage('profile.support')">
-        <SupportIcon class="sidebar__icon" />
-        <div class="sidebar__item-name">Поддержка</div>
+      <div class="sidebar__item" @click="goToPage('profile.about')">
+        <AboutIcon />
+        <div class="sidebar__item-name">О проекте</div>
       </div>
       <div class="sidebar__item" @click="goToPage('profile.market')">
         <MarketIcon class="sidebar__icon" />
@@ -31,7 +31,7 @@
       <div class="sidebar__information-name">Условия использования</div>
       <div class="sidebar__information-name">Политика конфиденциальности</div>
     </div>
-    <div class="sidebar__item">
+    <div class="sidebar__item" @click="logout">
       <LogoutIcon class="sidebar__icon" />
       <div class="sidebar__item-name">Выйти</div>
     </div>
@@ -44,7 +44,7 @@ import Logo from '@/components/icons/ProjectLogo.vue'
 import LogoutIcon from '@/components/icons/LogoutIcon.vue'
 import SettingsIcon from '@/components/icons/SettingsIcon.vue'
 import HomeIcon from '@/components/icons/HomeIcon.vue'
-import SupportIcon from '@/components/icons/SupportIcon.vue'
+import AboutIcon from '@/components/icons/AboutIcon.vue'
 import MarketIcon from '@/components/icons/MarketIcon.vue'
 
 export default {
@@ -53,15 +53,18 @@ export default {
     LogoutIcon,
     SettingsIcon,
     HomeIcon,
-    SupportIcon,
+    AboutIcon,
     MarketIcon
   },
-  methods:{
-    goToPage(pageName){
-      this.$router.push({name: pageName})
+  methods: {
+    goToPage(pageName) {
+      this.$router.push({ name: pageName })
     },
+    logout() {
+      this.$router.push({ path: '/' })
+    }
   },
-  computed:{
+  computed: {
     ...mapGetters('user', ['userData'])
   }
 }

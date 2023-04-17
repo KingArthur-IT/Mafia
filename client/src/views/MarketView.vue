@@ -4,7 +4,9 @@
           <div class="market__item">
               <h2 class="market__title">Базовый аккаунт</h2>
               <ul class="market__list">
-                  <li class="market__line">что-то</li>
+                  <li class="market__line">обычная скорость роста рейтинга</li>
+                  <li class="market__line">только текст в чатах</li>
+                  <li class="market__line">только открытые комнаты</li>
               </ul>
           </div>
       </div>
@@ -13,7 +15,8 @@
               <h2 class="market__title">Premium аккаунт <CrownIcon /></h2>
               <ul class="market__list">
                   <li class="market__line">+100% к игровому рейтингу</li>
-                  <li class="market__line">возможность выбирать игровую роль</li>
+                  <li class="market__line">крутые стикеры для чатов</li>
+                  <li class="market__line">возможность создавать приватные комнаты для друзей</li>
               </ul>
           </div>
       </div>

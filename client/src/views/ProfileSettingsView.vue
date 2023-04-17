@@ -11,6 +11,27 @@
     </div>
 
     <div class="hero__input-wrapper">
+      <CustomInput 
+          :id="'age-input'"
+          :label="'Возраст'"  
+          v-model="age.value"
+          :isWithEdit="true"
+          :isAgeValue="true"
+          @saveEvent="updateUserData"
+        >Не корректный возраст</CustomInput>
+    </div>
+
+    <div class="hero__input-wrapper">
+      <CustomInput 
+          :id="'country-input'"
+          :label="'Страна'"  
+          v-model="country.value"
+          :isWithEdit="true"
+          @saveEvent="updateUserData"
+        >Не корректная страна</CustomInput>
+    </div>
+
+    <div class="hero__input-wrapper">
       <div class="hero__row">
         <p class="hero__text">Пол</p>
         <CustomRadio
@@ -118,21 +139,29 @@ export default {
       this.email.value = this.userData.email;
       this.email.isNotification = this.userData.emailNotification;
       this.gender.value = this.userData.gender;
+      this.country.value = this.userData.country;
+      this.age.value = this.userData.age;
     }
   },
-  data(){
-    return{
-      nickname:{
+  data() {
+    return {
+      nickname: {
         value: '',
       },
-      email:{
+      age: {
+        value: '',
+      },
+      country: {
+        value: '',
+      },
+      email: {
         value: '',
         isNotification: false
       },
-      gender:{
+      gender: {
         value: 'male',
       },
-      password:{
+      password: {
         isChanging: false,
         old: '',
         new: '',
@@ -143,7 +172,7 @@ export default {
       }
     }
   },
-  methods:{
+  methods: {
     ...mapActions('user', ['updateUserInfo', 'updateUserPassword']),
     ...mapActions('toast', ['showToast']),
     savePasswordEvent(){
@@ -178,6 +207,8 @@ export default {
         this.updateUserInfo({
           id: this.userData.id,
           nickname: this.nickname.value,
+          age: this.age.value,
+          country: this.country.value,
           gender: this.gender.value,
           email: this.email.value,
           emailNotification: this.email.isNotification
@@ -190,7 +221,9 @@ export default {
       return this.userData.nickname !== this.nickname.value ||
             this.userData.email !== this.email.value ||
             this.userData.emailNotification !== this.email.isNotification ||
-            this.userData.gender !== this.gender.value
+            this.userData.gender !== this.gender.value ||
+            this.userData.age !== this.age.value ||
+            this.userData.country !== this.country.value
     }
   }
 }

@@ -7,10 +7,10 @@
                 class="input" 
                 :class="{'disable': !isEditing && isWithEdit}"
                 :type="inputType" 
-                :value="modelValue"
-                @input="(event) => $emit('update:modelValue', event.target.value)"
+                v-model="value"
+                @input="onInput"
                 :readonly="!isEditing && isWithEdit"
-            >
+            />
             <SaveEditButton v-if="isWithEdit" v-model="isEditing" @click="save" class="edit-btn" />
             <OpenedEyeIcon v-if="isOpenEyeVisible" class="eye" @click="isPasswordVisible = !isPasswordVisible"/>
             <ClosedEyeIcon v-if="isClosedEyeVisible" class="eye" @click="isPasswordVisible = !isPasswordVisible"/>
@@ -30,7 +30,7 @@ export default {
     components:{
         OpenedEyeIcon, ClosedEyeIcon, SaveEditButton
     },
-    props:{
+    props: {
         id: {
             type: String,
             default: ''
@@ -54,11 +54,16 @@ export default {
         isWithEdit: {
             type: Boolean,
             default: false
+        },
+        isAgeValue: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ['update:modelValue' , 'saveEvent'],
     data() {
-        return{
+        return {
+            value: '',
             isPasswordVisible: false,
             isEditing: false
         }
@@ -78,6 +83,21 @@ export default {
         save(){
             if (!this.isEditing)
                 this.$emit('saveEvent')
+        },
+        onInput(event) {
+            this.$emit('update:modelValue', event.target.value)
+        }
+    },
+    watch: {
+        modelValue() {
+            this.value = this.modelValue
+        },
+        value() {
+            if (this.isAgeValue) {
+                this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*?)\..*/g, '$1')
+                if (Number(this.value) > 70) 
+                    this.value = this.value.substring(this.value.length, 1)
+            }
         }
     }
 }

@@ -6,7 +6,7 @@ import ProfileStartView from '../views/ProfileStartView.vue'
 import ProfileSettingsView from '../views/ProfileSettingsView.vue'
 import RulesView from '../views/RulesView.vue'
 import MarketView from '../views/MarketView.vue'
-import SupportView from '../views/SupportView.vue'
+import AboutView from '../views/AboutView.vue'
 import MessageView from '../views/MessageView.vue'
 import NotificationsView from '../views/NotificationsView.vue'
 import HollView from '../views/HollView.vue'
@@ -25,7 +25,7 @@ const router = createRouter({
           { path: 'settings', name: 'profile.settings', component: ProfileSettingsView, meta: { pageName: 'Настройки профиля' } },
           { path: 'rules', name: 'profile.rules', component: RulesView, meta: { pageName: 'Правила игры' } },
           { path: 'market', name: 'profile.market', component: MarketView, meta: { pageName: 'Магазин' } },
-          { path: 'support', name: 'profile.support', component: SupportView, meta: { pageName: 'Поддержка' } },
+          { path: 'about', name: 'profile.about', component: AboutView, meta: { pageName: 'О проекте' } },
           { path: 'message', name: 'profile.message', component: MessageView, meta: { pageName: 'Сообщения' } },
           { path: 'notifications', name: 'profile.notifications', component: NotificationsView, meta: { pageName: 'Уведомления' } },
           { path: 'holl', name: 'profile.holl', component: HollView, meta: { pageName: 'Игровой холл' } },
