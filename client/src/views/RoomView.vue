@@ -109,7 +109,7 @@
   <ModalWrapper v-model="isEndGameModalOpened" :title="'Игра окончена'">
     <p class="modal-text">
         <span class="md-font">
-            <strong v-if="isInMafiaTeam">Поздравляем!</strong>
+            <strong v-if="(isInMafiaTeam && gameRezult.winnerTeam === 'mafia') || (!isInMafiaTeam && gameRezult.winnerTeam !== 'mafia')">Поздравляем!</strong>
             <strong v-else>Вы проиграли</strong>
         </span>
         <br>
@@ -117,6 +117,7 @@
             <span v-if="gameRezult.winnerTeam === 'mafia'"> мафии</span>
             <span v-else> мирных жителей</span>
         </span> <br>
+        <span>Вы получили +{{ gameWinnerScore }} очков рейтинга</span>
     </p>
   </ModalWrapper>
 </template>
@@ -147,7 +148,7 @@ export default {
         }
     },
     computed: {
-        ...mapGetters('game', ['gameChat', 'gameChatEnable', 'gamePlayers', 'gameRole', 'gameTimer', 'gameStatus', 'gameStage', 'gamePlayerIsAlive', 'gameLabels', 'gameVoicesCount', 'gameActionSended', 'gameMafiaPlayersCount', 'gameRezult']),
+        ...mapGetters('game', ['gameChat', 'gameChatEnable', 'gamePlayers', 'gameRole', 'gameTimer', 'gameStatus', 'gameStage', 'gamePlayerIsAlive', 'gameLabels', 'gameVoicesCount', 'gameActionSended', 'gameMafiaPlayersCount', 'gameRezult', 'gameWinnerScore']),
         ...mapGetters('user', ['userData']),
         isChatEnable() {
             const chatEnable = this.gameStage === 1 ? this.gameRole === 'mafia' : true
@@ -433,7 +434,6 @@ export default {
         margin-bottom: 10px
         mix-blend-mode: hard-light
     .modal-text
-        max-width: 300px
         text-align: center
         & .md-font
             color: var(--color-primary)

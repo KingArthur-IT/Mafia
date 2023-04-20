@@ -31,6 +31,7 @@ class SocketioService {
         this.socket.on('updateVoicesCount', data => store.commit('game/SOCKET_updateVoicesCount', data));
 
         this.socket.on('showGameResult', data => store.commit('game/SOCKET_showGameResult', data));
+        this.socket.on('setWinnerScore', data => store.commit('game/SOCKET_setWinnerScore', data));
         this.socket.on('setMafiaPlayersCount', data => store.commit('game/SOCKET_setMafiaPlayersCount', data));
     }
 

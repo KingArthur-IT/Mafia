@@ -23,7 +23,8 @@ export default{
     //votes
     voicesCount: {},
     //rezult
-    gameRezult: {}
+    gameRezult: {},
+    winnerScore: 0
   },
 
   getters: {
@@ -39,7 +40,8 @@ export default{
     gamePlayerIsAlive: state => state.isAlive,
     gameLabels: state => state.labels,
     gameVoicesCount: state => state.voicesCount,
-    gameRezult: state => state.gameRezult
+    gameRezult: state => state.gameRezult,
+    gameWinnerScore: state => state.winnerScore
   },
 
   mutations: {
@@ -90,6 +92,7 @@ export default{
     SOCKET_showGameResult: (state, data) => {
       state.gameRezult = {...data}
     },
+    SOCKET_setWinnerScore: (state, data) => state.winnerScore = data,
 
     SOCKET_setMafiaPlayersCount: (state, data) => state.mafiaPlayersCount = data,
 

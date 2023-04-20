@@ -49,6 +49,7 @@ export default{
     setUserNotifications: (state, data) => state.notifications = [...data],
     setUserStats: (state, data) => state.userStats = {...data},
     setUserAdditions: (state, data) => state.userAdditions = {...data},
+    setUserRating: (state, data) => state.user.rating = data
   },
 
   actions: {
@@ -97,6 +98,23 @@ export default{
       }
       else 
         this.dispatch('toast/showToast', { text: 'Request failed or new data is empty', type: 'error' }, { root: true })
+    },
+    //rating
+    async getUserRating ({ commit }) {
+      const res = await sendRequest('/user/rating', 'POST', { id: state.user.id });
+      if (res?.status)
+        if (res?.status === 'ok'){
+          commit('setUserRating', res.data);
+          return true
+        }
+        else {
+          this.dispatch('toast/showToast', { text: res.message, type: 'error' }, { root: true });
+          return false
+        }
+      else {
+        this.dispatch('toast/showToast', { text: 'Не удалось получить ответ от сервера', type: 'error' }, { root: true });
+        return false;
+      }
     },
     //notifications
     async getNotificationsData ({ commit, state }) {

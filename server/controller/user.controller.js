@@ -156,6 +156,24 @@ class UserController {
         }
         res.json(rez)
     };
+    // rating
+    getUserRating(req, res){
+        const user = users.find(el => el.id === req.body.id);
+        var rez;
+        if (user){
+            rez = {
+                status: 'ok',
+                data: user.rating
+            };
+        } else {
+            rez = {
+                status: 'error',
+                message: 'User not found',
+                data: null
+            };
+        }
+        res.json(rez)
+    };
 }
 
 module.exports = new UserController()

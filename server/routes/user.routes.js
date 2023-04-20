@@ -12,6 +12,7 @@ router.put('/user/notifications', userController.setAllNotificationsRead)
 //statistic
 router.post('/user/stats', userController.getStatsData)
 router.post('/user/additions', userController.getAdditionsData)
-
+//rating
+router.post('/user/rating', userController.getUserRating)
 
 module.exports = router

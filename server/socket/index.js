@@ -2,7 +2,7 @@ const getRolesCount = require('../game/getRolesCount')
 const { shuffle } = require('../use/additional')
 const { rooms, users, gameHallId } = require('../data')
 
-const STEPS_TIMER_COUNT = 30; //60 csec
+const STEPS_TIMER_COUNT = 20; //60 sec
 
 const getRoomsList = () => rooms.map( ({ id, name, maxPersons, minPersons, roles, users, status }) =>
     ({ id, name, maxPersons, minPersons, roles, usersCount: users.length, status}) )
@@ -298,6 +298,67 @@ function mySocket(socket) {
 
     //отписать всех от сокетов комнаты
     rooms.find(room => room.id === roomId).users.forEach(user => {
+      //score
+      const team = ['mafia', 'terrorist', 'barmen'].includes(user.role) ? 'mafia' : 'citizen'
+      const isInWinnerTeam = currRoom.gameData.winnerTeam === team
+      
+      let score = (isInWinnerTeam && (user.isLive || user.role === 'terrorist')) ? 50 : 10
+      if (users.find(u => u.id === user.id).accountType === 'premium')
+        score *= 2
+        
+      users.find(u => u.id === user.id).rating += score
+      this.to(user.socketId).emit("setWinnerScore", score)
+
+      //stats
+      users.find(u => u.id === user.id).statistics.allGames.count += 1
+      users.find(u => u.id === user.id).statistics.allGames.score += score
+
+      if (isInWinnerTeam && team === 'mafia') {
+        users.find(u => u.id === user.id).statistics.mafiaWins.count += 1
+        users.find(u => u.id === user.id).statistics.mafiaWins.score += score
+      }
+
+      if (isInWinnerTeam && team === 'citizen') {
+        users.find(u => u.id === user.id).statistics.citizenWins.count += 1
+        users.find(u => u.id === user.id).statistics.citizenWins.score += score
+      }
+
+      if (user.role == 'mafia') {
+        users.find(u => u.id === user.id).statistics.wasMafia.count += 1
+        users.find(u => u.id === user.id).statistics.wasMafia.score += score
+      }
+
+      if (user.role == 'sheriff') {
+        users.find(u => u.id === user.id).statistics.wasSheriff.count += 1
+        users.find(u => u.id === user.id).statistics.wasSheriff.score += score
+      }
+
+      if (user.role == 'doctor') {
+        users.find(u => u.id === user.id).statistics.wasDoctor.count += 1
+        users.find(u => u.id === user.id).statistics.wasDoctor.score += score
+      }
+
+      if (user.role == 'lover') {
+        users.find(u => u.id === user.id).statistics.wasLover.count += 1
+        users.find(u => u.id === user.id).statistics.wasLover.score += score
+      }
+
+      if (user.role == 'terrorist') {
+        users.find(u => u.id === user.id).statistics.wasTerrorist.count += 1
+        users.find(u => u.id === user.id).statistics.wasTerrorist.score += score
+      }
+
+      if (user.role == 'barmen') {
+        users.find(u => u.id === user.id).statistics.wasBarmen.count += 1
+        users.find(u => u.id === user.id).statistics.wasBarmen.score += score
+      }
+
+      if (user.role == 'bodyguard') {
+        users.find(u => u.id === user.id).statistics.wasBodyguard.count += 1
+        users.find(u => u.id === user.id).statistics.wasBodyguard.score += score
+      }
+
+      //leave
       this.sockets.get(user.socketId)?.leave(roomId);
     })
 

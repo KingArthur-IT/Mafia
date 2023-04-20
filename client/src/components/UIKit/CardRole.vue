@@ -105,6 +105,7 @@ export default {
             &.backdrop
                 backdrop-filter: blur(2px)
             &-hero
+                position: absolute
                 top: 50%
                 left: 50%
                 transform: translate(-55%, -55%)
