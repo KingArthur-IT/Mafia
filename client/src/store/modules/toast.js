@@ -1,6 +1,6 @@
 import createPersistedState from "vuex-persistedstate";
 
-export default{
+export default {
   name: 'toast', 
   namespaced: true,
 

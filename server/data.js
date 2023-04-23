@@ -2,13 +2,14 @@ const users = [
     {
         id: 1,
         nickname: 'Artem',
+        role: 'owner', //admin user
         gender: 'male',
         age: '22',
         country: 'USA',
         email: 'king@king.com',
         password: 'Qwerty12',
         emailNotification: true,
-        accountType: 'standart',
+        accountType: 'standart', //premium
         rating: 201,
         statistics: {
             allGames: { count: 1, score: 1 },

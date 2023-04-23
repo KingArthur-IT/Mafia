@@ -168,30 +168,63 @@ export default {
             document.querySelector('#loginEmailInput')?.focus()
     },
     methods: {
+        ...mapActions('auth', ['Register', 'Login']),
         ...mapActions('user', ['getUserData']),
         goToMainPage(){
             this.$router.push({ name: 'home' })
         },
-        regEvent() {
+        async regEvent() {
             if (!this.isRegAvailable) return;
             this.regData.isNicknameValid = this.regData.nickname.length > 5;
             this.regData.isEmailValid = validateEmail(this.regData.email);
             this.regData.isConfirmPasswordValid = this.regData.password === this.regData.confirmPassword && !!this.regData.password.length
             this.regData.isPasswordValid = validatePassword(this.regData.password);
+
+            if (this.regData.isNicknameValid && this.regData.isEmailValid && this.regData.isConfirmPasswordValid && this.regData.isPasswordValid) {
+                const regRez = await this.Register({
+                    nickname: this.regData.nickname,
+                    age: this.regData.age,
+                    gender: this.regData.gender,
+                    country: this.regData.country,
+                    email: this.regData.email,
+                    password: this.regData.password
+                })
+
+                if (regRez) {
+                    const loginRez = await this.Login({
+                        email: this.regData.email,
+                        password: this.regData.password
+                    });
+
+                    if (loginRez) {
+                        await this.getUserData({
+                            email: this.regData.email,
+                            password: this.regData.password
+                        });
+                        this.$router.push({ name: 'profile.main' })
+                    }
+                }
+            }
         },
         async loginEvent() {
             if (!this.isLoginAvailable) return;
             this.loginData.isEmailValid = validateEmail(this.loginData.email);
-            // this.loginData.isPasswordValid = validatePassword(this.loginData.password);
+            this.loginData.isPasswordValid = validatePassword(this.loginData.password);
 
-            if (!this.loginData.isEmailValid) return;
+            if (!this.loginData.isEmailValid || !this.loginData.isPasswordValid) return;
 
-            const rez = await this.getUserData({
+            const rez = await this.Login({
                 email: this.loginData.email,
                 password: this.loginData.password
             });
 
-            if (rez) this.$router.push({ name: 'profile.main' })
+            if (rez) {
+                await this.getUserData({
+                    email: this.loginData.email,
+                    password: this.loginData.password
+                });
+                this.$router.push({ name: 'profile.main' })
+            }
         },
     },
     computed: {

@@ -46,7 +46,7 @@ export default {
         padding: 10px 20px
         color: #fff
         background: #757B8C
-        position: absolute
+        position: fixed
         bottom: 5%
         left: 50%
         transform: translateX(-50%)

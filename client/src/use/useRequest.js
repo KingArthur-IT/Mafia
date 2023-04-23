@@ -25,3 +25,5 @@ async function sendRequest(url, method = 'GET', data = null){
 export {
     sendRequest
 }
+
+// { withCredentials: true }
