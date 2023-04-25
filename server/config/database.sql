@@ -22,7 +22,8 @@ create Table users(
     was_barmer_count INT DEFAULT 0, 
     was_bodyguard_count INT DEFAULT 0, 
     bring_friend_count INT DEFAULT 0, 
-    bring_friend_score INT DEFAULT 0 
+    bring_friend_score INT DEFAULT 0,
+    created_at TIMESTAMP
 );
 
 CREATE TABLE notifications (

@@ -1,5 +1,6 @@
 import axios from 'axios'
-// import { sendRequest } from '@/use/useRequest'
+import router from '@/router/index'
+import store from '@/store/index'
 
 axios.defaults.baseURL = 'http://localhost:3000/api'//process.env.VUE_APP_BASE_URL;
 axios.defaults.headers['Content-Type'] = 'application/json'
@@ -26,6 +27,9 @@ axios.interceptors.response.use(response => response, async error => {
             axios.defaults.headers.common['Authorization'] = `Bearer ${data.data}`
 
             return axios(error.config)
+        } else {
+            router.push({ name: 'home' })
+            store.dispatch('toast/showToast', { text: 'Не удалось обновить токен доступа. Попробуйте войти еще раз', type: 'error' }, { root: true })
         }
     }
 

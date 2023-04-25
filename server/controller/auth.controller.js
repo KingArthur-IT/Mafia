@@ -25,7 +25,7 @@ class AuthController {
                 res.json({
                     status: 'ok',
                     message: 'User created successfully',
-                    data: null //rez.rows[0] //!! не весь
+                    data: null
                 })
             } else 
                 res.json({
@@ -69,6 +69,7 @@ class AuthController {
     };
     async refreshToken(req, res){
         try { 
+            return res.status(500).json()
             if (req.headers?.cookie && getJWTCookie(req.headers.cookie)) {
                 const refreshToken = getJWTCookie(req.headers.cookie);
           

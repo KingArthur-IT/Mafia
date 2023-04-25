@@ -37,4 +37,15 @@ const router = createRouter({
   ]
 })
 
+router.beforeEach((to, from, next) => {
+  const currentUser = localStorage.getItem('access_token');
+  const requireAuth = to.matched.some(page => page.meta.auth)
+  
+  if (requireAuth && !currentUser){
+    next('/authorize')
+  } else {
+    next()
+  }
+})
+
 export default router

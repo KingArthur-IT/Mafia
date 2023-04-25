@@ -10,11 +10,11 @@ export default{
   },
 
   getters: {
-    // userData: state => state.user,
+
   },
 
   mutations: {
-    // setUserData: (state, data) => state.user = {...data},
+
   },
 
   actions: {
