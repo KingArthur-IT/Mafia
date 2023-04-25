@@ -11,6 +11,13 @@ const shuffle = (str) => {
     return a.join("");
 }
 
+const getJWTCookie = (str, name = 'jwt') => {
+    return str.split('; ').reduce((res, item) => { 
+        const data = item.trim().split('='); 
+        return { ...res, [data[0]] : data[1] }; 
+    }, {})[name]
+}
+
 module.exports = {
-    shuffle
+    shuffle, getJWTCookie
 }

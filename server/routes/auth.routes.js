@@ -2,7 +2,6 @@ const Router = require('express')
 const authController = require('../controller/auth.controller')
 const router = new Router()
 const { check } = require('express-validator')
-const authMiddleware = require('../middleware/authMiddleware')
 
 router.post('/auth/registration', [
     check('nickname', 'Nickname cannot be empty').notEmpty(),
@@ -11,5 +10,6 @@ router.post('/auth/registration', [
 ], authController.registration)
 
 router.post('/auth/login', authController.login)
+router.post('/auth/refresh', authController.refreshToken)
 
 module.exports = router

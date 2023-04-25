@@ -1,6 +1,5 @@
 import createPersistedState from "vuex-persistedstate";
 import { sendRequest } from '@/use/useRequest' 
-import store from "..";
 
 export default{
   name: 'user', 
@@ -10,13 +9,26 @@ export default{
     user: {
       id: 0,
       nickname: 'NotFound',
+      email: 'NotFound',
+      email_notification: true,
       gender: 'male',
       age: '0',
-      country: 'NotFound',
-      email: 'NotFound',
-      emailNotification: true,
-      accountType: 'standart',
+      country: '',
+      role: 'USER',
+      account_type: 'standart',
       rating: 0,
+      all_games_count: 0, 
+      mafia_wins_count: 0, 
+      citizen_wins_count: 0, 
+      was_mafia_count: 0, 
+      was_sheriff_count: 0, 
+      was_doctor_count: 0, 
+      was_lover_count: 0, 
+      was_terrorist_count: 0, 
+      was_barmer_count: 0, 
+      was_bodyguard_count: 0, 
+      bring_friend_count: 0, 
+      bring_friend_score: 0
     }, 
     userStats: {
       allGames: { count: 0, score: 0 },
@@ -54,20 +66,20 @@ export default{
 
   actions: {
     //user data
-    async getUserData ({ commit }, { email, password }) {
-      const res = await sendRequest('/user', 'POST', { email, password });
-      if (res?.status)
-        if (res?.status === 'ok'){
-          commit('setUserData', res.data);
-          return true
-        }
-        else {
-          this.dispatch('toast/showToast', { text: res.message, type: 'error' }, { root: true });
-          return false
-        }
-      else {
+    async getUserData ({ state, commit }) {
+      const res = await sendRequest(`/user?id=${state.user.id}`);
+      if (!res.status) {
         this.dispatch('toast/showToast', { text: 'Не удалось получить ответ от сервера', type: 'error' }, { root: true });
         return false;
+      }
+
+      if (res.status === 'ok'){
+        commit('setUserData', res.data);
+        return true
+      }
+      else {
+        this.dispatch('toast/showToast', { text: res.message, type: 'error' }, { root: true });
+        return false
       }
     },
     async updateUserInfo ({ commit }, newUserData) {

@@ -133,11 +133,12 @@ export default {
     CustomSwitch,
     SaveButton
   },
-  mounted(){
+  mounted() {
+    this.getUserData()
     if (this.userData){
       this.nickname.value = this.userData.nickname;
       this.email.value = this.userData.email;
-      this.email.isNotification = this.userData.emailNotification;
+      this.email.isNotification = this.userData.email_notification;
       this.gender.value = this.userData.gender;
       this.country.value = this.userData.country;
       this.age.value = this.userData.age;
@@ -173,7 +174,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions('user', ['updateUserInfo', 'updateUserPassword']),
+    ...mapActions('user', ['getUserData', 'updateUserInfo', 'updateUserPassword']),
     ...mapActions('toast', ['showToast']),
     savePasswordEvent(){
       this.password.isOldValid = this.password.old !== '';
@@ -220,7 +221,7 @@ export default {
     smthWasChanged(){
       return this.userData.nickname !== this.nickname.value ||
             this.userData.email !== this.email.value ||
-            this.userData.emailNotification !== this.email.isNotification ||
+            this.userData.email_notification !== this.email.isNotification ||
             this.userData.gender !== this.gender.value ||
             this.userData.age !== this.age.value ||
             this.userData.country !== this.country.value

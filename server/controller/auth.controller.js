@@ -3,9 +3,10 @@ const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const { validationResult } = require('express-validator')
 const jwtConfig = require('../config/jwt.config')
+const { getJWTCookie } = require('../use/additional')
 
 const generateAccessToken = (id, email, role) => jwt.sign({ id, email, role }, jwtConfig.access_token_secret, { expiresIn: jwtConfig.access_expires_in })
-const generateRefreshToken = (email) => jwt.sign({ email }, jwtConfig.access_token_secret, { expiresIn: jwtConfig.refresh_expires_in })
+const generateRefreshToken = (email) => jwt.sign({ email }, jwtConfig.refresh_token_secret, { expiresIn: jwtConfig.refresh_expires_in })
 
 class AuthController {
     async registration(req, res){
@@ -50,30 +51,29 @@ class AuthController {
             if (!usersWithEmailInDB.rows.length) 
                 return res.json({ status: 'error', message: 'User with such email is not found', data: null })
 
-            const validPassword = bcrypt.compareSync(password, usersWithEmailInDB.rows[0].password)
+            const { password: passwordFromDB, ...userData } = usersWithEmailInDB.rows[0]
+            const validPassword = bcrypt.compareSync(password, passwordFromDB)
             if (!validPassword)
                 return res.json({ status: 'error', message: 'Password is incorrect', data: null })
 
-            const access_token = generateAccessToken( usersWithEmailInDB.rows[0].id, usersWithEmailInDB.rows[0].email, usersWithEmailInDB.rows[0].role)
-            const refresh_token = generateRefreshToken( usersWithEmailInDB.rows[0].email)
+            const access_token = generateAccessToken( userData.id, userData.email, userData.role)
+            const refresh_token = generateRefreshToken( userData.email)
             
             res.cookie('jwt', refresh_token, { httpOnly: true, sameSite: 'None', secure: true, maxAge: jwtConfig.refresh_max_age });
 
-            return res.json({ status: 'ok', message: 'Authorization success', data: access_token })
+            return res.json({ status: 'ok', message: 'Authorization success', data: { access_token, user_data: userData } })
         } catch (error) {
             console.log(error);
             res.json({ status: 'error', message: 'Failed to login', data: null })
         }
     };
     async refreshToken(req, res){
-        try {
-            if (req.cookies?.jwt) {
-                const refreshToken = req.cookies.jwt;
-                console.log('refresh token = ', refreshToken);
+        try { 
+            if (req.headers?.cookie && getJWTCookie(req.headers.cookie)) {
+                const refreshToken = getJWTCookie(req.headers.cookie);
           
                 jwt.verify(refreshToken, jwtConfig.refresh_token_secret, async (err, decoded) => {
-                    console.log('decoded = ', decoded);
-                    if (err) {
+                    if (err || !decoded) {
                         return res.status(406).json({ message: 'Unauthorized' });
                     }
                     else {
@@ -81,7 +81,7 @@ class AuthController {
 
                         const access_token = generateAccessToken( usersWithEmailInDB.rows[0].id, usersWithEmailInDB.rows[0].email, usersWithEmailInDB.rows[0].role)
                         const refresh_token = generateRefreshToken( usersWithEmailInDB.rows[0].email)
-                        
+
                         res.cookie('jwt', refresh_token, { httpOnly: true, sameSite: 'None', secure: true, maxAge: jwtConfig.refresh_max_age });
 
                         return res.json({ status: 'ok', message: 'Token refresh success', data: access_token })
@@ -91,7 +91,7 @@ class AuthController {
                 return res.status(406).json({ message: 'Unauthorized' });
             }
         } catch (error) {
-            console.log(error);
+            console.log('ERR = ', error);
             res.json({ status: 'error', message: 'Failed to refresh token', data: null })
         }
     }

@@ -13,7 +13,7 @@ const server = require('http').createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server, {
   cors: {
-    origin: '*', //"http://localhost:5000"
+    origin: 'http://localhost:5173', //"http://localhost:5000"
   }
 });
 

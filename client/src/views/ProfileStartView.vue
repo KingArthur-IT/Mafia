@@ -49,10 +49,10 @@ export default {
     computed:{
         ...mapGetters('user', ['userData']),
         profileType: function(){
-            return this.userData?.accountType === 'standart' ? 'Базовый' : 'premium';
+            return this.userData?.account_type === 'standart' ? 'Базовый' : 'premium';
         },
         isCrownShown: function(){
-            return this.userData?.accountType === 'premium'
+            return this.userData?.account_type === 'premium'
         }
     }
 }

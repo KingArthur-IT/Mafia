@@ -196,13 +196,8 @@ export default {
                         password: this.regData.password
                     });
 
-                    if (loginRez) {
-                        await this.getUserData({
-                            email: this.regData.email,
-                            password: this.regData.password
-                        });
+                    if (loginRez) 
                         this.$router.push({ name: 'profile.main' })
-                    }
                 }
             }
         },
@@ -218,13 +213,8 @@ export default {
                 password: this.loginData.password
             });
 
-            if (rez) {
-                await this.getUserData({
-                    email: this.loginData.email,
-                    password: this.loginData.password
-                });
+            if (rez)
                 this.$router.push({ name: 'profile.main' })
-            }
         },
     },
     computed: {

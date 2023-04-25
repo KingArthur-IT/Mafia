@@ -32,8 +32,11 @@ export default{
     async Login ({ commit }, { email, password }) {
       const res = await sendRequest('/auth/login', 'POST', { email, password });
       if (res?.status) {
-        if (res.status === 'ok') localStorage.setItem('access_token', res.data)
-        this.dispatch('toast/showToast', { text: res.message, type: res.status }, { root: true });
+        if (res.status === 'ok') {
+          localStorage.setItem('access_token', res.data.access_token)
+          this.commit('user/setUserData', res.data.user_data, { root: true });
+        } else
+          this.dispatch('toast/showToast', { text: res.message, type: res.status }, { root: true });
         return res.status === 'ok'
       }
       else {

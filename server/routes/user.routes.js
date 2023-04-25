@@ -1,9 +1,10 @@
 const Router = require('express')
 const userController = require('../controller/user.controller')
 const router = new Router()
+const authMiddleware = require('../middleware/authMiddleware')
 
 //user data
-router.post('/user', userController.getUserInfo)
+router.get('/user?:id', authMiddleware, userController.getUserInfo)
 router.put('/user', userController.updateUserInfo)
 router.put('/user/password', userController.updateUserPassword)
 //notifications

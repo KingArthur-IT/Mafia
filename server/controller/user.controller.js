@@ -1,34 +1,26 @@
-// import {user} from '../data'
+const pool = require('../config/db.config')
 const { users } = require('../data')
 
 class UserController {
     //user data
-    getUserInfo(req, res){
-        const user = users.find(el => el.email === req.body.email);
-        var rez;
-        if (user){
-            rez = {
-                status: 'ok',
-                data: {
-                    id: user.id,
-                    nickname: user.nickname,
-                    age: user.age,
-                    country: user.country,
-                    gender: user.gender,
-                    email: user.email,
-                    emailNotification: user.emailNotification,
-                    rating: user.rating,
-                    accountType: user.accountType,
-                }
-            };
-        } else {
-            rez = {
-                status: 'error',
-                message: 'User not found',
-                data: null
-            };
-        }
-        res.json(rez)
+    async getUserInfo(req, res){
+       try {
+            const userId = req.query.id
+
+            if (!userId) 
+                return res.json({ status: 'error', message: 'Invalid request. No user id', data: null })
+
+            const usersWitID = await pool.query('SELECT * FROM users WHERE id=$1', [userId])
+
+            if (!usersWitID.rows.length) 
+                return res.json({ status: 'error', message: 'User with such id is not found', data: null })
+
+            const { password, ...userData } = usersWitID.rows[0]
+
+            res.json({ status: 'ok', message: 'User get success', data: userData })
+       } catch (error) {
+           console.log(error);
+       }
     };
     updateUserInfo(req, res){
         var rez;
