@@ -18,6 +18,10 @@ const getJWTCookie = (str, name = 'jwt') => {
     }, {})[name]
 }
 
+const resFormat = (resStatus, message, data = null) => { //resStatus = ok, error
+    return { resStatus, message, data }
+}
+
 module.exports = {
-    shuffle, getJWTCookie
+    shuffle, getJWTCookie, resFormat
 }

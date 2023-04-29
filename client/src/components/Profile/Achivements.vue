@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
     <div class="achievements">
         <p v-if="achievementsData?.length" class="achievements__text">Достижения</p>
         <p v-else class="achievements__text">Достижений пока нет</p>
@@ -88,4 +88,4 @@ export default {
             bottom: 0
             right: 0
             cursor: pointer
-</style>
+</style> -->

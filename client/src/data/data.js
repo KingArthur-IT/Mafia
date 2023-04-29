@@ -123,10 +123,19 @@ const rolesInfo = {
     },
 }
 
-const achievementsInfo = {
-    sheriff: 'Вы успешно сыграли в роли шерифа'
-}
+const levelsInfo = [
+    { name: 'Новичок', scoreMin: 0, scoreMax: 199 },
+    { name: 'Гражданин', scoreMin: 200, scoreMax: 499 },
+    { name: 'Крестный отец', scoreMin: 500, scoreMax: 999 },
+    { name: 'Консильери', scoreMin: 1000, scoreMax: 1999 },
+    { name: 'Дон', scoreMin: 2000, scoreMax: 4999 },
+    { name: 'Босс мафии', scoreMin: 5000, scoreMax: 9999 },
+    { name: 'Преступный гений', scoreMin: 10000, scoreMax: 14999 },
+    { name: 'Владыка теней', scoreMin: 15000, scoreMax: 19999 },
+    { name: 'Король преступного мира', scoreMin: 20000, scoreMax: 24999 },
+    { name: 'Божество мафии', scoreMin: 25000, scoreMax: 1000000 },
+]
 
 export {
-    rolesList, rolesInfo, achievementsInfo
+    rolesList, rolesInfo, levelsInfo
 }

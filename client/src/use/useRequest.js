@@ -8,10 +8,10 @@ async function sendRequest(url, method = 'GET', data = null){
         data: {...data}
     })
         .then((response) => {
-            return response.data
+            return response
         })
-        .catch(() => {
-            return null
+        .catch((error) => {
+            return error
         })
 }
 

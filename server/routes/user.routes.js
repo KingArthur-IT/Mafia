@@ -10,10 +10,7 @@ router.put('/user/password', userController.updateUserPassword)
 //notifications
 router.post('/user/notifications', userController.getNotificationsData)
 router.put('/user/notifications', userController.setAllNotificationsRead)
-//statistic
-router.post('/user/stats', userController.getStatsData)
-router.post('/user/additions', userController.getAdditionsData)
 //rating
-router.post('/user/rating', userController.getUserRating)
+router.get('/user/rating?:id', authMiddleware, userController.getUserRating)
 
 module.exports = router

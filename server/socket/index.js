@@ -1,5 +1,5 @@
 const getRolesCount = require('../game/getRolesCount')
-const { shuffle } = require('../use/additional')
+const { shuffle } = require('../use/helpers')
 const { rooms, users, gameHallId } = require('../data')
 
 const STEPS_TIMER_COUNT = 20; //60 sec

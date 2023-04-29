@@ -22,7 +22,7 @@ axios.interceptors.response.use(response => response, async error => {
             withCredentials: true
         })
 
-        if (status === 200) {
+        if (status === 200 && data.data) {
             localStorage.setItem('access_token', data.data)
             axios.defaults.headers.common['Authorization'] = `Bearer ${data.data}`
 

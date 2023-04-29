@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const { validationResult } = require('express-validator')
 const jwtConfig = require('../config/jwt.config')
-const { getJWTCookie } = require('../use/additional')
+const { getJWTCookie, resFormat } = require('../use/helpers')
 
 const generateAccessToken = (id, email, role) => jwt.sign({ id, email, role }, jwtConfig.access_token_secret, { expiresIn: jwtConfig.access_expires_in })
 const generateRefreshToken = (email) => jwt.sign({ email }, jwtConfig.refresh_token_secret, { expiresIn: jwtConfig.refresh_expires_in })
@@ -13,7 +13,7 @@ class AuthController {
         try {
             const errors = validationResult(req)
             if (!errors.isEmpty())
-                return res.json({ status: 'error', message: 'Validation errors', data: null })
+                return res.json(resFormat('error', 'Validation errors'))
 
             const { nickname, email, password, age, country, gender } = req.body
 
@@ -22,25 +22,14 @@ class AuthController {
                 const hashPassword = bcrypt.hashSync(password, 7);
                 const rez = await pool.query('INSERT INTO users (nickname, email, age, country, password, gender) values ($1, $2, $3, $4, $5, $6) RETURNING *', [nickname, email, age, country, hashPassword, gender])
 
-                res.json({
-                    status: 'ok',
-                    message: 'User created successfully',
-                    data: null
-                })
+                //check rez !!!
+                res.json(resFormat('ok', 'User created successfully'))
             } else 
-                res.json({
-                    status: 'error',
-                    message: 'User with such nickname or email is already exists',
-                    data: null
-                })
+                res.json(resFormat('error', 'User with such nickname or email is already exists'))
             
         } catch (error) {
-            console.log(error);
-            res.json({
-                status: 'error',
-                message: 'User creation failed',
-                data: null
-            })
+            console.log('Error in registration', error.message);
+            res.json(resFormat('error','User creation failed'))
         }
     };
     async login(req, res){
@@ -49,33 +38,32 @@ class AuthController {
             const usersWithEmailInDB = await pool.query('SELECT * FROM users WHERE email=$1', [email])
             
             if (!usersWithEmailInDB.rows.length) 
-                return res.json({ status: 'error', message: 'User with such email is not found', data: null })
+                return res.json(resFormat('error', 'User with such email is not found'))
 
             const { password: passwordFromDB, ...userData } = usersWithEmailInDB.rows[0]
             const validPassword = bcrypt.compareSync(password, passwordFromDB)
             if (!validPassword)
-                return res.json({ status: 'error', message: 'Password is incorrect', data: null })
+                return res.json(resFormat('error', 'Password is incorrect'))
 
             const access_token = generateAccessToken( userData.id, userData.email, userData.role)
             const refresh_token = generateRefreshToken( userData.email)
             
             res.cookie('jwt', refresh_token, { httpOnly: true, sameSite: 'None', secure: true, maxAge: jwtConfig.refresh_max_age });
 
-            return res.json({ status: 'ok', message: 'Authorization success', data: { access_token, user_data: userData } })
+            return res.json(resFormat('ok', 'Authorization success', { access_token, user_data: userData }))
         } catch (error) {
-            console.log(error);
-            res.json({ status: 'error', message: 'Failed to login', data: null })
+            console.log('Error in login', error.message);
+            res.json(resFormat('error', 'Failed to login'))
         }
     };
     async refreshToken(req, res){
         try { 
-            return res.status(500).json()
             if (req.headers?.cookie && getJWTCookie(req.headers.cookie)) {
                 const refreshToken = getJWTCookie(req.headers.cookie);
           
                 jwt.verify(refreshToken, jwtConfig.refresh_token_secret, async (err, decoded) => {
                     if (err || !decoded) {
-                        return res.status(406).json({ message: 'Unauthorized' });
+                        return res.status(406).json(resFormat('error', 'Unauthorized'));
                     }
                     else {
                         const usersWithEmailInDB = await pool.query('SELECT * FROM users WHERE email=$1', [decoded.email])
@@ -85,15 +73,15 @@ class AuthController {
 
                         res.cookie('jwt', refresh_token, { httpOnly: true, sameSite: 'None', secure: true, maxAge: jwtConfig.refresh_max_age });
 
-                        return res.json({ status: 'ok', message: 'Token refresh success', data: access_token })
+                        return res.json(resFormat('ok', 'Token refresh success', access_token))
                     }
                 })
             } else {
-                return res.status(406).json({ message: 'Unauthorized' });
+                return res.status(406).json(resFormat('error', 'Unauthorized'));
             }
         } catch (error) {
-            console.log('ERR = ', error);
-            res.json({ status: 'error', message: 'Failed to refresh token', data: null })
+            console.log('Error in refreshToken ', error.message);
+            res.json(resFormat('error', 'Failed to refresh token'))
         }
     }
 }

@@ -18,26 +18,26 @@ export default{
   },
 
   actions: {
-    async Register ({ commit }, { nickname, age, gender, country, email, password }) {
+    async Register ({ }, { nickname, age, gender, country, email, password }) {
       const res = await sendRequest('/auth/registration', 'POST', { nickname, email, password, age, country, gender });
-      if (res?.status) {
-        this.dispatch('toast/showToast', { text: res.message, type: res.status }, { root: true });
-        return res.status === 'ok'
+      if (res.status === 200 && res.data?.resStatus) {
+        this.dispatch('toast/showToast', { text: res.data.message, type: res.data.resStatus }, { root: true });
+        return res.resStatus === 'ok'
       }
       else {
         this.dispatch('toast/showToast', { text: 'Не удалось получить ответ от сервера', type: 'error' }, { root: true });
         return false;
       }
     },
-    async Login ({ commit }, { email, password }) {
+    async Login ({ }, { email, password }) {
       const res = await sendRequest('/auth/login', 'POST', { email, password });
-      if (res?.status) {
-        if (res.status === 'ok') {
-          localStorage.setItem('access_token', res.data.access_token)
-          this.commit('user/setUserData', res.data.user_data, { root: true });
+      if (res.status === 200 && res.data?.resStatus) {
+        if (res.data.resStatus === 'ok' && res.data?.data?.access_token && res.data?.data?.user_data) {
+          localStorage.setItem('access_token', res.data.data.access_token)
+          this.commit('user/setUserData', res.data.data.user_data, { root: true });
         } else
-          this.dispatch('toast/showToast', { text: res.message, type: res.status }, { root: true });
-        return res.status === 'ok'
+          this.dispatch('toast/showToast', { text: res.data.message, type: res.data.resStatus }, { root: true });
+        return res.data.resStatus === 'ok'
       }
       else {
         this.dispatch('toast/showToast', { text: 'Не удалось получить ответ от сервера', type: 'error' }, { root: true });

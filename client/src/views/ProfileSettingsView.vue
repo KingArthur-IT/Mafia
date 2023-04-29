@@ -176,17 +176,18 @@ export default {
   methods: {
     ...mapActions('user', ['getUserData', 'updateUserInfo', 'updateUserPassword']),
     ...mapActions('toast', ['showToast']),
-    savePasswordEvent(){
+    async savePasswordEvent(){
       this.password.isOldValid = this.password.old !== '';
       this.password.isNewValid = validatePassword(this.password.new);
       this.password.isRepeatValid = this.password.new === this.password.repeatNew && this.password.new !== '';
 
       if (this.password.isOldValid && this.password.isNewValid && this.password.isRepeatValid) {
-        const rez = this.updateUserPassword({
+        const rez = await this.updateUserPassword({
           id: this.userData.id,
           oldPassword: this.password.old,
           newPassword: this.password.new
         })
+
         if (rez) {
           this.password.old = ''
           this.password.new = ''
@@ -212,7 +213,7 @@ export default {
           country: this.country.value,
           gender: this.gender.value,
           email: this.email.value,
-          emailNotification: this.email.isNotification
+          email_notification: this.email.isNotification
         })
     }
   },

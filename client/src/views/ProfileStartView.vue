@@ -8,7 +8,7 @@
               <UpIcon v-else />
           </p>
           <div @click="$router.push({ name: 'profile.statistics' })">
-              <p class="hero__text">Рейтинг: {{ userData.rating }} (Горожанин) <StarIcon /> </p>
+              <p class="hero__text">Рейтинг: {{ userData.rating }} ({{ currentLevel(userData.rating) }}) <StarIcon /> </p>
           </div>
       </div>
       <!-- <Achivements /> -->
@@ -23,30 +23,36 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import Achivements from '@/components/Profile/Achivements.vue'
+import { mapActions, mapGetters } from 'vuex'
+// import Achivements from '@/components/Profile/Achivements.vue'
 import StarIcon from '@/components/icons/StarIcon.vue'
 import CrownIcon from '@/components/icons/CrownIcon.vue'
 import UpIcon from '@/components/icons/UpIcon.vue'
+import { currentLevel } from '@/use/userInfo'
 
 export default {
-    components:{
-        Achivements,
+    components: {
+        // Achivements,
         StarIcon,
         CrownIcon,
         UpIcon
     },
-    data(){
+    data() {
         return{
             
         }
     },
-    methods:{
+    mounted() {
+        this.getUserRating()
+    },
+    methods: {
+        ...mapActions('user', ['getUserRating']),
+        currentLevel,
         goToPage(name){
             this.$router.push({ name: name })
         }
     },
-    computed:{
+    computed: {
         ...mapGetters('user', ['userData']),
         profileType: function(){
             return this.userData?.account_type === 'standart' ? 'Базовый' : 'premium';

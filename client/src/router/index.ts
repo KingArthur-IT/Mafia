@@ -14,6 +14,8 @@ import StatisticsView from '../views/StatisticsView.vue'
 import RoomCreateView from '../views/RoomCreateView.vue'
 import RoomView from '../views/RoomView.vue'
 
+import store from '../store/index'
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -40,7 +42,15 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const currentUser = localStorage.getItem('access_token');
   const requireAuth = to.matched.some(page => page.meta.auth)
+  const userId = store.getters['user/userData'].id
   
+  //выйти если данные потеряны из стора
+  if (to.name !== 'home' && to.name !== 'auth' && !userId) {
+    next('/authorize')
+    return
+  }
+
+  //защитить роуты
   if (requireAuth && !currentUser){
     next('/authorize')
   } else {
