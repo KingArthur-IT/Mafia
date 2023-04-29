@@ -3,14 +3,12 @@
       <li 
         v-for="(notification, i) in notificationsList" :key="i" 
         class="notifications__item" 
-        :class="{'new': !notification.isRead}"
+        :class="{'new': !notification.isread}"
       >
         <div class="notifications__title md-font">
             <div>{{ notification.title }}</div>
         </div>
-        <p class="notifications__msg">
-            {{ notification.msg }}
-        </p>
+        <p class="notifications__msg" v-html="notification.message"></p>
         <div class="notifications__date">{{ notification.date }}</div>
       </li>
   </ul>

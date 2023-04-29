@@ -22,6 +22,7 @@ class UserController {
             res.json(resFormat('ok', 'User get success', userData))
        } catch (error) {
            console.log('Error in getUserInfo. ', error.message);
+           res.json(resFormat('error', 'Error in getUserInfo'))
        }
     };
     async updateUserInfo(req, res){ //id, nickname, email, gender, country, age, email_notification
@@ -45,6 +46,7 @@ class UserController {
 
         } catch (error) {
             console.log('Error in updateUserInfo. ', error.message);
+            res.json(resFormat('error', 'Error in updateUserInfo'))
         }
     };
     async updateUserPassword(req, res){
@@ -89,45 +91,49 @@ class UserController {
             return res.json(resFormat('ok', 'Rating get success', usersWitID.rows[0].rating))
         } catch (error) {
             console.log('Error in getUserRating. ', error.message);
+            res.json(resFormat('error', 'Error in getUserRating'))
         }
     };
     //notifications
-    getNotificationsData(req, res){
-        const user = users.find(el => el.id === req.body.id);
-        var rez;
-        if (user){
-            rez = {
-                status: 'ok',
-                message: 'Success',
-                data: user.notifications
-            };
-        } else {
-            rez = {
-                status: 'error',
-                message: 'User not found',
-                data: null
-            };
+    async getNotificationsData(req, res){
+        try {
+            const userId = req.query.id
+
+            if (!userId) 
+                return res.json(resFormat('error', 'Invalid request. No user id'))
+
+            const usersWitID = await pool.query('SELECT * FROM users WHERE id=$1', [userId])
+            
+            if (!usersWitID.rows.length) 
+                return res.json(resFormat('error', 'User with such id is not found'))
+            
+            const userNotifications = await pool.query('SELECT * FROM notifications WHERE user_id=$1', [userId])
+            return res.json(resFormat('ok', 'Notifications get successfully', userNotifications.rows))
+
+        } catch (error) {
+            console.log('Error in getNotificationsData. ', error.message);
+            res.json(resFormat('error', 'Error in getNotificationsData'))
         }
-        res.json(rez)
     };
-    setAllNotificationsRead(req, res){
-        const user = users.find(el => el.id === req.body.id);
-        var rez;
-        if (user){
-            user.notifications.forEach(n => n.isRead = true)
-            rez = {
-                status: 'ok',
-                message: 'Success',
-                data: user.notifications
-            };
-        } else {
-            rez = {
-                status: 'error',
-                message: 'User not found',
-                data: null
-            };
+    async setAllNotificationsRead(req, res){
+        try {
+            const userId = req.body.id
+
+            if (!userId) 
+                return res.json(resFormat('error', 'Invalid request. No user id'))
+
+            const usersWitID = await pool.query('SELECT * FROM users WHERE id=$1', [userId])
+            
+            if (!usersWitID.rows.length) 
+                return res.json(resFormat('error', 'User with such id is not found'))
+            
+            const userNotifications = await pool.query('UPDATE notifications SET isRead = true WHERE user_id = $1 RETURNING *', [userId])
+            return res.json(resFormat('ok', 'All notifications read', userNotifications.rows))
+
+        } catch (error) {
+            console.log('Error in setAllNotificationsRead. ', error.message);
+            res.json(resFormat('error', 'Error in setAllNotificationsRead'))
         }
-        res.json(rez)
     };
 }
 

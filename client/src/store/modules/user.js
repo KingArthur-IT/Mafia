@@ -131,23 +131,35 @@ export default{
 
     },
     //notifications
-    async getNotificationsData ({ commit, state }) {
-      // const res = await sendRequest('/user/notifications', 'POST', { id: state.user.id });
-      // if (res?.status) {
-      //   if (res?.status === 'ok')
-      //     commit('setUserNotifications', res.data.reverse())
-      //   else this.dispatch('toast/showToast', { text: res.message, type: 'error' }, { root: true })
-      // } else {
-      //   this.dispatch('toast/showToast', { text: 'Failed to get notifications', type: 'error' }, { root: true })
-      // }
+    async getNotificationsData ({ state, commit }) {
+      const res = await sendRequest(`/user/notifications?id=${state.user.id}`);
+
+      if (res.status !== 200) {
+        this.dispatch('toast/showToast', { text: 'Не удалось получить ответ от сервера', type: 'error' }, { root: true });
+        return false;
+      }
+
+      if (res.data?.resStatus === 'ok'){
+        commit('setUserNotifications', res.data.data.reverse())
+        return true
+      }
+      else {
+        this.dispatch('toast/showToast', { text: res.data.message, type: 'error' }, { root: true });
+        return false
+      }
     },
     async setAllNotificationsRead({ commit, state }) {
+      if (state.notifications.every(el => el.isread)) return
+
       const res = await sendRequest('/user/notifications', 'PUT', { id: state.user.id });
-      //null if server in not available
-      if (res?.status) {
-        if (res?.status === 'ok')
-          commit('setUserNotifications', res.data.reverse())
-        else this.dispatch('toast/showToast', { text: res.message, type: 'error' }, { root: true })
+      
+      if (res.status !== 200) {
+        this.dispatch('toast/showToast', { text: 'Не удалось получить ответ от сервера', type: 'error' }, { root: true });
+        return false;
+      }
+
+      if (res.data?.resStatus === 'ok'){
+        commit('setUserNotifications', res.data.data.reverse())
       } else {
         this.dispatch('toast/showToast', { text: 'Cannot set all notifications as read', type: 'error' }, { root: true })
       }

@@ -168,6 +168,7 @@ export default {
             document.querySelector('#loginEmailInput')?.focus()
     },
     methods: {
+        ...mapActions('admin', ['sendEntryNotification']),
         ...mapActions('auth', ['Register', 'Login']),
         ...mapActions('user', ['getUserData']),
         goToMainPage(){
@@ -191,6 +192,8 @@ export default {
                 })
 
                 if (regRez) {
+                    await this.sendEntryNotification({ email: this.regData.email })
+                    
                     const loginRez = await this.Login({
                         email: this.regData.email,
                         password: this.regData.password

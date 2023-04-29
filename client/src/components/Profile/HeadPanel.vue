@@ -37,7 +37,7 @@ export default {
   computed: {
     ...mapGetters('user', ['notificationsList']),
     newNotificationsCount() {
-      return this.notificationsList.filter(n => !n.isRead).length
+      return this.notificationsList.filter(n => !n.isread).length
     }
   },
   methods: {

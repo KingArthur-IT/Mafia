@@ -27,11 +27,11 @@ create Table users(
 );
 
 CREATE TABLE notifications (
-  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  user_id INT UNSIGNED NOT NULL,
+  id SERIAL PRIMARY KEY,
+  user_id INT NOT NULL,
   title VARCHAR(50) NOT NULL,
-  message VARCHAR(255) NOT NULL,
+  message VARCHAR(1000) NOT NULL,
+  isRead BOOLEAN DEFAULT false,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES users (id),
-  INDEX(user_id)
+  FOREIGN KEY (user_id) REFERENCES users (id)
 );

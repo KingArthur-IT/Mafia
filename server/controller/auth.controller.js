@@ -20,9 +20,8 @@ class AuthController {
             const exist = await pool.query('SELECT * FROM users WHERE nickname=$1 or email=$2', [nickname, email])
             if (!exist.rows.length) {
                 const hashPassword = bcrypt.hashSync(password, 7);
-                const rez = await pool.query('INSERT INTO users (nickname, email, age, country, password, gender) values ($1, $2, $3, $4, $5, $6) RETURNING *', [nickname, email, age, country, hashPassword, gender])
+                await pool.query('INSERT INTO users (nickname, email, age, country, password, gender) values ($1, $2, $3, $4, $5, $6) RETURNING *', [nickname, email, age, country, hashPassword, gender])
 
-                //check rez !!!
                 res.json(resFormat('ok', 'User created successfully'))
             } else 
                 res.json(resFormat('error', 'User with such nickname or email is already exists'))

@@ -22,7 +22,7 @@ export default{
       const res = await sendRequest('/auth/registration', 'POST', { nickname, email, password, age, country, gender });
       if (res.status === 200 && res.data?.resStatus) {
         this.dispatch('toast/showToast', { text: res.data.message, type: res.data.resStatus }, { root: true });
-        return res.resStatus === 'ok'
+        return res.data.resStatus === 'ok'
       }
       else {
         this.dispatch('toast/showToast', { text: 'Не удалось получить ответ от сервера', type: 'error' }, { root: true });
