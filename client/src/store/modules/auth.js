@@ -20,9 +20,13 @@ export default{
   actions: {
     async Register ({ }, { nickname, age, gender, country, email, password }) {
       const res = await sendRequest('/auth/registration', 'POST', { nickname, email, password, age, country, gender });
-      if (res.status === 200 && res.data?.resStatus) {
-        this.dispatch('toast/showToast', { text: res.data.message, type: res.data.resStatus }, { root: true });
-        return res.data.resStatus === 'ok'
+      if (res.status === 200) {
+        if (res.data?.resStatus === 'ok')
+          return true
+        else {
+          this.dispatch('toast/showToast', { text: res.data.message, type: res.data.resStatus }, { root: true });
+          return res.data.resStatus === 'ok'
+        }
       }
       else {
         this.dispatch('toast/showToast', { text: 'Не удалось получить ответ от сервера', type: 'error' }, { root: true });

@@ -26,6 +26,8 @@ class RoomsController{
                     winnerTeam: ''
                 }
             });
+            // INSERT INTO rooms (name, max_persons, min_persons, lover_max_count, reporter_max_count, barmen_max_count, doctor_max_count, bodyguard_max_count, terrorist_max_count)
+// VALUES ('Название комнаты', 20, 5, 1, 1, 2, 1, 1, 2);
 
             res.json({
                 status: 'ok',

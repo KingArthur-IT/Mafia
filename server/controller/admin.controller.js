@@ -31,3 +31,7 @@ class AdminController {
 }
 
 module.exports = new AdminController()
+
+// удаление комнат / created_at поле видно
+// отправка сообщений всем и конкретно
+// список пользователей / удаление

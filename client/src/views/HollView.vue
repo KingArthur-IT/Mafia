@@ -24,8 +24,8 @@
                 <tr v-for="room in currentPageArray" :key="room.id" @click="goToRoom(room.id)">
                     <td>{{ room.name }}</td>
                     <td>{{ statuses[room.status] }}</td>
-                    <td>{{ room.usersCount }}</td>
-                    <td>{{ room.minPersons }} / {{ room.maxPersons }}</td>
+                    <td>{{ room.users_count }}</td>
+                    <td>{{ room.min_persons }} / {{ room.max_persons }}</td>
                     <td class="holl__rolles-list">
                         <div class="holl__role" v-for="(role, i) in room.roles" :key="i">
                             <div v-if="role.count">

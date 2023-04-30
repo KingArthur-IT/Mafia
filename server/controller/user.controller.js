@@ -1,5 +1,4 @@
 const pool = require('../config/db.config')
-const { users } = require('../data')
 const { resFormat } = require('../use/helpers')
 const bcrypt = require('bcryptjs')
 

@@ -226,8 +226,6 @@ const rolesList = [
     'terrorist'
 ];
 
-const gameHallId = 31415926535;
-
 const rooms = [
     {
         id: 1,
@@ -434,5 +432,5 @@ const rooms = [
  */
 
 module.exports = {
-    users, rolesList, rooms, gameHallId
+    users, rolesList, rooms
 }

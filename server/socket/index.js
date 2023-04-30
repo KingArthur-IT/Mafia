@@ -1,12 +1,38 @@
+const pool = require('../config/db.config')
 const getRolesCount = require('../game/getRolesCount')
 const { shuffle } = require('../use/helpers')
-const { rooms, users, gameHallId } = require('../data')
+const { rooms, users } = require('../data')
 
+const GAME_HALL_ID = 31415926535
 const STEPS_TIMER_COUNT = 20; //60 sec
 
-const getRoomsList = () => rooms.map( ({ id, name, maxPersons, minPersons, roles, users, status }) =>
-    ({ id, name, maxPersons, minPersons, roles, usersCount: users.length, status}) )
+const getRoomsList = async () => {
+  const list = await pool.query(`
+    SELECT id, name, max_persons, min_persons, lover_max_count, reporter_max_count, barmen_max_count, doctor_max_count, bodyguard_max_count, terrorist_max_count, users, status 
+    FROM rooms GROUP BY id;
+  `)
 
+  const mappedList = list.rows.map( room => {
+      return {
+        id: room.id,
+        name: room.name,
+        max_persons: room.max_persons,
+        min_persons: room.min_persons,
+        roles: [
+          { role: 'lover', count: room.lover_max_count },
+          { role: 'reporter', count: room.reporter_max_count },
+          { role: 'barmen', count: room.barmen_max_count },
+          { role: 'doctor', count: room.doctor_max_count },
+          { role: 'bodyguard', count: room.bodyguard_max_count },
+          { role: 'terrorist', count: room.terrorist_max_count }
+        ],
+        users_count: room.users.length,
+        status: room.status
+      }
+    }
+  )
+  return mappedList
+}
 
 // Main function
 function mySocket(socket) {
@@ -253,7 +279,7 @@ function mySocket(socket) {
 
     currRoom.status = 'playing';
 
-    this.in(gameHallId).emit('setRoomsList', getRoomsList()); //emit in hall
+    this.in(GAME_HALL_ID).emit('setRoomsList', getRoomsList()); //emit in hall
     
     distributeRoles(currRoom) //распределить роли
     openNewGameStep(data.roomId)
@@ -385,15 +411,19 @@ function mySocket(socket) {
   //--------------------------------------------------------------------------------
   //enter game hall
   //--------------------------------------------------------------------------------
-  socket.on('enterGameHall', (data, cb) => {  // data: { userId }
-    if (!data.userId)
-      return cb({ status: 'error', text: 'Данные пользователя не корректны' })
-    else {
-      cb({ status: 'ok' });
-      socket.join(gameHallId); //join user to game hall
-  
-      //send room list
-      socket.emit('setRoomsList', getRoomsList())
+  socket.on('enterGameHall', async (data, cb) => {  // data: { userId }
+    try {
+      if (!data.userId)
+        return cb({ status: 'error', text: 'User data in not correct' })
+      else {
+        cb({ status: 'ok' });
+        socket.join(GAME_HALL_ID); //join user to game hall
+    
+        const list = await getRoomsList()
+        socket.emit('setRoomsList', list)
+      }
+    } catch (error) {
+      return cb({ status: 'error', text: 'Error in enterGameHall' })
     }
   })
 
@@ -435,7 +465,7 @@ function mySocket(socket) {
       //ok
       cb({ status: 'ok' });
 
-      socket.leave(gameHallId)
+      socket.leave(GAME_HALL_ID)
       socket.join(data.roomId) //join user to room
 
       if (currRoom.status !== 'playing') {
@@ -453,7 +483,7 @@ function mySocket(socket) {
           isActionSend: false
         });
         this.in(data.roomId).emit('updateUsers', currRoom.users); //update users in room
-        this.in(gameHallId).emit('setRoomsList', getRoomsList()); //update in hall
+        this.in(GAME_HALL_ID).emit('setRoomsList', getRoomsList()); //update in hall
       }
 
       if (currRoom.status === 'collecting') {
@@ -470,7 +500,7 @@ function mySocket(socket) {
       if (currRoom.users.length == currRoom.minPersons && currRoom.status === 'collecting') {
         currRoom.gameData.timeCounter =  STEPS_TIMER_COUNT
         currRoom.status = 'countdown';
-        this.in(gameHallId).emit('setRoomsList', getRoomsList()); //update in hall
+        this.in(GAME_HALL_ID).emit('setRoomsList', getRoomsList()); //update in hall
         this.in(data.roomId).emit('setCountdown', currRoom.gameData.timeCounter);
         this.in(data.roomId).emit('updateGameTitle', 'Игра начнется через:');
 
@@ -513,7 +543,7 @@ function mySocket(socket) {
         //remove user
         currRoom.users = currRoom.users.filter((user) => user.id !== data.userId)
         this.in(data.roomId).emit('updateUsers', currRoom.users)
-        this.in(gameHallId).emit('setRoomsList', getRoomsList()); //update in hall
+        this.in(GAME_HALL_ID).emit('setRoomsList', getRoomsList()); //update in hall
       }
 
       //check if was countdown
@@ -756,7 +786,7 @@ function mySocket(socket) {
       //remove user
       currRoom.users = currRoom.users.filter((user) => user.socketId !== socket.id)
       this.in(currRoom.id).emit('updateUsers', currRoom.users)
-      this.in(gameHallId).emit('setRoomsList', getRoomsList()); //update in hall
+      this.in(GAME_HALL_ID).emit('setRoomsList', getRoomsList()); //update in hall
 
       //check if was countdown
       if (currRoom.status === 'countdown' && currRoom.users.length < currRoom.minPersons){
