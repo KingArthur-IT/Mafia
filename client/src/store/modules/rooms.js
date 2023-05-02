@@ -20,16 +20,21 @@ export default{
   actions: {
     async createRoom({ commit }, data) {
       const res = await sendRequest('/rooms/create', 'POST', data);
-      if (res?.status === 'ok') {
-        if (res?.data?.id){
-          return res.data.id;
+      if (res.status !== 200) {
+        this.dispatch('toast/showToast', { text: 'Не удалось получить ответ от сервера', type: 'error' }, { root: true });
+        return false;
+      }
+
+      if (res.data?.resStatus === 'ok') {
+        if (res.data?.data?.id){
+          return res.data.data.id;
         }
         else {
-          this.dispatch('toast/showToast', { text: res.message, type: 'error' }, { root: true })
+          this.dispatch('toast/showToast', { text: res.data.message, type: 'error' }, { root: true })
           return -1
         }
       } else {
-        this.dispatch('toast/showToast', { text: 'Failed to create room', type: 'error' }, { root: true })
+        this.dispatch('toast/showToast', { text: res.data.message, type: 'error' }, { root: true })
         return -1
       }
     }

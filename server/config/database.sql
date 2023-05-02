@@ -52,7 +52,7 @@ CREATE TABLE rooms (
   chat JSONB DEFAULT '[]',
   status VARCHAR(20) DEFAULT 'collecting',
   game_stage smallint DEFAULT 0,
-  game_timer_id smallint DEFAULT -1,
+  game_is_timer_active BOOLEAN DEFAULT false,
   game_timer_counter smallint DEFAULT 0,
   game_chat_enable BOOLEAN DEFAULT true,
   game_mafia_in_chat BOOLEAN DEFAULT false,

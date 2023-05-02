@@ -173,14 +173,15 @@ export default {
     },
     methods:{
         ...mapActions('rooms', ['createRoom']),
+        ...mapActions('toast', ['showToast']),
         async createRoomEvent(){
             this.isRoomNameValid = !!this.roomName.length;
             if (!this.isRoomNameValid) return;
 
             const roomId = await this.createRoom({
                 name: this.roomName,
-                maxPersons: this.roomPlayers[0],
-                minPersons: this.roomPlayers[1],
+                max_persons: this.roomPlayers[0],
+                min_persons: this.roomPlayers[1],
                 roles: [
                     { role: 'lover', count: this.lover.value },
                     { role: 'reporter', count: this.reporter.value },

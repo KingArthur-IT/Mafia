@@ -34,25 +34,45 @@ const getRoomsList = async () => {
   return mappedList
 }
 
+const getTableData = async (table, id) => {
+  const data = await pool.query(`SELECT * FROM ${table} WHERE id = $1`, [id])
+  return data.rows[0]
+}
+
+const getFieldValue = async (table, tableId, field) => {
+  const data = await pool.query(`SELECT ${field} FROM ${table} WHERE id = $1`, [tableId])
+  return data.rows[0][field]
+}
+
+const updateFieldInDB = async (table, id, field, value) => {
+  await pool.query(`UPDATE ${table} SET ${field} = $1 WHERE id = $2;`, [value, id])
+}
+
 // Main function
 function mySocket(socket) {
 
-  const clearTimer = (roomId) => {
-    this.in(roomId).emit('setCountdown', 0);
-    clearInterval(rooms.find(r => r.id === roomId).gameData.timerID)
-    rooms.find(r => r.id === roomId).gameData.timerID = null
-    rooms.find(r => r.id === roomId).gameData.timeCounter = 0
-  }
-
-  const sendChatMsg = (roomId, author, text, isHidden) => {
-    rooms.find(room => room.id === roomId).chat.push({ author, text, isHidden });
+  // const clearTimer = async (roomId) => {
+  //   this.in(roomId).emit('setCountdown', 0);
+  //   const timerID = await pool.query('SELECT game_timer_id FROM rooms WHERE id = $1;', [roomId])
+  //   // clearInterval(rooms.find(r => r.id === roomId).gameData.timerID)
+  //   clearInterval(timerID.rows[0].game_timer_id)
+  //   await pool.query('UPDATE rooms SET game_timer_id = $1 WHERE id = $2;', [-1, roomId])
+  //   await pool.query('UPDATE rooms SET game_timer_counter = $1 WHERE id = $2;', [0, roomId])
+  //   // rooms.find(r => r.id === roomId).gameData.timerID = null
+  //   // rooms.find(r => r.id === roomId).gameData.timeCounter = 0
+  // }
+  
+  const sendChatMsg = async (roomId, author, text, isHidden) => {
+    await pool.query('UPDATE rooms SET chat = chat || $1 WHERE id = $2;', [{ author, text, isHidden }, roomId])
 
     if (!isHidden)
         this.in(roomId).emit('newChatMsg', { author, text, isHidden });  
-    else 
-      rooms.find(room => room.id === roomId).users
-        .filter(user => user.role === 'mafia')
-        .forEach(user => this.to(user.socketId).emit("newChatMsg", { author, text, isHidden }))
+    else {
+      const users = await pool.query('SELECT users FROM rooms WHERE id = $1')
+      const usersInRoom = users.rows[0]
+
+      usersInRoom.forEach(user => this.to(user.socketId).emit("newChatMsg", { author, text, isHidden }))
+    }
   }
 
   const sendGameDataToRoom = (roomId, title, isChatEnable, isMaffiaInChat) => {
@@ -409,19 +429,19 @@ function mySocket(socket) {
   }
 
   //--------------------------------------------------------------------------------
-  //enter game hall
+  //enter game hall +
   //--------------------------------------------------------------------------------
   socket.on('enterGameHall', async (data, cb) => {  // data: { userId }
     try {
       if (!data.userId)
         return cb({ status: 'error', text: 'User data in not correct' })
-      else {
-        cb({ status: 'ok' });
+
         socket.join(GAME_HALL_ID); //join user to game hall
-    
+        
         const list = await getRoomsList()
         socket.emit('setRoomsList', list)
-      }
+        
+        return cb({ status: 'ok' });
     } catch (error) {
       return cb({ status: 'error', text: 'Error in enterGameHall' })
     }
@@ -430,49 +450,57 @@ function mySocket(socket) {
   //--------------------------------------------------------------------------------
   // enter room
   //--------------------------------------------------------------------------------
-  socket.on('enterRoom', (data, cb) => { // data: { userId, nickname, roomId }
-    if (!data.userId || !data.roomId){
-      return cb({ status: 'error', text: 'Данные пользователя не корректны' })
-    } else {
-      const currRoom = rooms.find(room => room.id === data.roomId);
-      const currUser = users.find(user => user.id === data.userId);
-      const isAlreadyInThisRoom = currRoom.users.some((user) => user.id === data.userId)
+  socket.on('enterRoom', async (data, cb) => { // data: { userId, nickname, roomId }
+    if (!data.userId || !data.roomId)
+      return cb({ status: 'error', text: 'Invalid request. No user id or room id found' })
 
-      //Вы уже играете в другой комнате
-      if (rooms.filter((r) => r.id !== data.roomId).some((r) => r.users.some((user) => user.id === data.userId))) {
-        cb({ status: 'error', text: 'Вы уже играете в другой комнате' });
-        return
-      }
+    const currRoom = await getTableData('rooms', data.roomId)
+    const currUser = await getTableData('users', data.userId)
 
-      //chat
-      socket.emit('clearChat')
+    if (!currRoom) 
+      return res.json(resFormat('error', 'Room with such id is not found'))
 
-      if (!isAlreadyInThisRoom) { //игрок не числится в комнате
-        if (currRoom.users.length >= currRoom.maxPersons){ //check max players
-          cb({ status: 'error', text: 'В комнате уже максимальное количество игроков' });
-          return
-        }
-        if (currRoom.status === 'playing') { //check if game is started
-          cb({ status: 'error', text: 'Игра в этой комнате уже началась' });
-          return
-        }
-      } else { 
-        //игрок уже числится в комнате - восстановить ему все данные и обновить сокет ид
-        currRoom.users.find(user => user.id === data.userId).socketId = socket.id
-        returnDataToFallenUser(data.userId, data.roomId)
-      }
+    if (!currUser) 
+      return res.json(resFormat('error', 'User with such id is not found'))
 
-      //ok
-      cb({ status: 'ok' });
+    let currRoomUsersCount = currRoom.users.length
 
-      socket.leave(GAME_HALL_ID)
-      socket.join(data.roomId) //join user to room
+    //Вы уже играете в другой комнате
+    const userInRoom = await pool.query('SELECT * FROM rooms WHERE EXISTS ( SELECT * FROM jsonb_array_elements(users) u WHERE u->>\'id\' = $1 );', [data.userId])
 
-      if (currRoom.status !== 'playing') {
-        sendChatMsg(data.roomId, 'server', `Присоединился игрок ${currUser.nickname}`, false)   
-  
-        //add user
-        currRoom.users.push({
+    if (userInRoom.rows.some(r => r.id !== data.roomId))
+      return cb({ status: 'error', text: 'You are already playing in other room' });
+    
+    //chat
+    socket.emit('clearChat')
+    
+    //игрок числится в комнате
+    const isAlreadyInThisRoom = currRoom.users.some((user) => user.id === data.userId)
+
+    if (!isAlreadyInThisRoom) { //игрок не числится в комнате
+      if (currRoomUsersCount >= currRoom.max_persons) //check max players
+        return cb({ status: 'error', text: 'The room already has the maximum number of players' });
+
+      if (currRoom.status === 'playing') //check if game is started
+        return cb({ status: 'error', text: 'The game in this room has already begun' });
+    } else { 
+      //игрок уже числится в комнате - восстановить ему все данные и обновить сокет ид
+      //!!!
+      // currRoom.users.find(user => user.id === data.userId).socketId = socket.id
+      // returnDataToFallenUser(data.userId, data.roomId)
+    }
+
+    //ok
+    cb({ status: 'ok' });
+
+    socket.leave(GAME_HALL_ID)
+    socket.join(data.roomId) //join user to room
+
+    if (currRoom.status !== 'playing') {
+      sendChatMsg(data.roomId, 'server', `Присоединился игрок ${currUser.nickname}`, false)   
+      //add user
+      const newRoomData = await pool.query('UPDATE rooms SET users = users || $1 WHERE id = $2 RETURNING users', 
+        [{ 
           socketId: socket.id,
           id: currUser.id,
           nickname: currUser.nickname,
@@ -481,77 +509,94 @@ function mySocket(socket) {
           isLive: true,
           labels: [],
           isActionSend: false
-        });
-        this.in(data.roomId).emit('updateUsers', currRoom.users); //update users in room
-        this.in(GAME_HALL_ID).emit('setRoomsList', getRoomsList()); //update in hall
-      }
+         }, 
+         data.roomId
+        ])
+      currRoomUsersCount ++;
+      this.in(data.roomId).emit('updateUsers', newRoomData.rows[0].users); //update users in room
+      const roomsList = await getRoomsList()
+      this.in(GAME_HALL_ID).emit('setRoomsList', roomsList); //update in hall
+    }
 
-      if (currRoom.status === 'collecting') {
-        socket.emit('updateGameTitle', 'Набор игроков');
-        socket.emit('setCountdown', 0)
-      }
-      
-      if (currRoom.status === 'countdown') {
-        socket.emit('updateGameTitle', 'Игра начнется через:');
-        socket.emit('setCountdown', currRoom.gameData.timeCounter)  
-      }
+    if (currRoom.status === 'collecting') {
+      socket.emit('updateGameTitle', 'Набор игроков');
+      socket.emit('setCountdown', 0)
+    }
+    
+    if (currRoom.status === 'countdown') {
+      socket.emit('updateGameTitle', 'Игра начнется через:');
+      socket.emit('setCountdown', currRoom.game_time_counter)  //???
+    }
 
-      //check min for start
-      if (currRoom.users.length == currRoom.minPersons && currRoom.status === 'collecting') {
-        currRoom.gameData.timeCounter =  STEPS_TIMER_COUNT
-        currRoom.status = 'countdown';
-        this.in(GAME_HALL_ID).emit('setRoomsList', getRoomsList()); //update in hall
-        this.in(data.roomId).emit('setCountdown', currRoom.gameData.timeCounter);
-        this.in(data.roomId).emit('updateGameTitle', 'Игра начнется через:');
+    //check min for start
+    if (currRoomUsersCount == currRoom.min_persons && currRoom.status === 'collecting') {
+      await updateFieldInDB('rooms', data.roomId, 'game_timer_counter', STEPS_TIMER_COUNT)
+      this.in(data.roomId).emit('setCountdown', STEPS_TIMER_COUNT);
 
-        currRoom.gameData.timerID = setInterval(() => {
-          currRoom.gameData.timeCounter --
-          if (currRoom.gameData.timeCounter <= 0)
-            startGame(data)
-        }, 1000)
-      }
+      await updateFieldInDB('rooms', data.roomId, 'status', 'countdown')
+      this.in(data.roomId).emit('updateGameTitle', 'Игра начнется через:');
+
+      const roomsList = await getRoomsList()
+      this.in(GAME_HALL_ID).emit('setRoomsList', roomsList); //update in hall
+
+      let intervalCounter = STEPS_TIMER_COUNT
+      await updateFieldInDB('rooms', data.roomId, 'game_is_timer_active', true)
+      const intervalId = setInterval(function(){
+        const isTimerActive = getFieldValue('rooms', data.roomId, 'game_is_timer_active')
+        pool.query('UPDATE rooms SET game_timer_counter = game_timer_counter - 1 WHERE id = $1', [data.roomId])
+        intervalCounter --
+        if (!isTimerActive) {
+          clearInterval(intervalId)
+        }
+        if (intervalCounter <= 0) {
+          clearInterval(intervalId)
+          // startGame(data)
+        }
+      }, 1000)
     }
   })
 
   //--------------------------------------------------------------------------------
   //leave the room
   //--------------------------------------------------------------------------------
-  socket.on('leaveRoom', (data, cb) => { //data: { userId, nickname, roomId }
-    if (!data.userId || !data.roomId)
-      return cb({ status: 'error', text: 'Данные пользователя не корректны' })
-    else {
-      const currRoom = rooms.find(room => room.id === data.roomId);
-      const currUser = users.find(user => user.id === data.userId);
-      
-      if (!currUser) {
-        cb({ status: 'error', text: 'User not found' })
-        return
-      }
+  socket.on('leaveRoom', async (data, cb) => { //data: { userId, nickname, roomId }
+    try {
+      if (!data.userId || !data.roomId)
+        return cb({ status: 'error', text: 'invalid request. No user id or room id found' })
 
-      if (!currRoom) { //комнаты может уже не быть после окончания игры
-        cb({ status: 'ok' });
-        return
-      }
-      //ok
+      const currRoom = await getTableData('rooms', data.roomId)
+      const currUser = await getTableData('users', data.userId)
+  
+      if (!currRoom) 
+        return res.json(resFormat('error', 'Room with such id is not found'))
+  
+      if (!currUser) 
+        return res.json(resFormat('error', 'User with such id is not found'))
+
       cb({ status: 'ok' });
-
       socket.leave(data.roomId); //left the room
 
       if (currRoom.status !== 'playing') {
         sendChatMsg(data.roomId, 'server', `Игрок ${currUser.nickname} вышел`, false)
 
         //remove user
-        currRoom.users = currRoom.users.filter((user) => user.id !== data.userId)
-        this.in(data.roomId).emit('updateUsers', currRoom.users)
-        this.in(GAME_HALL_ID).emit('setRoomsList', getRoomsList()); //update in hall
+        const updatedUsers = currRoom.users.filter((user) => user.id !== data.userId)
+        await updateFieldInDB('rooms', data.roomId, 'users', JSON.stringify(updatedUsers))
+        this.in(data.roomId).emit('updateUsers', updatedUsers)
+        const uList = await getRoomsList()
+        this.in(GAME_HALL_ID).emit('setRoomsList', uList); //update in hall
       }
 
       //check if was countdown
-      if (currRoom.status === 'countdown' && currRoom.users.length < currRoom.minPersons){
-        currRoom.status = 'collecting';
-        clearTimer(data.roomId)
+      if (currRoom.status === 'countdown' && currRoom.users.length - 1 < currRoom.min_persons){
         this.in(data.roomId).emit('updateGameTitle', 'Набор игроков')
+        this.in(data.roomId).emit('setCountdown', 0);
+        await updateFieldInDB('rooms', data.roomId, 'status', 'collecting')
+        await updateFieldInDB('rooms', data.roomId, 'game_is_timer_active', false)
       }
+
+    } catch (error) {
+      return cb({ status: 'error', text: 'Error in leaveRoom' })
     }
   })
 
@@ -775,25 +820,32 @@ function mySocket(socket) {
   //--------------------------------------------------------------------------------
   //disconnect
   //--------------------------------------------------------------------------------
-  socket.on("disconnect", () => {
-    const currRoom = rooms.find(r => r.users.some(user => user.socketId === socket.id))
+  socket.on("disconnect", async () => {
+    try {
+      const roomsWithUser = await pool.query('SELECT * FROM rooms WHERE EXISTS ( SELECT * FROM jsonb_array_elements(users) u WHERE u->>\'socketId\' = $1 );', [socket.id])
+      const currRoom = roomsWithUser.rows[0]
 
-    if (currRoom && currRoom.status !== 'playing') {
-      socket.leave(currRoom.id);
-
-      sendChatMsg(currRoom.id, 'server', `Игрок ${currRoom.users.find(user => user.socketId === socket.id).nickname} вышел`, false)
-
-      //remove user
-      currRoom.users = currRoom.users.filter((user) => user.socketId !== socket.id)
-      this.in(currRoom.id).emit('updateUsers', currRoom.users)
-      this.in(GAME_HALL_ID).emit('setRoomsList', getRoomsList()); //update in hall
-
-      //check if was countdown
-      if (currRoom.status === 'countdown' && currRoom.users.length < currRoom.minPersons){
-        currRoom.status = 'collecting';
-        clearTimer(currRoom.id)
-        this.in(currRoom.id).emit('updateGameTitle', 'Набор игроков')
+      if (currRoom?.status !== 'playing') {
+        socket.leave(currRoom.id);
+  
+        sendChatMsg(currRoom.id, 'server', `Игрок ${currRoom.users.find(user => user.socketId === socket.id).nickname} вышел`, false)
+  
+        //remove user
+        const updatedUsers = currRoom.users.filter((user) => user.socketId !== socket.id)
+        await updateFieldInDB('rooms', currRoom.id, 'users', JSON.stringify(updatedUsers))
+        this.in(currRoom.id).emit('updateUsers', updatedUsers)
+        const uList = await getRoomsList();
+        this.in(GAME_HALL_ID).emit('setRoomsList', uList); //update in hall
+  
+        //check if was countdown
+        if (currRoom.status === 'countdown' && currRoom.users.length < currRoom.min_persons){
+          await updateFieldInDB('rooms', currRoom.id, 'status', 'collecting')
+          await updateFieldInDB('rooms', currRoom.id, 'game_is_timer_active', false)
+          this.in(currRoom.id).emit('updateGameTitle', 'Набор игроков')
+        }
       }
+    } catch (error) {
+      console.log('Error in disconnect', error.message);
     }
   });
 }
