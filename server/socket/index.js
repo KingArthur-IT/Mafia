@@ -51,6 +51,8 @@ const updateFieldInDB = async (table, id, field, value) => {
 // Main function
 function mySocket(socket) {
 
+  // await updateFieldInDB('rooms', currRoom.id, 'status', 'collecting')
+  // await updateFieldInDB('rooms', currRoom.id, 'game_is_timer_active', false)
   // const clearTimer = async (roomId) => {
   //   this.in(roomId).emit('setCountdown', 0);
   //   const timerID = await pool.query('SELECT game_timer_id FROM rooms WHERE id = $1;', [roomId])
@@ -68,27 +70,25 @@ function mySocket(socket) {
     if (!isHidden)
         this.in(roomId).emit('newChatMsg', { author, text, isHidden });  
     else {
-      const users = await pool.query('SELECT users FROM rooms WHERE id = $1')
-      const usersInRoom = users.rows[0]
+      const users = await getFieldValue('rooms', roomId, 'users')
 
-      usersInRoom.forEach(user => this.to(user.socketId).emit("newChatMsg", { author, text, isHidden }))
+      users.forEach(user => this.to(user.socketId).emit("newChatMsg", { author, text, isHidden }))
     }
   }
 
-  const sendGameDataToRoom = (roomId, title, isChatEnable, isMaffiaInChat) => {
-    const currRoom = rooms.find(room => room.id === roomId)
-
+  const sendGameDataToRoom = async (roomId, title, isChatEnable, isMaffiaInChat) => {
     this.in(roomId).emit('updateGameTitle', title);
-
     this.in(roomId).emit('chatEnable', isChatEnable);
-    currRoom.gameData.chatEnable = isChatEnable
-    currRoom.gameData.mafiaInChat = isMaffiaInChat
+
+    await updateFieldInDB('rooms', roomId, 'game_chat_enable', isChatEnable)
+    await updateFieldInDB('rooms', roomId, 'game_mafia_in_chat', isMaffiaInChat)
     
-    this.in(roomId).emit('setCountdown', currRoom.gameData.timeCounter);
+    const timerCounter = await getFieldValue('rooms', roomId, 'game_timer_counter')
+    this.in(roomId).emit('setCountdown', timerCounter);
   }
 
-  const setGameStage = (roomId, stage) => {
-    rooms.find(room => room.id === roomId).gameData.gameStage = stage
+  const setGameStage = async (roomId, stage) => {
+    await updateFieldInDB('rooms', roomId, 'game_stage', stage)
     this.in(roomId).emit('setGameStage', stage);
   }
 
@@ -151,12 +151,21 @@ function mySocket(socket) {
 
   //--------------------------------------------------------------------------------
 
-  const distributeRoles = (currRoom) => {
-    const roles = getRolesCount(currRoom.users.length, currRoom.roles)
+  const distributeRoles = async (currRoom) => {
+    const maxSetedRoles = [
+      { role: 'lover', count: currRoom.lover_max_count },
+      { role: 'reporter', count: currRoom.reporter_max_count },
+      { role: 'barmen', count: currRoom.barmen_max_count },
+      { role: 'doctor', count: currRoom.doctor_max_count },
+      { role: 'bodyguard', count: currRoom.bodyguard_max_count },
+      { role: 'terrorist', count: currRoom.terrorist_max_count }
+    ]
+    const roles = getRolesCount(currRoom.users.length, maxSetedRoles)
     const rolesEntries = Object.entries(roles)
 
     //распределить роли
-    currRoom.users.forEach((user) => {
+    const users = currRoom.users
+    users.forEach((user) => {
         if (rolesEntries.length) {
             const rand = Math.round( Math.random() * (rolesEntries.length - 1) )
             user.role = rolesEntries[rand][0]
@@ -169,10 +178,11 @@ function mySocket(socket) {
 
         this.to(user.socketId).emit("setPlayerRole", user.role)
     })
+    await updateFieldInDB('rooms', currRoom.id, 'users', JSON.stringify(users))
 
     //мафия видит мафию
-    currRoom.users.filter((user) => user.role === 'mafia').forEach( user =>
-      this.to(user.socketId).emit("updateUsers", currRoom.users.map( ({ socketId, id, nickname, gender, role, isLive, labels, isActionSend }) => 
+    users.filter((user) => user.role === 'mafia').forEach( user =>
+      this.to(user.socketId).emit("updateUsers", users.map( ({ socketId, id, nickname, gender, role, isLive, labels, isActionSend }) => 
         ({ socketId, id, nickname, gender, role: role !== 'mafia' && role !== 'terrorist' ? 'unknown' : role, isLive, labels, isActionSend })
       ))
     )
@@ -227,83 +237,110 @@ function mySocket(socket) {
 
   //--------------------------------------------------------------------------------
 
-  const clearLabelsList = (roomId) => {
-    rooms.find(room => room.id === roomId).users.forEach((user) => {
+  const clearLabelsList = async (roomId) => {
+    const currRoom = await getTableData('rooms', roomId)
+
+    const users = currRoom.users
+    users.forEach((user) => {
       user.labels = user.labels.filter(lbl => lbl === 'sheriff' || lbl === 'reporter' || lbl === 'bodyguard');
       this.to(user.socketId).emit('setLabels', user.labels)
     })
+
+    await updateFieldInDB('rooms', roomId, 'users', JSON.stringify(users))
   }
 
-  const setLabel = (roomId, actionUserId, labelName) => {
-    const selectedUser = rooms.find(room => room.id === roomId).users.find((user) => user.id === actionUserId)
+  const setLabel = async (roomId, actionUserId, labelName) => {
+    const users = await getFieldValue('rooms', roomId, 'users')
+    const selectedUser = users.find((user) => user.id === actionUserId)
     selectedUser.labels.push(labelName)
+
+    await updateFieldInDB('rooms', roomId, 'users', JSON.stringify(users))
+
     this.to(selectedUser.socketId).emit('setLabel', labelName);
   }
 
-  const removeBodyguardLabel = (roomId) => {
-    rooms.find(room => room.id === roomId).users.forEach((user) => {
+  const removeBodyguardLabel = async (roomId) => {
+    const currRoom = await getTableData('rooms', roomId)
+
+    currRoom.users.forEach((user) => {
       user.labels = user.labels.filter(lbl => lbl !== 'bodyguard');
       this.to(user.socketId).emit('setLabels', user.labels)
     })
+
+    await updateFieldInDB('rooms', roomId, 'users', JSON.stringify(currRoom.users))
   }
 
   //--------------------------------------------------------------------------------
 
-  const clearActionSend = (roomId) => {
-    rooms.find(room => room.id === roomId).users.forEach((user) => {
+  const clearActionSend = async (roomId) => {
+    const currRoom = await getTableData('rooms', roomId)
+
+    currRoom.users.forEach((user) => {
       user.isActionSend = false
       this.to(user.socketId).emit('setActionSend', false)
     })
+
+    await updateFieldInDB('rooms', roomId, 'users', JSON.stringify(currRoom.users))
   }
 
-  const updateActionSend = (roomId, userId, val) => {
-    const user = rooms.find(room => room.id === roomId).users.find((user) => user.id === userId)
+  const updateActionSend = async (roomId, userId, val) => {
+    const currRoom = await getTableData('rooms', roomId)
+    
+    const users = currRoom.users
+    const user = users.find((user) => user.id === userId)
     user.isActionSend = val
+    await updateFieldInDB('rooms', roomId, 'users', JSON.stringify(users))
+
     this.to(user.socketId).emit('setActionSend', val);
   }
 
   //--------------------------------------------------------------------------------
 
-  const openNewGameStep = (roomId) => {
-    const gameStage = rooms.find(room => room.id === roomId).gameData.gameStage
-    rooms.find(room => room.id === roomId).gameData.timeCounter = STEPS_TIMER_COUNT
-    clearActionSend(roomId)
+  const openNewGameStep = async (roomId) => {
+    const gameStage = await getFieldValue('rooms', roomId, 'game_stage')
+    await updateFieldInDB('rooms', roomId, 'game_timer_counter', STEPS_TIMER_COUNT)
+    await clearActionSend(roomId)
+
+    const currRoom = await getTableData('rooms', roomId)
     this.in(roomId).emit('updateVoicesCount', {});
-    this.in(roomId).emit('setMafiaPlayersCount', rooms.find(room => room.id === roomId).users.filter(user => user.isLive && ['mafia', 'barmen', 'terrorist'].includes(user.role)).length);
+    this.in(roomId).emit('setMafiaPlayersCount', currRoom.users.filter(user => user.isLive && ['mafia', 'barmen', 'terrorist'].includes(user.role)).length);
 
     if (gameStage === 1) {
-      sendGameDataToRoom(roomId, 'Ночь. Мафия в чате', true, true)
-      clearLabelsList(roomId)
+      await sendGameDataToRoom(roomId, 'Ночь. Мафия в чате', true, true)
+      await clearLabelsList(roomId)
     }
     if (gameStage === 2) {
-      rooms.find(room => room.id === roomId).gameData.votedUsers = []
-      sendGameDataToRoom(roomId, 'Мафия выбирает жертву', false, false)
+      await updateFieldInDB('rooms', roomId, game_voted_users, '[]')
+      await sendGameDataToRoom(roomId, 'Мафия выбирает жертву', false, false)
     }
     if (gameStage === 3) {
-      sendGameDataToRoom(roomId, 'День. Общее обсуждение', true, false)
-      removeBodyguardLabel(roomId)
+      await sendGameDataToRoom(roomId, 'День. Общее обсуждение', true, false)
+      await removeBodyguardLabel(roomId)
     }
     if (gameStage === 4) {
-      rooms.find(room => room.id === roomId).gameData.votedUsers = []
-      sendGameDataToRoom(roomId, 'День. Голосование', false, false)
+      await updateFieldInDB('rooms', roomId, game_voted_users, '[]')
+      await sendGameDataToRoom(roomId, 'День. Голосование', false, false)
     }
   }
 
   //--------------------------------------------------------------------------------
 
-  const startGame = (data) => {
-    const currRoom = rooms.find(room => room.id === data.roomId)
+  const startGame = async (data) => {
+    const currRoom = await getTableData('rooms', data.roomId)
+
+    await updateFieldInDB('rooms', data.roomId, 'status', 'playing')
+    await updateFieldInDB('rooms', data.roomId, 'game_is_timer_active', false)
     
-    clearTimer(data.roomId)
     setGameStage(data.roomId, 1)
 
-    currRoom.status = 'playing';
-
-    this.in(GAME_HALL_ID).emit('setRoomsList', getRoomsList()); //emit in hall
+    const uList = await getRoomsList()
+    this.in(GAME_HALL_ID).emit('setRoomsList', uList); //emit in hall
     
     distributeRoles(currRoom) //распределить роли
     openNewGameStep(data.roomId)
 
+    //!!!
+    return
     currRoom.gameData.timerID = setInterval(() => {
       currRoom.gameData.timeCounter --
 
@@ -429,7 +466,7 @@ function mySocket(socket) {
   }
 
   //--------------------------------------------------------------------------------
-  //enter game hall +
+  //enter game hall
   //--------------------------------------------------------------------------------
   socket.on('enterGameHall', async (data, cb) => {  // data: { userId }
     try {
@@ -541,16 +578,16 @@ function mySocket(socket) {
 
       let intervalCounter = STEPS_TIMER_COUNT
       await updateFieldInDB('rooms', data.roomId, 'game_is_timer_active', true)
+      
       const intervalId = setInterval(function(){
         const isTimerActive = getFieldValue('rooms', data.roomId, 'game_is_timer_active')
         pool.query('UPDATE rooms SET game_timer_counter = game_timer_counter - 1 WHERE id = $1', [data.roomId])
         intervalCounter --
-        if (!isTimerActive) {
+        if (!isTimerActive)
           clearInterval(intervalId)
-        }
         if (intervalCounter <= 0) {
           clearInterval(intervalId)
-          // startGame(data)
+          startGame(data)
         }
       }, 1000)
     }
@@ -603,27 +640,22 @@ function mySocket(socket) {
   //--------------------------------------------------------------------------------
   //send msg
   //--------------------------------------------------------------------------------
-  socket.on('sendMsg', (data, cb) => { //data: { userId, nickname, roomId, msgText }
-    if (!data.userId || !data.roomId){
-      return cb({ status: 'error', text: 'Данные пользователя не корректны' })
-    } else {
-      const currRoom = rooms.find(room => room.id === data.roomId);
-      const currUser = users.find(user => user.id === data.userId);
+  socket.on('sendMsg', async (data, cb) => { //data: { userId, nickname, roomId, msgText }
+    try {
+      if (!data.userId || !data.roomId)
+        return cb({ status: 'error', text: 'Данные пользователя не корректны' })
       
-      if (!currRoom || !currUser) {
-        cb({ status: 'error', text: 'Room or user not found' })
-        return
-      }
+      const currRoom = await getTableData('rooms', data.roomId)
+      const currUser = await getTableData('users', data.userId)
       
-      if (!currRoom.gameData.chatEnable) {
-        cb({ status: 'error', text: 'You cant send message now' })
-        return
-      }
+      if (!currRoom || !currUser)
+        return cb({ status: 'error', text: 'Room or user not found' })
+      
+      if (!currRoom.game_chat_enable)
+        return cb({ status: 'error', text: 'You cant send message now' })
 
-      if (currRoom.gameData.mafiaInChat && currRoom.users.find(usr => usr.id === currUser.id).role !== 'mafia') {
-        cb({ status: 'error', text: 'You cant send message now. Mafia in chat' })
-        return
-      }
+      if (currRoom.game_mafia_in_chat && currRoom.users.find(usr => usr.id === currUser.id).role !== 'mafia')
+        return cb({ status: 'error', text: 'You cant send message now. Mafia in chat' })
 
       //ok
       cb({ status: 'ok' });
@@ -631,9 +663,12 @@ function mySocket(socket) {
       const labels = currRoom.users.find((user) => user.id === currUser.id).labels
       sendChatMsg(data.roomId, data.nickname, 
         !labels.includes('barmen') ? data.msgText : shuffle(data.msgText), 
-        currRoom.gameData.mafiaInChat
+        currRoom.game_mafia_in_chat
       )
+    } catch (error) {
+      return cb({ status: 'error', text: 'Error in sendMsg' })
     }
+    
   })
 
   //--------------------------------------------------------------------------------
@@ -823,6 +858,7 @@ function mySocket(socket) {
   socket.on("disconnect", async () => {
     try {
       const roomsWithUser = await pool.query('SELECT * FROM rooms WHERE EXISTS ( SELECT * FROM jsonb_array_elements(users) u WHERE u->>\'socketId\' = $1 );', [socket.id])
+      // console.log(roomsWithUser);
       const currRoom = roomsWithUser.rows[0]
 
       if (currRoom?.status !== 'playing') {
@@ -851,3 +887,13 @@ function mySocket(socket) {
 }
 
 module.exports = mySocket
+
+// UPDATE rooms
+// SET users = jsonb_set(users, 
+//     (SELECT ARRAY_POSITION(users, u) FROM jsonb_array_elements(users) u WHERE u->>'id' = 'user_id' LIMIT 1), 
+//     jsonb_set(users->(SELECT ARRAY_POSITION(users, u) FROM jsonb_array_elements(users) u WHERE u->>'id' = 'user_id' LIMIT 1), '{socketId}', '"new_socket_id"')
+// )
+// WHERE id = 'room_id';
+
+// const updatedUsers = currRoom.users.filter((user) => user.id !== data.userId)
+// await updateFieldInDB('rooms', data.roomId, 'users', JSON.stringify(updatedUsers))
